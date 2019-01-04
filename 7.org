@@ -23,6 +23,7 @@
 
  此一谓词应当被定义，但缺失于第 6 修订版中。
 
+
 *** 7.2. 点对和列表
 
  过程: (atom? obj)
@@ -251,7 +252,7 @@
  #+END_SRC
 
 
-*** 7.3. Characters
+*** 7.3. 字符
 
  Chez Scheme 以两种方式扩展了字符的语法。其一，前缀 ~#\~ 后面紧跟 3 位八进制数字会被读取为一个字符，其数字编码即为此 3 位数的八进制值，例如， ~#\044~ 被读取为 ~#\$~. 其二，它可以识别若干非标准命名的字符： ~#\rubout~ (等同于 ~#\delete~)， ~#\bel~ (等同于 ~#\alarm~), ~#\vt~ (等同于 ~#\vtab~), ~#\nel~ (Unicode NEL 字符), 以及 ~#\ls~ (Unicode LS 字符). 非标准字符的名字可以通过过程 ~char-name~ 更改（参见 9.14 节）。
 
@@ -324,7 +325,7 @@
  #+END_SRC
 
 
-*** 7.4. Strings
+*** 7.4. 字符串
 
  Chez Scheme extends the standard string syntax with two character escapes: \', which produces the single quote character, and \nnn, i.e., backslash followed by 3 octal digits, which produces the character equivalent of the octal value of the 3 digits. These extensions are disabled in an input stream after #!r6rs has been seen by the reader, unless #!chezscheme has been seen more recently.
 
@@ -333,287 +334,421 @@
  The length and indices of a string in Chez Scheme are always fixnums.
 
  过程: (string=? string1 string2 string3 ...)
+
  过程: (string<? string1 string2 string3 ...)
+
  过程: (string>? string1 string2 string3 ...)
+
  过程: (string<=? string1 string2 string3 ...)
+
  过程: (string>=? string1 string2 string3 ...)
+
  过程: (string-ci=? string1 string2 string3 ...)
+
  过程: (string-ci<? string1 string2 string3 ...)
+
  过程: (string-ci>? string1 string2 string3 ...)
+
  过程: (string-ci<=? string1 string2 string3 ...)
+
  过程: (string-ci>=? string1 string2 string3 ...)
- 返回: #t if the relation holds, #f otherwise
+
+ 返回: 如果关系成立，则为 ~#t~, 否则为 ~#f~.
+
  库: (chezscheme)
 
- These predicates are identical to the Revised6 Report counterparts, except they are extended to accept one or more rather than two or more arguments. When passed one argument, each of these predicates 返回 #t.
+ 这些谓词与第 6 修订版中的对应版本是一样的，只是被扩展为接受一个以上参数，而非两个以上参数。当只传入一个参数时，这些谓词均返回 ~#t~.
 
- (string>? "a") => #t
- (string<? "a") => #t
- (string-ci=? "a") => #t
+ #+BEGIN_SRC scheme
+   (string>? "a") => #t
+   (string<? "a") => #t
+   (string-ci=? "a") => #t
+ #+END_SRC
+
 
  过程: (string-copy! src src-start dst dst-start n)
+
  返回: unspecified
+
  库: (chezscheme)
 
- src and dst must be strings, and dst must be mutable. src-start, dst-start, and n must be exact nonnegative integers. The sum of src-start and n must not exceed the length of src, and the sum of dst-start and n must not exceed the length of dst.
+ ~src~ 和 ~dst~ 必须是字符串，且 ~dst~ 必须可变。 ~src-start~, ~dst-start~, 以及 ~n~ 必须是非负整数。 ~src-start~ 和 ~n~ 的和不能超过 ~src~ 的长度， ~dst-start~ 和 ~n~ 的和不能超过 ~dst~ 的长度。
 
- string-copy! overwrites the n bytes of dst starting at dst-start with the n bytes of dst starting at src-start. This works even if dst is the same string as src and the source and destination locations overlap. That is, the destination is filled with the characters that appeared at the source before the operation began.
+ ~string-copy!~ 以 ~src~ 中起始于 ~src-start~ 长度为 ~n~ 字节的部分，覆盖 ~dst~ 中起始于 ~dst-start~ ，长度为 ~n~ 字节的部分。即使 ~dst~ 和 ~src~ 是同一个字符串，且源和目标位置相互重叠，这个操作也能生效。即，在操作开始时，目标位置先被源字符串中的字符填充。
 
- (define s1 "to boldly go")
- (define s2 (make-string 10 #\-))
+ #+BEGIN_SRC scheme
+   (define s1 "to boldly go")
+   (define s2 (make-string 10 #\-))
 
- (string-copy! s1 3 s2 1 3)
- s2 => "-bol------"
- 
- (string-copy! s1 7 s2 4 2)
- s2 => "-bolly----"
- 
- (string-copy! s2 2 s2 5 4)
- s2 => "-bollolly-"
+   (string-copy! s1 3 s2 1 3)
+   s2 => "-bol------"
+
+   (string-copy! s1 7 s2 4 2)
+   s2 => "-bolly----"
+
+   (string-copy! s2 2 s2 5 4)
+   s2 => "-bollolly-"
+ #+END_SRC
+
 
  过程: (substring-fill! string start end char)
+
  返回: unspecified
+
  库: (chezscheme)
 
- string must be mutable. The characters of string from start (inclusive) to end (exclusive) are set to char. start and end must be nonnegative integers; start must be strictly less than the length of string, while end may be less than or equal to the length of string. If end ≤ start, the string is left unchanged.
+ 字符串必须是可变的。字符串于 ~start~ (包含) 和 ~end~ (不包含) 之间的字符均被设置为 ~char~. ~start~ 和 ~end~ 必须是非负整数； ~start~ 必须小于字符串的长度，而 ~end~ 可以小于或等于字符串的长度。如果 =end ≤ start=, 则字符串保持不变。
 
- (let ([str (string-copy "a tpyo typo")])
-   (substring-fill! str 2 6 #\X)
-   str) => "a XXXX typo"
+ #+BEGIN_SRC scheme
+   (let ([str (string-copy "a tpyo typo")])
+     (substring-fill! str 2 6 #\X)
+     str) => "a XXXX typo"
+ #+END_SRC
+
 
  过程: (string-truncate! string n)
- 返回: string or the empty string
+
+ 返回: 字符串或空字符串
+
  库: (chezscheme)
 
- string must be mutable. n must be an exact nonnegative fixnum not greater than the length of string. If n is zero, string-truncate! 返回 the empty string. Otherwise, string-truncate! destructively truncates string to its first n characters and 返回 string.
+ 字符串必须是可变的。 ~n~ 必须是精确的非负 ~fixnum~, 且不大于字符串的长度。如果 ~n~ 是 0, ~string-truncate!~ 返回空字符串。否则， ~string-truncate!~ 破坏性地把字符串缩短为其前 ~n~ 个字符，并返回此字符串。
 
- (define s (make-string 7 #\$))
- (string-truncate! s 0) => ""
- s => "$$$$$$$"
- (string-truncate! s 3) => "$$$"
- s => "$$$"
+ #+BEGIN_SRC scheme
+   (define s (make-string 7 #\$))
+   (string-truncate! s 0) => ""
+   s => "$$$$$$$"
+   (string-truncate! s 3) => "$$$"
+   s => "$$$"
+ #+END_SRC
+
 
  过程: (mutable-string? obj)
- 返回: #t if obj is a mutable string, #f otherwise
+
+ 返回: 如果 ~obj~ 是可变字符串，则为 ~#t~, 否则为 ~#f~.
+
  过程: (immutable-string? obj)
- 返回: #t if obj is an immutable string, #f otherwise
+
+ 返回: 如果 ~obj~ 是不可变字符串，则为 ~#t~, 否则为 ~#f~.
+
  库: (chezscheme)
 
- (mutable-string? (string #\a #\b #\c)) => #t
- (mutable-string? (string->immutable-string "abc")) => #f
- (immutable-string? (string #\a #\b #\c)) => #f
- (immutable-string? (string->immutable-string "abc")) => #t
- (immutable-string? (cons 3 4)) => #f
+ #+BEGIN_SRC scheme
+   (mutable-string? (string #\a #\b #\c)) => #t
+   (mutable-string? (string->immutable-string "abc")) => #f
+   (immutable-string? (string #\a #\b #\c)) => #f
+   (immutable-string? (string->immutable-string "abc")) => #t
+   (immutable-string? (cons 3 4)) => #f
+ #+END_SRC
+
 
  过程: (string->immutable-string string)
- 返回: an immutable string equal to string
+
+ 返回: 与 ~string~ 相等(equal)的不可变字符串
+
  库: (chezscheme)
 
- The result is string itself if string is immutable; otherwise, the result is an immutable string with the same content as string.
+ 如果 ~string~ 是不可变字符串，则结果为其本身；否则，结果是个不可变字符串，其内容与 ~string~ 相同。
 
- (define s (string->immutable-string (string #\x #\y #\z)))
- (string-set! s 0 #\a) => exception: not mutable
+ #+BEGIN_SRC scheme 
+   (define s (string->immutable-string (string #\x #\y #\z)))
+   (string-set! s 0 #\a) => exception: not mutable
+ #+END_SRC
+
 
 *** 7.5. Vectors
  Chez Scheme extends the syntax of vectors to allow the length of the vector to be specified between the # and open parenthesis, e.g., #3(a b c). If fewer elements are supplied in the syntax than the specified length, each element after the last printed element is the same as the last printed element. This extension is disabled in an input stream after #!r6rs has been seen by the reader, unless #!chezscheme has been seen more recently.
 
  The length and indices of a vector in Chez Scheme are always fixnums.
 
- All vectors are mutable by default, including constants. A program can create immutable vectors via vector->immutable-vector. Any attempt to modify an immutable vector causes an exception to be raised.
+ 所有向量默认都是可变的，包括常量。程序可以通过 ~vector->immutable-vector~ 创建不可变向量。尝试修改不可变向量会导致抛出异常。
 
  过程: (vector-copy vector)
- 返回: a copy of vector
+
+ 返回: ~vector~ 的一份拷贝
+
  库: (chezscheme)
 
- vector-copy creates a new vector of the same length and contents as vector. The elements themselves are not copied.
+ ~vector-copy~ 生成一个长度和内容都和 ~vector~ 相同的新向量。里面的元素本身并不被复制。
 
- (vector-copy '#(a b c)) => #(a b c)
+ #+BEGIN_SRC scheme
+   (vector-copy '#(a b c)) => #(a b c)
 
- (let ([v '#(a b c)])
-   (eq? v (vector-copy v))) => #f
+   (let ([v '#(a b c)])
+     (eq? v (vector-copy v))) => #f
+ #+END_SRC
+
 
  过程: (vector-set-fixnum! vector n fixnum)
+
  返回: unspecified
+
  库: (chezscheme)
 
- vector must be mutable. vector-set-fixnum! changes the nth element of vector to fixnum. n must be an exact nonnegative integer strictly less than the length of vector.
+ 向量必须是不可变的。 ~vector-set-fixnum!~ 把向量的第 ~n~ 个元素变更为 ~fixnum~. ~n~ 必须是一个确切的非负整数，且严格小于 ~vector~ 的长度。
 
  It is faster to store a fixnum than an arbitrary value, since for arbitrary values, the system has to record potential assignments from older to younger objects to support generational garbage collection. Care must be taken to ensure that the argument is indeed a fixnum, however; otherwise, the collector may not properly track the assignment. The primitive performs a fixnum check on the argument except at optimization level 3.
+ 储存 ~fixnum~ 要比储存任意值快，因为对于任意值，
 
- See also the description of fixnum-only vectors (fxvectors) below.
+ 参见后面关于仅由 =fixnum= 构成的向量 (=fxvectors=) 的描述。
 
- (let ([v (vector 1 2 3 4 5)])
-   (vector-set-fixnum! v 2 73)
-   v) => #(1 2 73 4 5)
+ #+BEGIN_SRC scheme
+   (let ([v (vector 1 2 3 4 5)])
+     (vector-set-fixnum! v 2 73)
+     v) => #(1 2 73 4 5)
+ #+END_SRC
+
 
  过程: (vector-cas! vector n old-obj new-obj)
- 返回: #t if vector is changed, #f otherwise
+
+ 返回: 如果 ~vector~ 有改变，则为 ~#t~, 否则为 ~#f~.
+
  库: (chezscheme)
 
- vector must be mutable. vector-cas! atomically changes the nth element of vector to new-obj if the replaced nth element is eq? to old-obj. If the nth element of vector that would be replaced is not eq? to old-obj, then vector is unchanged.
+ 向量必须是可变的。 若 ~vector~ 的第 ~n~ 个元素和 ~old-obj~ 相等（使用 ~eq?~ 判断相等性）, 则 ~vector-cas!~ 自动将此元素替换为 ~new-obj~, 若不相等，则 ~vector~ 保持不变。
 
- (define v (vector 'old0 'old1 'old2))
- (vector-cas! v 1 'old1 'new1) => #t
- (vector-ref v 1) => 'new1
- (vector-cas! v 2 'old1 'new2) => #f
- (vector-ref v 2) => 'old2
+ #+BEGIN_SRC scheme
+   (define v (vector 'old0 'old1 'old2))
+   (vector-cas! v 1 'old1 'new1) => #t
+   (vector-ref v 1) => 'new1
+   (vector-cas! v 2 'old1 'new2) => #f
+   (vector-ref v 2) => 'old2
+ #+END_SRC
+
 
  过程: (mutable-vector? obj)
- 返回: #t if obj is a mutable vector, #f otherwise
+
+ 返回: 如果 ~obj~ 是可变向量，则为 ~#t~, 否则为 ~#f~.
+
  过程: (immutable-vector? obj)
- 返回: #t if obj is an immutable vector, #f otherwise
+
+ 返回: 如果 ~obj~ 是不可变向量，则为 ~#t~, 否则为 ~#f~.
+
  库: (chezscheme)
 
- (mutable-vector? (vector 1 2 3)) => #t
- (mutable-vector? (vector->immutable-vector (vector 1 2 3))) => #f
- (immutable-vector? (vector 1 2 3)) => #f
- (immutable-vector? (vector->immutable-vector (vector 1 2 3))) => #t
- (immutable-vector? (cons 3 4)) => #f
+ #+BEGIN_SRC scheme
+   (mutable-vector? (vector 1 2 3)) => #t
+   (mutable-vector? (vector->immutable-vector (vector 1 2 3))) => #f
+   (immutable-vector? (vector 1 2 3)) => #f
+   (immutable-vector? (vector->immutable-vector (vector 1 2 3))) => #t
+   (immutable-vector? (cons 3 4)) => #f
+ #+END_SRC
+
 
  过程: (vector->immutable-vector vector)
- 返回: an immutable vector equal to vector
+
+ 返回: 与 ~vector~ 相等(equal)的一个不可变向量
+
  库: (chezscheme)
 
- The result is vector itself if vector is immutable; otherwise, the result is an immutable vector with the same content as vector.
+ 如果 ~vector~ 是不可变向量，则结果为其本身；否则，结果是与 ~vector~ 内容相同的一个不可变向量。
 
- (define v (vector->immutable-vector (vector 1 2 3)))
- (vector-set! v 0 0) => exception: not mutable
+ #+BEGIN_SRC scheme
+   (define v (vector->immutable-vector (vector 1 2 3)))
+   (vector-set! v 0 0) => exception: not mutable
+ #+END_SRC
 
-*** 7.6. Fixnum-Only Vectors
 
- Fixnum-only vectors, or "fxvectors," are like vectors but contain only fixnums. Fxvectors are written with the #vfx prefix in place of the # prefix for vectors, e.g., #vfx(1 2 3) or #10vfx(2). The fxvector syntax is disabled in an input stream after #!r6rs has been seen by the reader, unless #!chezscheme has been seen more recently.
+*** 7.6. 全定长数向量 (Fixnum-Only Vectors)
 
- The length and indices of an fxvector are always fixnums.
+ Fixnum-only 向量, 即 "fxvectors", 类似于向量，但只包含 ~fixnums~. Fxvectors 的写法是以前缀 =#vfx= 替换向量的前缀 =#=, 例如， ~#vfx(1 2 3)~ 或 ~#10vfx(2)~. The fxvector syntax is disabled in an input stream after #!r6rs has been seen by the reader, unless #!chezscheme has been seen more recently.
+
+ ~fxvector~ 的长度和索引总是定长数。
 
  Updating an fxvector is generally less expensive than updating a vector, since for vectors, the system records potential assignments from older to younger objects to support generational garbage collection. The storage management system also takes advantage of the fact that fxvectors contain no pointers to place them in an area of memory that does not have to be traced during collection.
+ 更新 ~fxvector~ 通常比更新向量节省资源，因为对于向量来说，系统需要记录从老到新的各个对象的潜在分配，以支持分代垃圾回收。 =fxvectors= 不包含任何指针，受益于此，存储管理系统 TODO
 
- All fxvectors are mutable by default, including constants. A program can create immutable fxvectors via fxvector->immutable-fxvector. Any attempt to modify an immutable fxvector causes an exception to be raised.
+ 所有 ~fxvectors~ 默认是可变的，包括常量。程序可以通过 ~fxvector->immutable-fxvector~ 创建不可变的 ~fxvectors~. 尝试修改一个不可变的 ~fxvector~ 会导致异常抛出。
 
- See also vector-set-fixnum! above.
+ 可参考前述的 ~vector-set-fixnum!~.
 
  过程: (fxvector? obj)
- 返回: #t if obj is an fxvector, #f otherwise
+
+ 返回: 如果 ~obj~ 是一个 ~fxvector~, 则为 ~#t~, 否则为 ~#f~.
+
  库: (chezscheme)
 
- (fxvector? #vfx()) => #t
- (fxvector? #vfx(1 2 3)) => #t
- (fxvector? (fxvector 1 2 3)) => #t
- (fxvector? '#(a b c)) => #f
- (fxvector? '(a b c)) => #f
- (fxvector? "abc") => #f
+ #+BEGIN_SRC scheme
+   (fxvector? #vfx()) => #t
+   (fxvector? #vfx(1 2 3)) => #t
+   (fxvector? (fxvector 1 2 3)) => #t
+   (fxvector? '#(a b c)) => #f
+   (fxvector? '(a b c)) => #f
+   (fxvector? "abc") => #f
+ #+END_SRC
+
 
  过程: (fxvector fixnum ...)
- 返回: an fxvector of the fixnums fixnum ...
+
+ 返回: 一个由参数中的所有定长数组成的 ~fxvector~.
+
  库: (chezscheme)
 
- (fxvector) => #vfx()
- (fxvector 1 3 5) => #vfx(1 3 5)
+ #+BEGIN_SRC scheme
+   (fxvector) => #vfx()
+   (fxvector 1 3 5) => #vfx(1 3 5)
+ #+END_SRC
+
 
  过程: (make-fxvector n)
+
  过程: (make-fxvector n fixnum)
- 返回: an fxvector of length n
+
+ 返回: 一个长度为 ~n~ 的 ~fxvector~.
+
  库: (chezscheme)
 
  n must be a fixnum. If fixnum is supplied, each element of the fxvector is initialized to fixnum; otherwise, the elements are unspecified.
+ ~n~ 必须是定长数。如果有提供参数 ~fixnum~, 则 ~fxvector~ 中的每个元素都被初始化为 ~fixnum~; 不然，元素则均为未定义。
 
- (make-fxvector 0) => #vfx()
- (make-fxvector 0 7) => #vfx()
- (make-fxvector 5 7) => #vfx(7 7 7 7 7)
+ #+BEGIN_SRC scheme
+   (make-fxvector 0) => #vfx()
+   (make-fxvector 0 7) => #vfx()
+   (make-fxvector 5 7) => #vfx(7 7 7 7 7)
+ #+END_SRC
+
 
  过程: (fxvector-length fxvector)
- 返回: the number of elements in fxvector
+
+ 返回: ~fxvector~ 中的元素个数
+
  库: (chezscheme)
 
- (fxvector-length #vfx()) => 0
- (fxvector-length #vfx(1 2 3)) => 3
- (fxvector-length #10vfx(1 2 3)) => 10
- (fxvector-length (fxvector 1 2 3 4)) => 4
- (fxvector-length (make-fxvector 300)) => 300
+ #+BEGIN_SRC scheme
+   (fxvector-length #vfx()) => 0
+   (fxvector-length #vfx(1 2 3)) => 3
+   (fxvector-length #10vfx(1 2 3)) => 10
+   (fxvector-length (fxvector 1 2 3 4)) => 4
+   (fxvector-length (make-fxvector 300)) => 300
+ #+END_SRC
+
 
  过程: (fxvector-ref fxvector n)
- 返回: the nth element (zero-based) of fxvector
+
+ 返回: ~fxvector~ 中的第 ~n~ 个元素 (索引基于 0)
+
  库: (chezscheme)
 
- n must be a nonnegative fixnum strictly less than the length of fxvector.
+ ~n~ 必须是一个非负定长数，且严格小于 ~fxvector~ 的长度。
 
- (fxvector-ref #vfx(-1 2 4 7) 0) => -1
- (fxvector-ref #vfx(-1 2 4 7) 1) => 2
- (fxvector-ref #vfx(-1 2 4 7) 3) => 7
+ #+BEGIN_SRC scheme
+   (fxvector-ref #vfx(-1 2 4 7) 0) => -1
+   (fxvector-ref #vfx(-1 2 4 7) 1) => 2
+   (fxvector-ref #vfx(-1 2 4 7) 3) => 7
+ #+END_SRC
+
 
  过程: (fxvector-set! fxvector n fixnum)
+
  返回: unspecified
+
  库: (chezscheme)
 
- fxvector must be mutable. n must be a nonnegative fixnum strictly less than the length of fxvector. fxvector-set! changes the nth element of fxvector to fixnum.
+ ~fxvector~ 必须是可变的。 ~n~ 必须是一个非负定长数，且严格小于 ~fxvector~ 的长度。 ~fxvector-set!~ 把 ~fxvector~ 中的第 ~n~ 个元素修改为 ~fixnum~.
 
- (let ([v (fxvector 1 2 3 4 5)])
-   (fxvector-set! v 2 (fx- (fxvector-ref v 2)))
-   v) => #vfx(1 2 -3 4 5)
+ #+BEGIN_SRC scheme
+   (let ([v (fxvector 1 2 3 4 5)])
+     (fxvector-set! v 2 (fx- (fxvector-ref v 2)))
+     v) => #vfx(1 2 -3 4 5)
+ #+END_SRC
+
 
  过程: (fxvector-fill! fxvector fixnum)
+
  返回: unspecified
+
  库: (chezscheme)
 
- fxvector must be mutable. fxvector-fill! replaces each element of fxvector with fixnum.
+ ~fxvector~ 必须是可变的。 ~fxvector-fill!~ 把 ~fxvector~ 中的每个元素替换为 ~fixnum~.
 
- (let ([v (fxvector 1 2 3)])
-   (fxvector-fill! v 0)
-   v) => #vfx(0 0 0)
+ #+BEGIN_SRC scheme
+   (let ([v (fxvector 1 2 3)])
+     (fxvector-fill! v 0)
+     v) => #vfx(0 0 0)
+ #+END_SRC
+
 
  过程: (fxvector->list fxvector)
- 返回: a list of the elements of fxvector
+
+ 返回: ~fxvector~ 中所有元素组成的列表
+
  库: (chezscheme)
 
- (fxvector->list (fxvector)) => ()
- (fxvector->list #vfx(7 5 2)) => (7 5 2)
+ #+BEGIN_SRC scheme
+   (fxvector->list (fxvector)) => ()
+   (fxvector->list #vfx(7 5 2)) => (7 5 2)
 
- (let ([v #vfx(1 2 3 4 5)])
-   (apply fx* (fxvector->list v))) => 120
+   (let ([v #vfx(1 2 3 4 5)])
+     (apply fx* (fxvector->list v))) => 120
+ #+END_SRC
+
 
  过程: (list->fxvector list)
- 返回: an fxvector of the elements of list
+
+ 返回: 列表中所有元素组成的 ~fxvector~
+
  库: (chezscheme)
 
- list must consist entirely of fixnums.
+ ~list~ 必须完全由定长数组成。
 
- (list->fxvector '()) => #vfx()
- (list->fxvector '(3 5 7)) => #vfx(3 5 7)
+ #+BEGIN_SRC scheme
+   (list->fxvector '()) => #vfx()
+   (list->fxvector '(3 5 7)) => #vfx(3 5 7)
 
- (let ([v #vfx(1 2 3 4 5)])
-   (let ([ls (fxvector->list v)])
-     (list->fxvector (map fx* ls ls)))) => #vfx(1 4 9 16 25)
+   (let ([v #vfx(1 2 3 4 5)])
+     (let ([ls (fxvector->list v)])
+       (list->fxvector (map fx* ls ls)))) => #vfx(1 4 9 16 25)
+ #+END_SRC
+
 
  过程: (fxvector-copy fxvector)
- 返回: a copy of fxvector
+
+ 返回: ~fxvector~ 的一份拷贝
+
  库: (chezscheme)
 
- fxvector-copy creates a new fxvector with the same length and contents as fxvector.
+ ~fxvector-copy~ 生成一个与原 ~fxvector~ 长度和内容都一样的新的 ~fxvector~.
 
- (fxvector-copy #vfx(3 4 5)) => #vfx(3 4 5)
+ #+BEGIN_SRC scheme
+   (fxvector-copy #vfx(3 4 5)) => #vfx(3 4 5)
 
- (let ([v #vfx(3 4 5)])
-   (eq? v (fxvector-copy v))) => #f
+   (let ([v #vfx(3 4 5)])
+     (eq? v (fxvector-copy v))) => #f
+ #+END_SRC
+
 
  过程: (mutable-fxvector? obj)
- 返回: #t if obj is a mutable fxvector, #f otherwise
+
+ 返回: 如果 ~obj~ 是一个可变的 ~fxvector~, 则为 ~#t~, 否则为 ~#f~.
+
  过程: (immutable-fxvector? obj)
- 返回: #t if obj is an immutable fxvector, #f otherwise
+
+ 返回: 如果 ~obj~ 是一个不可变的 ~fxvector~, 则为 ~#t~, 否则为 ~#f~.
+
  库: (chezscheme)
 
- (mutable-fxvector? (fxvector 1 2 3)) => #t
- (mutable-fxvector? (fxvector->immutable-fxvector (fxvector 1 2 3))) => #f
- (immutable-fxvector? (fxvector 1 2 3)) => #f
- (immutable-fxvector? (fxvector->immutable-fxvector (fxvector 1 2 3))) => #t
- (immutable-fxvector? (cons 3 4)) => #f
+ #+BEGIN_SRC scheme
+   (mutable-fxvector? (fxvector 1 2 3)) => #t
+   (mutable-fxvector? (fxvector->immutable-fxvector (fxvector 1 2 3))) => #f
+   (immutable-fxvector? (fxvector 1 2 3)) => #f
+   (immutable-fxvector? (fxvector->immutable-fxvector (fxvector 1 2 3))) => #t
+   (immutable-fxvector? (cons 3 4)) => #f
+ #+END_SRC
+
 
  过程: (fxvector->immutable-fxvector fxvector)
- 返回: either an immutable copy of fxvector or fxvector itself
+
+ 返回: ~fxvector~ 的一份不可变的拷贝或其自身
+
  库: (chezscheme)
 
- The result is fxvector itself if fxvector is immutable; otherwise, the result is an immutable fxvector with the same content as fxvector.
+ 如果 ~fxvector~ 是不可变的，则结果为其本身；否则，结果是与原 ~fxvector~ 内容相同的一个不可变 ~fxvector~.
 
- (define v (fxvector->immutable-fxvector (fxvector 1 2 3)))
- (fxvector-set! v 0 0) => exception: not mutable
+ #+BEGIN_SRC scheme
+   (define v (fxvector->immutable-fxvector (fxvector 1 2 3)))
+   (fxvector-set! v 0 0) => exception: not mutable
+ #+END_SRC
+
 
 *** 7.7. Bytevectors
 
