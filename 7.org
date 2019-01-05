@@ -24,7 +24,7 @@
  此一谓词应当被定义，但缺失于第 6 修订版中。
 
 
-*** 7.2. 点对和列表
+*** 7.2. 点对和列表 (Pair and List)
 
  过程: (atom? obj)
 
@@ -133,7 +133,6 @@
 
  库: (chezscheme)
 
- n must be an exact nonnegative integer.
  n 须为精确的非负整数。
 
  #+BEGIN_SRC scheme
@@ -252,11 +251,11 @@
  #+END_SRC
 
 
-*** 7.3. 字符
+*** 7.3. 字符 (Characters)
 
- Chez Scheme 以两种方式扩展了字符的语法。其一，前缀 ~#\~ 后面紧跟 3 位八进制数字会被读取为一个字符，其数字编码即为此 3 位数的八进制值，例如， ~#\044~ 被读取为 ~#\$~. 其二，它可以识别若干非标准命名的字符： ~#\rubout~ (等同于 ~#\delete~)， ~#\bel~ (等同于 ~#\alarm~), ~#\vt~ (等同于 ~#\vtab~), ~#\nel~ (Unicode NEL 字符), 以及 ~#\ls~ (Unicode LS 字符). 非标准字符的名字可以通过过程 ~char-name~ 更改（参见 9.14 节）。
+ Chez Scheme 以两种方式扩展了字符的句法。其一，前缀 ~#\~ 后面紧跟 3 位八进制数字会被读取为一个字符，其数字编码即为此 3 位数的八进制值，例如， ~#\044~ 被读取为 ~#\$~. 其二，它可以识别若干非标准命名的字符： ~#\rubout~ (等同于 ~#\delete~)， ~#\bel~ (等同于 ~#\alarm~), ~#\vt~ (等同于 ~#\vtab~), ~#\nel~ (Unicode NEL 字符), 以及 ~#\ls~ (Unicode LS 字符). 非标准字符的名字可以通过过程 ~char-name~ 更改（参见 9.14 节）。
 
- 读取器若遇到 ~#!r6rs~ ，则这些扩展会在其后的输入流中被禁用，除非更接近的位置有 ~#!chezscheme~.
+ 读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
 
  过程: (char=? char1 char2 ...)
 
@@ -292,18 +291,18 @@
 
  过程: (char- char1 char2)
 
- 返回: 两个字符间的整数差值
+ 返回: ~char1~ 和 ~char2~ 间的整数差值
 
  库: (chezscheme)
 
- ~char-~ 以 ~char1~ 的数值减去 ~char2~ 的数值，并返回差值。后面的例子假设字符的整数表示为其 ASCII 码。
+ ~char-~ 以 ~char1~ 的整数值减去 ~char2~ 的整数值，并返回差值。后面的例子假设以字符的 ASCII 码作为其整数表示。
 
  #+BEGIN_SRC scheme
    (char- #\f #\e) => 1
 
    (define digit-value
-     ; return the digit value of the base-r digit c, or #f if c
-     ; is not a valid digit
+     ; 根据基数 r 返回数字 c 的值，
+     ; 如果 c 不是有效的数字，则返回 #f
      (lambda (c r)
        (let ([v (cond
                  [(char<=? #\0 c #\9) (char- c #\0)]
@@ -325,9 +324,10 @@
  #+END_SRC
 
 
-*** 7.4. 字符串
+*** 7.4. 字符串 (Strings)
 
  Chez Scheme extends the standard string syntax with two character escapes: \', which produces the single quote character, and \nnn, i.e., backslash followed by 3 octal digits, which produces the character equivalent of the octal value of the 3 digits. These extensions are disabled in an input stream after #!r6rs has been seen by the reader, unless #!chezscheme has been seen more recently.
+ 读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
 
  All strings are mutable by default, including constants. A program can create immutable strings via string->immutable-string. Any attempt to modify an immutable string causes an exception to be raised.
 
@@ -458,6 +458,7 @@
 
 *** 7.5. Vectors
  Chez Scheme extends the syntax of vectors to allow the length of the vector to be specified between the # and open parenthesis, e.g., #3(a b c). If fewer elements are supplied in the syntax than the specified length, each element after the last printed element is the same as the last printed element. This extension is disabled in an input stream after #!r6rs has been seen by the reader, unless #!chezscheme has been seen more recently.
+ 读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
 
  The length and indices of a vector in Chez Scheme are always fixnums.
 
@@ -552,6 +553,7 @@
 *** 7.6. 全定长数向量 (Fixnum-Only Vectors)
 
  Fixnum-only 向量, 即 "fxvectors", 类似于向量，但只包含 ~fixnums~. Fxvectors 的写法是以前缀 =#vfx= 替换向量的前缀 =#=, 例如， ~#vfx(1 2 3)~ 或 ~#10vfx(2)~. The fxvector syntax is disabled in an input stream after #!r6rs has been seen by the reader, unless #!chezscheme has been seen more recently.
+ 读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
 
  ~fxvector~ 的长度和索引总是定长数。
 
@@ -754,6 +756,7 @@
 
  As with vectors, Chez Scheme extends the syntax of bytevectors to allow the length of the vector to be specified between the # and open parenthesis, e.g., #3vu8(1 105 73). If fewer elements are supplied in the syntax than the specified length, each element after the last printed element is the same as the last printed element. This extension is disabled in an input stream after #!r6rs has been seen by the reader, unless #!chezscheme has been seen more recently.
  和对向量一样，Chez Scheme 扩展了字节向量的语法，以允许在 ~#~ 和左括号之间指定向量的长度，例如， ~#3vu8(1 105 73).~ 如果在此语法形式下提供的向量元素比指定的长度要少，则后面的每个元素都与最后一个提供的元素相同。TODO
+ 读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
 
  Chez Scheme 同时扩展了字节向量的基本操作集，包括了加载和存储 3, 5, 6, 7 字节长度的基本操作。
 
@@ -953,6 +956,7 @@
  Boxes are single-cell objects that are primarily useful for providing an "extra level of indirection." This extra level of indirection is typically used to allow more than one body of code or data structure to share a reference, or pointer, to an object. For example, boxes may be used to implement call-by-reference semantics in an interpreter for a language employing this parameter passing discipline.
 
  Boxes are written with the prefix #& (pronounced "hash-ampersand"). For example, #&(a b c) is a box holding the list (a b c). The box syntax is disabled in an input stream after #!r6rs has been seen by the reader, unless #!chezscheme has been seen more recently.
+ 读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
 
  All boxes are mutable by default, including constants. A program can create immutable boxes via box-immutable. Any attempt to modify an immutable box causes an exception to be raised.
 
@@ -1048,6 +1052,7 @@
  Gensyms are printed #{ and } brackets that enclose both the "pretty" and "unique" names, e.g., #{g1426 e5g1c94g642dssw-a}. They may also be printed using the pretty name only with the prefix #:, e.g., #:g1426.
 
  These extensions are disabled in an input stream after #!r6rs has been seen by the reader, unless #!chezscheme has been seen more recently.
+ 读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
 
  过程: (gensym)
  过程: (gensym pretty-name)
@@ -1760,6 +1765,7 @@
  The default printing of records of a given type may be overridden with record-writer.
 
  The default syntax may be used as input to the reader as well, as long as the corresponding record type has already been defined in the Scheme session in which the read occurs. The parameter record-reader may be used to specify a different name to be recognized by the reader in place of the generated name. Specifying a different name in this manner also changes the name used when the record is printed. This reader extension is disabled in an input stream after #!r6rs has been seen by the reader, unless #!chezscheme has been seen more recently.
+ 读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
 
  The mark (#n=) and reference (#n#) syntaxes may be used within the record syntax, with the result of creating shared or cyclic structure as desired. All cycles must be resolvable, however, without mutation of an immutable record field. That is, any cycle must contain at least one pointer through a mutable field, whether it is a mutable record field or a mutable field of a built-in object type such as a pair or vector.
 
