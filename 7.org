@@ -753,131 +753,200 @@
 *** 7.7. Bytevectors
 
  As with vectors, Chez Scheme extends the syntax of bytevectors to allow the length of the vector to be specified between the # and open parenthesis, e.g., #3vu8(1 105 73). If fewer elements are supplied in the syntax than the specified length, each element after the last printed element is the same as the last printed element. This extension is disabled in an input stream after #!r6rs has been seen by the reader, unless #!chezscheme has been seen more recently.
+ 和对向量一样，Chez Scheme 扩展了字节向量的语法，以允许在 ~#~ 和左括号之间指定向量的长度，例如， ~#3vu8(1 105 73).~ 如果在此语法形式下提供的向量元素比指定的长度要少，则后面的每个元素都与最后一个提供的元素相同。TODO
 
- Chez Scheme also extends the set of bytevector primitives, including primitives for loading and storing 3, 5, 6, and 7-byte quantities.
+ Chez Scheme 同时扩展了字节向量的基本操作集，包括了加载和存储 3, 5, 6, 7 字节长度的基本操作。
 
- The length and indices of a bytevector in Chez Scheme are always fixnums.
+ Chez Scheme 中，字节向量的长度和索引总是定长数。
 
- All bytevectors are mutable by default, including constants. A program can create immutable bytevectors via bytevector->immutable-bytevector. Any attempt to modify an immutable bytevector causes an exception to be raised.
+ 字节向量默认是可变的，包括常量。程序可以通过 ~bytevector->immutable-bytevector~ 创建不可变字节向量。尝试修改不可变字节向量会导致抛出异常。
 
  过程: (bytevector fill ...)
- 返回: a new bytevector containing fill ...
+
+ 返回: 一个内容为 ~fill ...~ 的字节向量
+
  库: (chezscheme)
 
  Each fill value must be an exact integer representing a signed or unsigned 8-bit value, i.e., a value in the range -128 to 255 inclusive. A negative fill value is treated as its two's complement equivalent.
+ 每个填充值必须为一个表示 8 位有符号或无符号值的精确整数，即，一个在范围 -128 至 255（两端均包含）之间的值。负的填充数被视为与其等价的补码。
 
- (bytevector) => #vu8()
- (bytevector 1 3 5) => #vu8(1 3 5)
- (bytevector -1 -3 -5) => #vu8(255 253 251)
+ #+BEGIN_SRC scheme
+   (bytevector) => #vu8()
+   (bytevector 1 3 5) => #vu8(1 3 5)
+   (bytevector -1 -3 -5) => #vu8(255 253 251)
+ #+END_SRC
+
 
  过程: (bytevector->s8-list bytevector)
- 返回: a new list of the 8-bit signed elements of bytevector
+
+ 返回: ~bytevector~ 转化成的 8 位有符号数列表
+
  库: (chezscheme)
 
  The values in the returned list are exact eight-bit signed integers, i.e., values in the range -128 to 127 inclusive. bytevector->s8-list is similar to the Revised6 Report bytevector->u8-list except the values in the returned list are signed rather than unsigned.
+ 返回列表中的值均为精确的 8 位有符号整数，即，在范围 -128 至 127（两端均包含）之间的值。 ~bytevector->s8-list~ 与第 6 修订版中的 ~bytevector->u8-list~ 相似，只是返回列表中的值是有符号数，而非无符号数。
 
- (bytevector->s8-list (make-bytevector 0)) => ()
- (bytevector->s8-list #vu8(1 127 128 255)) => (1 127 -128 -1)
+ #+BEGIN_SRC scheme
+   (bytevector->s8-list (make-bytevector 0)) => ()
+   (bytevector->s8-list #vu8(1 127 128 255)) => (1 127 -128 -1)
 
- (let ([v #vu8(1 2 3 255)])
-   (apply * (bytevector->s8-list v))) => -6
+   (let ([v #vu8(1 2 3 255)])
+     (apply * (bytevector->s8-list v))) => -6
+ #+END_SRC
+
 
  过程: (s8-list->bytevector list)
- 返回: a new bytevector of the elements of list
+
+ 返回: ~list~ 中的元素组成的新字节向量
+
  库: (chezscheme)
 
- list must consist entirely of exact eight-bit signed integers, i.e., values in the range -128 to 127 inclusive. s8-list->bytevector is similar to the Revised6 Report 过程 u8-list->bytevector, except the elements of the input list are signed rather than unsigned.
+ 列表必须完全由精确 8 位有符号整数组成，即，在范围 -128 至 127（两端均包含）之间的值。 ~s8-list->bytevector~ 与第 6 修订版中的过程 ~u8-list->bytevector~ 相似，只是输入列表中的元素是有符号数，而非无符号数。
 
- (s8-list->bytevector '()) => #vu8()
- (s8-list->bytevector '(1 127 -128 -1)) => #vu8(1 127 128 255)
+ #+BEGIN_SRC scheme
+   (s8-list->bytevector '()) => #vu8()
+   (s8-list->bytevector '(1 127 -128 -1)) => #vu8(1 127 128 255)
 
- (let ([v #vu8(1 2 3 4 5)])
-   (let ([ls (bytevector->s8-list v)])
-     (s8-list->bytevector (map - ls)))) => #vu8(255 254 253 252 251)
+   (let ([v #vu8(1 2 3 4 5)])
+     (let ([ls (bytevector->s8-list v)])
+       (s8-list->bytevector (map - ls)))) => #vu8(255 254 253 252 251)
+ #+END_SRC
+
 
  过程: (bytevector-truncate! bytevector n)
- 返回: bytevector or the empty bytevector
+
+ 返回: 字节向量，或空字节向量
+
  库: (chezscheme)
 
- bytevector must be mutable. n must be an exact nonnegative fixnum not greater than the length of bytevector. If n is zero, bytevector-truncate! 返回 the empty bytevector. Otherwise, bytevector-truncate! destructively truncates bytevector to its first n bytes and 返回 bytevector.
+ bytevector must be mutable. n must be an exact nonnegative fixnum not greater than the length of bytevector. 
+ ~bytevector~ 必须是可变的。 ~n~ 必须是一个精确的非负定长数，且不大于 ~bytevector~ 的长度。如果 ~n~ 是 0, ~bytevector-truncate!~ 返回空字节向量，否则， ~bytevector-truncate!~ 破坏性地把 ~bytevector~ 缩短为其前 ~n~ 个字节，并返回此字节向量。
 
- (define bv (make-bytevector 7 19))
- (bytevector-truncate! bv 0) => #vu8()
- bv => #vu8(19 19 19 19 19 19 19)
- (bytevector-truncate! bv 3) => #vu8(19 19 19)
- bv => #vu8(19 19 19)
+ #+BEGIN_SRC scheme
+   (define bv (make-bytevector 7 19))
+   (bytevector-truncate! bv 0) => #vu8()
+   bv => #vu8(19 19 19 19 19 19 19)
+   (bytevector-truncate! bv 3) => #vu8(19 19 19)
+   bv => #vu8(19 19 19)
+ #+END_SRC
+
 
  过程: (bytevector-u24-ref bytevector n eness)
- 返回: the 24-bit unsigned integer at index n (zero-based) of bytevector
+ 
+ 返回: ~bytevector~ 的索引 ~n~ (始于 0) 处的 24 位无符号整数
+
  过程: (bytevector-s24-ref bytevector n eness)
- 返回: the 24-bit signed integer at index n (zero-based) of bytevector
+
+ 返回: ~bytevector~ 的索引 ~n~ (始于 0) 处的 24 位有符号整数
+
  过程: (bytevector-u40-ref bytevector n eness)
- 返回: the 40-bit unsigned integer at index n (zero-based) of bytevector
+
+ 返回: ~bytevector~ 的索引 ~n~ (始于 0) 处的 40 位无符号整数
+
  过程: (bytevector-s40-ref bytevector n eness)
- 返回: the 40-bit signed integer at index n (zero-based) of bytevector
+
+ 返回: ~bytevector~ 的索引 ~n~ (始于 0) 处的 40 位有符号整数
+
  过程: (bytevector-u48-ref bytevector n eness)
- 返回: the 48-bit unsigned integer at index n (zero-based) of bytevector
+
+ 返回: ~bytevector~ 的索引 ~n~ (始于 0) 处的 48 位无符号整数
+
  过程: (bytevector-s48-ref bytevector n eness)
- 返回: the 48-bit signed integer at index n (zero-based) of bytevector
+
+ 返回: ~bytevector~ 的索引 ~n~ (始于 0) 处的 48 位有符号整数
+
  过程: (bytevector-u56-ref bytevector n eness)
- 返回: the 56-bit unsigned integer at index n (zero-based) of bytevector
+
+ 返回: ~bytevector~ 的索引 ~n~ (始于 0) 处的 56 位无符号整数
+
  过程: (bytevector-s56-ref bytevector n eness)
- 返回: the 56-bit signed integer at index n (zero-based) of bytevector
+
+ 返回: ~bytevector~ 的索引 ~n~ (始于 0) 处的 56 位有符号整数
+
  库: (chezscheme)
 
- n must be an exact nonnegative integer and indexes the starting byte of the value. The sum of n and the number of bytes occupied by the value (3 for 24-bit values, 5 for 40-bit values, 6 for 48-bit values, and 7 for 56-bit values) must not exceed the length of bytevector. eness must be a valid endianness symbol naming the endianness.
+ ~n~ 必须是一个精确的非负整数，并且索引数值的起始字节。 ~n~ 和数值占用的字节之和 (24 位数值为 3 个字节，40 位数值为 5 个字节，48 位数值为 6 个字节，56 位数值为 7 个字节) 一定不能超过 ~bytevector~ 的长度。 ~eness~ 必须是一个命名此字节序(endianness)的有效的字节序符号(symbol)。
 
  The return value is an exact integer in the appropriate range for the number of bytes occupied by the value. Signed values are the equivalent of the stored value treated as a two's complement value.
+ 返回值是一个精确整数，根据数值所占用的字节数处于适当的区间。TODO
 
  过程: (bytevector-u24-set! bytevector n u24 eness)
+
  过程: (bytevector-s24-set! bytevector n s24 eness)
+
  过程: (bytevector-u40-set! bytevector n u40 eness)
+
  过程: (bytevector-s40-set! bytevector n s40 eness)
+
  过程: (bytevector-u48-set! bytevector n u48 eness)
+
  过程: (bytevector-s48-set! bytevector n s48 eness)
+
  过程: (bytevector-u56-set! bytevector n u56 eness)
+
  过程: (bytevector-s56-set! bytevector n s56 eness)
+
  返回: unspecified
+
  库: (chezscheme)
 
- bytevector must be mutable. n must be an exact nonnegative integer and indexes the starting byte of the value. The sum of n and the number of bytes occupied by the value must not exceed the length of bytevector. u24 must be a 24-bit unsigned value, i.e., a value in the range 0 to 224 - 1 inclusive; s24 must be a 24-bit signed value, i.e., a value in the range -223 to 223 - 1 inclusive; u40 must be a 40-bit unsigned value, i.e., a value in the range 0 to 240 - 1 inclusive; s40 must be a 40-bit signed value, i.e., a value in the range -239 to 239 - 1 inclusive; u48 must be a 48-bit unsigned value, i.e., a value in the range 0 to 248 - 1 inclusive; s48 must be a 48-bit signed value, i.e., a value in the range -247 to 247 - 1 inclusive; u56 must be a 56-bit unsigned value, i.e., a value in the range 0 to 256 - 1 inclusive; and s56 must be a 56-bit signed value, i.e., a value in the range -255 to 255 - 1 inclusive. eness must be a valid endianness symbol naming the endianness.
+ ~bytevector~ 必须是不可变的。 ~n~ 必须是一个精确的非负整数，并且索引数值的起始字节。 ~n~ 和数值占用的字节之和一定不能超过 ~bytevector~ 的长度。 ~u24~ 必须是一个 24 位无符号值，即，在 0 至 2^24 - 1 (两端均包含) 区间中的值； ~s24~ 必须是一个 24 位有符号值，即，在 -2^23 至 2^23 - 1 (两端均包含) 区间中的值； ~u40~ 必须是一个 40 位无符号值，即，在 0 至 2^40 - 1 (两端均包含) 区间中的值； ~s40~ 必须是一个 40 位有符号值，即，在 -2^39 至 2^39 - 1 (两端均包含) 区间中的值； ~u48~ 必须是一个 48 位无符号值，即，在 0 至 2^48 - 1 (两端均包含) 区间中的值； ~s48~ 必须是一个 48 位有符号值，即，在 -2^47 至 2^47 - 1 (两端均包含) 区间中的值； ~u56~ 必须是一个 56 位无符号值，即，在 0 至 2^56 - 1 (两端均包含) 区间中的值； ~s56~ 必须是一个 56 位有符号值，即，在 -2^55 至 2^55 - 1 (两端均包含) 区间中的值。 ~eness~ 必须是一个命名此字节序(endianness)的有效的字节序符号(symbol)。
 
  These procedures store the given value in the 3, 5, 6, or 7 bytes starting at index n (zero-based) of bytevector. Negative values are stored as their two's complement equivalent.
+ 这些过程把给定值存储到 ~bytevector~ 的索引 ~n~ (基于 0)处起始的 3, 5, 6, 7 字节中。负值存储为其等价的补码。
 
  过程: (mutable-bytevector? obj)
- 返回: #t if obj is a mutable bytevector, #f otherwise
+
+ 返回: 如果 ~obj~ 是一个可变的字节向量，则为 ~#t~, 否则为 ~#f~.
+
  过程: (immutable-bytevector? obj)
- 返回: #t if obj is an immutable bytevector, #f otherwise
+
+ 返回: 如果 ~obj~ 是一个不可变的字节向量，则为 ~#t~, 否则为 ~#f~.
+
  库: (chezscheme)
 
- (mutable-bytevector? (bytevector 1 2 3)) => #t
- (mutable-bytevector?
-   (bytevector->immutable-bytevector (bytevector 1 2 3))) => #f
- (immutable-bytevector? (bytevector 1 2 3)) => #f
- (immutable-bytevector?
-   (bytevector->immutable-bytevector (bytevector 1 2 3))) => #t
- (immutable-bytevector? (cons 3 4)) => #f
+ #+BEGIN_SRC scheme
+   (mutable-bytevector? (bytevector 1 2 3)) => #t
+   (mutable-bytevector?
+    (bytevector->immutable-bytevector (bytevector 1 2 3))) => #f
+   (immutable-bytevector? (bytevector 1 2 3)) => #f
+   (immutable-bytevector?
+    (bytevector->immutable-bytevector (bytevector 1 2 3))) => #t
+   (immutable-bytevector? (cons 3 4)) => #f
+ #+END_SRC
+
 
  过程: (bytevector->immutable-bytevector bytevector)
- 返回: an immutable bytevector equal to bytevector
+
+ 返回: 与 ~bytevector~ 相等(equal)的一个不可变字节向量
+
  库: (chezscheme)
 
  The result is bytevector itself if bytevector is immutable; otherwise, the result is an immutable bytevector with the same content as bytevector.
+ 如果 ~bytevector~ 是不可变的，则结果为其本身；否则，结果是与 ~bytevector~ 内容相同的一个不可变字节向量。
 
- (define bv (bytevector->immutable-bytevector (bytevector 1 2 3)))
- (bytevector-u8-set! bv 0 0) => exception: not mutable
+ #+BEGIN_SRC scheme
+   (define bv (bytevector->immutable-bytevector (bytevector 1 2 3)))
+   (bytevector-u8-set! bv 0 0) => exception: not mutable
+ #+END_SRC
+
 
  过程: (bytevector-compress bytevector)
- 返回: a new bytevector containing compressed content of bytevector
+
+ 返回: 一个新的字节向量，包含 ~bytevector~ 压缩后的内容
+
  库: (chezscheme)
 
  The result is the raw compressed data with a minimal header to record the uncompressed size and the compression mode. The result does not include the header that is written by port-based compression using the compressed option.
 
  过程: (bytevector-uncompress bytevector)
- 返回: a bytevector containing uncompressed content of bytevector
+
+ 返回: 一个字节向量，包含 ~bytevector~ 解压缩后的内容
+
  库: (chezscheme)
 
- Uncompresses a bytevector produced by bytevector-compress to a new bytevector with the same content as the original given to bytevector-compress.
+ 把一个由 ~bytevector-compress~ 生成的 ~bytevector~, 解压为一个新的字节向量，其内容与最初传递给 ~bytevector-compress~ 的 ~bytevector~ 相同。
+ 
 
 *** 7.8. Boxes
 
