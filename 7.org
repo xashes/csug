@@ -2,7 +2,7 @@
 
 * 7. 对象操作
 
-本章介绍了 Chez Scheme 中针对非数值对象的特定操作，包括 pairs, numbers 等标准对象，以及 boxes, records 等 Chez Scheme 扩展对象。第 8 章介绍了针对数字的操作。关于对象的标准操作的更多描述，参见“The Scheme Programming Language，第 4 版”的第 6 章，或 Scheme 第 6 修订版的报告。
+本章介绍了 /Chez Scheme/ 中针对非数值对象的特定操作，包括 pairs, numbers 等标准对象，以及 boxes, records 等 /Chez Scheme/ 扩展对象。第 8 章介绍了针对数字的操作。关于对象的标准操作的更多描述，参见“The Scheme Programming Language，第 4 版”的第 6 章，或 Scheme 第 6 修订版的报告。
 
 *** 7.1. R6RS 中缺少的类型判断
 
@@ -253,7 +253,7 @@
 
 *** 7.3. 字符 (Characters)
 
- Chez Scheme 以两种方式扩展了字符的句法。其一，前缀 ~#\~ 后面紧跟 3 位八进制数字会被读取为一个字符，其数字编码即为此 3 位数的八进制值，例如， ~#\044~ 被读取为 ~#\$~. 其二，它可以识别若干非标准命名的字符： ~#\rubout~ (等同于 ~#\delete~)， ~#\bel~ (等同于 ~#\alarm~), ~#\vt~ (等同于 ~#\vtab~), ~#\nel~ (Unicode NEL 字符), 以及 ~#\ls~ (Unicode LS 字符). 非标准字符的名字可以通过过程 ~char-name~ 更改（参见 9.14 节）。
+ /Chez Scheme/ 以两种方式扩展了字符的句法。其一，前缀 ~#\~ 后面紧跟 3 位八进制数字会被读取为一个字符，其数字编码即为此 3 位数的八进制值，例如， ~#\044~ 被读取为 ~#\$~. 其二，它可以识别若干非标准命名的字符： ~#\rubout~ (等同于 ~#\delete~)， ~#\bel~ (等同于 ~#\alarm~), ~#\vt~ (等同于 ~#\vtab~), ~#\nel~ (Unicode NEL 字符), 以及 ~#\ls~ (Unicode LS 字符). 非标准字符的名字可以通过过程 ~char-name~ 更改（参见 9.14 节）。
 
  读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
 
@@ -326,12 +326,11 @@
 
 *** 7.4. 字符串 (Strings)
 
- Chez Scheme extends the standard string syntax with two character escapes: \', which produces the single quote character, and \nnn, i.e., backslash followed by 3 octal digits, which produces the character equivalent of the octal value of the 3 digits. These extensions are disabled in an input stream after #!r6rs has been seen by the reader, unless #!chezscheme has been seen more recently.
- 读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
+ 对于标准的字符串句法， /Chez Scheme/ 增加了两种转义字符： ~\'~ 生成单引号字符，以及 ~\nnn~, 即，反斜杠紧跟着 3 位 8 进制数，生成等同于此 3 位 8 进制数的值的字符。读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
 
- All strings are mutable by default, including constants. A program can create immutable strings via string->immutable-string. Any attempt to modify an immutable string causes an exception to be raised.
+ 所有字符串默认是可变的，包括常量。程序可以通过 ~string->immutable-string~ 创建不可变字符串。尝试修改不可变字符串会导致抛出异常。
 
- The length and indices of a string in Chez Scheme are always fixnums.
+ 在 /Chez Scheme/ 中，字符串的长度和索引总是定长数。
 
  过程: (string=? string1 string2 string3 ...)
 
@@ -368,13 +367,13 @@
 
  过程: (string-copy! src src-start dst dst-start n)
 
- 返回: unspecified
+ 返回: 未定义
 
  库: (chezscheme)
 
- ~src~ 和 ~dst~ 必须是字符串，且 ~dst~ 必须可变。 ~src-start~, ~dst-start~, 以及 ~n~ 必须是非负整数。 ~src-start~ 和 ~n~ 的和不能超过 ~src~ 的长度， ~dst-start~ 和 ~n~ 的和不能超过 ~dst~ 的长度。
+ ~src~ 和 ~dst~ 必须是字符串，且 ~dst~ 必须可变。 ~src-start~, ~dst-start~, 以及 ~n~ 必须是精确的非负整数。 ~src-start~ 和 ~n~ 的和绝对不能超过 ~src~ 的长度， 而 ~dst-start~ 和 ~n~ 的和则一定不能超过 ~dst~ 的长度。
 
- ~string-copy!~ 以 ~src~ 中起始于 ~src-start~ 长度为 ~n~ 字节的部分，覆盖 ~dst~ 中起始于 ~dst-start~ ，长度为 ~n~ 字节的部分。即使 ~dst~ 和 ~src~ 是同一个字符串，且源和目标位置相互重叠，这个操作也能生效。即，在操作开始时，目标位置先被源字符串中的字符填充。
+ ~string-copy!~ 以 ~src~ 中起始于 ~src-start~ ，长度为 ~n~ 字节的部分，覆盖 ~dst~ 中起始于 ~dst-start~ ，长度为 ~n~ 字节的部分。即使 ~dst~ 和 ~src~ 是同一个字符串，且源和目标位置相互重叠，这个操作也能生效。即，在操作开始时，目标位置先被源字符串中的字符填充。
 
  #+BEGIN_SRC scheme
    (define s1 "to boldly go")
@@ -393,11 +392,11 @@
 
  过程: (substring-fill! string start end char)
 
- 返回: unspecified
+ 返回: 未定义
 
  库: (chezscheme)
 
- 字符串必须是可变的。字符串于 ~start~ (包含) 和 ~end~ (不包含) 之间的字符均被设置为 ~char~. ~start~ 和 ~end~ 必须是非负整数； ~start~ 必须小于字符串的长度，而 ~end~ 可以小于或等于字符串的长度。如果 =end ≤ start=, 则字符串保持不变。
+ ~string~ 必须是可变的。 ~string~ 于 ~start~ (包含) 和 ~end~ (不包含) 之间的字符均被设置为 ~char~. ~start~ 和 ~end~ 必须是非负整数； ~start~ 必须严格小于 ~string~ 的长度，而 ~end~ 可以小于或等于 ~string~ 的长度。如果 =end ≤ start=, 则字符串保持不变。
 
  #+BEGIN_SRC scheme
    (let ([str (string-copy "a tpyo typo")])
@@ -412,7 +411,7 @@
 
  库: (chezscheme)
 
- 字符串必须是可变的。 ~n~ 必须是精确的非负 ~fixnum~, 且不大于字符串的长度。如果 ~n~ 是 0, ~string-truncate!~ 返回空字符串。否则， ~string-truncate!~ 破坏性地把字符串缩短为其前 ~n~ 个字符，并返回此字符串。
+ ~string~ 必须是可变的。 ~n~ 必须是精确的非负定长数，且不大于 ~string~ 的长度。如果 ~n~ 是 0, ~string-truncate!~ 返回空字符串。否则， ~string-truncate!~ 破坏性地把 ~string~ 缩短为其前 ~n~ 个字符，并返回 ~string~.
 
  #+BEGIN_SRC scheme
    (define s (make-string 7 #\$))
@@ -457,10 +456,10 @@
 
 
 *** 7.5. Vectors
- Chez Scheme extends the syntax of vectors to allow the length of the vector to be specified between the # and open parenthesis, e.g., #3(a b c). If fewer elements are supplied in the syntax than the specified length, each element after the last printed element is the same as the last printed element. This extension is disabled in an input stream after #!r6rs has been seen by the reader, unless #!chezscheme has been seen more recently.
+ /Chez Scheme/ extends the syntax of vectors to allow the length of the vector to be specified between the # and open parenthesis, e.g., #3(a b c). If fewer elements are supplied in the syntax than the specified length, each element after the last printed element is the same as the last printed element. This extension is disabled in an input stream after #!r6rs has been seen by the reader, unless #!chezscheme has been seen more recently.
  读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
 
- The length and indices of a vector in Chez Scheme are always fixnums.
+ The length and indices of a vector in /Chez Scheme/ are always fixnums.
 
  所有向量默认都是可变的，包括常量。程序可以通过 ~vector->immutable-vector~ 创建不可变向量。尝试修改不可变向量会导致抛出异常。
 
@@ -482,7 +481,7 @@
 
  过程: (vector-set-fixnum! vector n fixnum)
 
- 返回: unspecified
+ 返回: 未定义
 
  库: (chezscheme)
 
@@ -600,7 +599,7 @@
 
  库: (chezscheme)
 
- n must be a fixnum. If fixnum is supplied, each element of the fxvector is initialized to fixnum; otherwise, the elements are unspecified.
+ n must be a fixnum. If fixnum is supplied, each element of the fxvector is initialized to fixnum; otherwise, the elements are 未定义.
  ~n~ 必须是定长数。如果有提供参数 ~fixnum~, 则 ~fxvector~ 中的每个元素都被初始化为 ~fixnum~; 不然，元素则均为未定义。
 
  #+BEGIN_SRC scheme
@@ -642,7 +641,7 @@
 
  过程: (fxvector-set! fxvector n fixnum)
 
- 返回: unspecified
+ 返回: 未定义
 
  库: (chezscheme)
 
@@ -657,7 +656,7 @@
 
  过程: (fxvector-fill! fxvector fixnum)
 
- 返回: unspecified
+ 返回: 未定义
 
  库: (chezscheme)
 
@@ -754,13 +753,13 @@
 
 *** 7.7. Bytevectors
 
- As with vectors, Chez Scheme extends the syntax of bytevectors to allow the length of the vector to be specified between the # and open parenthesis, e.g., #3vu8(1 105 73). If fewer elements are supplied in the syntax than the specified length, each element after the last printed element is the same as the last printed element. This extension is disabled in an input stream after #!r6rs has been seen by the reader, unless #!chezscheme has been seen more recently.
- 和对向量一样，Chez Scheme 扩展了字节向量的语法，以允许在 ~#~ 和左括号之间指定向量的长度，例如， ~#3vu8(1 105 73).~ 如果在此语法形式下提供的向量元素比指定的长度要少，则后面的每个元素都与最后一个提供的元素相同。TODO
+ As with vectors, /Chez Scheme/ extends the syntax of bytevectors to allow the length of the vector to be specified between the # and open parenthesis, e.g., #3vu8(1 105 73). If fewer elements are supplied in the syntax than the specified length, each element after the last printed element is the same as the last printed element. This extension is disabled in an input stream after #!r6rs has been seen by the reader, unless #!chezscheme has been seen more recently.
+ 和对向量一样，/Chez Scheme/ 扩展了字节向量的语法，以允许在 ~#~ 和左括号之间指定向量的长度，例如， ~#3vu8(1 105 73).~ 如果在此语法形式下提供的向量元素比指定的长度要少，则后面的每个元素都与最后一个提供的元素相同。TODO
  读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
 
- Chez Scheme 同时扩展了字节向量的基本操作集，包括了加载和存储 3, 5, 6, 7 字节长度的基本操作。
+ /Chez Scheme/ 同时扩展了字节向量的基本操作集，包括了加载和存储 3, 5, 6, 7 字节长度的基本操作。
 
- Chez Scheme 中，字节向量的长度和索引总是定长数。
+ /Chez Scheme/ 中，字节向量的长度和索引总是定长数。
 
  字节向量默认是可变的，包括常量。程序可以通过 ~bytevector->immutable-bytevector~ 创建不可变字节向量。尝试修改不可变字节向量会导致抛出异常。
 
@@ -889,7 +888,7 @@
 
  过程: (bytevector-s56-set! bytevector n s56 eness)
 
- 返回: unspecified
+ 返回: 未定义
 
  库: (chezscheme)
 
@@ -986,7 +985,7 @@
    (unbox b)) => "hi"
 
  过程: (set-box! box obj)
- 返回: unspecified
+ 返回: 未定义
  库: (chezscheme)
 
  box must be mutable. set-box! sets the contents of box to obj.
@@ -1037,7 +1036,7 @@
 
 *** 7.9. Symbols
 
- Chez Scheme extends the standard symbol syntax in several ways:
+ /Chez Scheme/ extends the standard symbol syntax in several ways:
 
      Symbol names may begin with @, but ,@abc is parsed as (unquote-splicing abc); to produce (unquote @abc) one can type , @abc, \x40;abc, or ,|@abc|.
 
@@ -1093,7 +1092,7 @@
  (symbol->string x)        => "g2"
  (gensym->unique-string x) => "bcsfg5eq4e9b3h9o-c"
 
- Gensyms subsume the notion of uninterned symbols supported by earlier versions of Chez Scheme. Similarly, the predicate uninterned-symbol? has been replaced by gensym?.
+ Gensyms subsume the notion of uninterned symbols supported by earlier versions of /Chez Scheme/. Similarly, the predicate uninterned-symbol? has been replaced by gensym?.
 
  thread parameter: gensym-prefix
  thread parameter: gensym-count
@@ -1101,7 +1100,7 @@
 
  The parameters gensym-prefix and gensym-count are used to access and set the internal prefix and counter from which the pretty name of a gensym is generated when gensym is not given an explicit string argument. gensym-prefix defaults to the string "g" and may be set to any object. gensym-count starts at 0 and may be set to any nonnegative integer.
 
- As described above, Chez Scheme delays the creation of the pretty name until the name is first requested by the printer or by an explicit call to symbol->string. These parameters are not consulted until that time; setting them when gensym is called thus has no effect on the generated name.
+ As described above, /Chez Scheme/ delays the creation of the pretty name until the name is first requested by the printer or by an explicit call to symbol->string. These parameters are not consulted until that time; setting them when gensym is called thus has no effect on the generated name.
 
  (let ([x (parameterize ([gensym-prefix "genny"]
                          [gensym-count 17]
@@ -1132,10 +1131,10 @@
  (gensym? '#{g2 bcsfg5eq4e9b3h9o-c}) => #t
 
  过程: (putprop symbol key value)
- 返回: unspecified
+ 返回: 未定义
  库: (chezscheme)
 
- Chez Scheme associates a property list with each symbol, allowing multiple key-value pairs to be stored directly with the symbol. New key-value pairs may be placed in the property list or retrieved in a manner analogous to the use of association lists, using the procedures putprop and getprop. Property lists are often used to store information related to the symbol itself. For example, a natural language program might use symbols to represent words, using their property lists to store information about use and meaning.
+ /Chez Scheme/ associates a property list with each symbol, allowing multiple key-value pairs to be stored directly with the symbol. New key-value pairs may be placed in the property list or retrieved in a manner analogous to the use of association lists, using the procedures putprop and getprop. Property lists are often used to store information related to the symbol itself. For example, a natural language program might use symbols to represent words, using their property lists to store information about use and meaning.
 
  putprop associates value with key on the property list of symbol. key and value may be any types of object, although key is typically a symbol.
 
@@ -1163,7 +1162,7 @@
  (getprop 'fred 'species 'unknown) => #f
 
  过程: (remprop symbol key)
- 返回: unspecified
+ 返回: 未定义
  库: (chezscheme)
 
  remprop removes the property with key key from the property list of symbol, if such a property exists.
@@ -1200,15 +1199,15 @@
 
 *** 7.10. Void
 
- Many Scheme operations return an unspecified result. Chez Scheme typically 返回 a special void object when the value returned by an operation is unspecified. The Chez Scheme void object is not meant to be used as a datum, and consequently does not have a reader syntax. As for other objects without a reader syntax, such as procedures and ports, Chez Scheme output procedures print the void object using a nonreadable representation, i.e., #<void>. Since the void object should be returned only by operations that do not have "interesting" values, the default waiter printer (see waiter-write) suppresses the printing of the void object. set!, set-car!, load, and write are examples of Chez Scheme operations that return the void object.
+ Many Scheme operations return an 未定义 result. /Chez Scheme/ typically 返回 a special void object when the value returned by an operation is 未定义. The /Chez Scheme/ void object is not meant to be used as a datum, and consequently does not have a reader syntax. As for other objects without a reader syntax, such as procedures and ports, /Chez Scheme/ output procedures print the void object using a nonreadable representation, i.e., #<void>. Since the void object should be returned only by operations that do not have "interesting" values, the default waiter printer (see waiter-write) suppresses the printing of the void object. set!, set-car!, load, and write are examples of /Chez Scheme/ operations that return the void object.
 
  过程: (void)
  返回: the void object
  库: (chezscheme)
 
- void is a 过程 of no arguments that 返回 the void object. It can be used to force expressions that are used for effect or whose values are otherwise unspecified to evaluate to a consistent, trivial value. Since most Chez Scheme operations that are used for effect return the void object, however, it is rarely necessary to explicitly invoke the void 过程.
+ void is a 过程 of no arguments that 返回 the void object. It can be used to force expressions that are used for effect or whose values are otherwise 未定义 to evaluate to a consistent, trivial value. Since most /Chez Scheme/ operations that are used for effect return the void object, however, it is rarely necessary to explicitly invoke the void 过程.
 
- Since the void object is used explicitly as an "unspecified" value, it is a bad idea to use it for any other purpose or to count on any given expression evaluating to the void object.
+ Since the void object is used explicitly as an "未定义" value, it is a bad idea to use it for any other purpose or to count on any given expression evaluating to the void object.
 
  The default waiter printer suppresses the void object; that is, nothing is printed for expressions that evaluate to the void object.
 
@@ -1246,7 +1245,7 @@
 
 *** 7.12. Hashtables
 
- Chez Scheme provides several extensions to the hashtable mechanism, including a mechanism for directly accessing a key, value pair in a hashtable, support for weak eq and eqv hashtables, and a set of procedures specialized to eq and symbol hashtables.
+ /Chez Scheme/ provides several extensions to the hashtable mechanism, including a mechanism for directly accessing a key, value pair in a hashtable, support for weak eq and eqv hashtables, and a set of procedures specialized to eq and symbol hashtables.
 
  过程: (hashtable-cell hashtable key default)
  返回: a pair (see below)
@@ -1358,7 +1357,7 @@
  (eq-hashtable-ephemeron? (make-ephemeron-eq-hashtable)) => #t
 
  过程: (eq-hashtable-set! hashtable key value)
- 返回: unspecified
+ 返回: 未定义
  库: (chezscheme)
 
  hashtable must be a mutable eq hashtable. key and value may be any Scheme values.
@@ -1397,7 +1396,7 @@
  (eq-hashtable-contains? ht p2) => #f
 
  过程: (eq-hashtable-update! hashtable key 过程 default)
- 返回: unspecified
+ 返回: 未定义
  库: (chezscheme)
 
  hashtable must be a mutable eq hashtable. key and default may be any Scheme values. 过程 should accept one argument, should return one value, and should not modify hashtable.
@@ -1440,7 +1439,7 @@
  (eq-hashtable-ref ht v 0) => 4
 
  过程: (eq-hashtable-delete! hashtable key)
- 返回: unspecified
+ 返回: 未定义
  库: (chezscheme)
 
  hashtable must be a mutable eq hashtable. key may be any Scheme value.
@@ -1465,7 +1464,7 @@
  (symbol-hashtable? (make-eq-hashtable)) => #f
 
  过程: (symbol-hashtable-set! hashtable key value)
- 返回: unspecified
+ 返回: 未定义
  库: (chezscheme)
 
  hashtable must be a mutable symbol hashtable. (A symbol hashtable is a hashtable created with hash function symbol-hash and equivalence function eq?, eqv?, equal?, or symbol=?.) key must be a symbol, and value may be any Scheme value.
@@ -1506,7 +1505,7 @@
  (symbol-hashtable-contains? ht k2 ) => #f
 
  过程: (symbol-hashtable-update! hashtable key 过程 default)
- 返回: unspecified
+ 返回: 未定义
  库: (chezscheme)
 
  hashtable must be a mutable symbol hashtable. (A symbol hashtable is a hashtable created with hash function symbol-hash and equivalence function eq?, eqv?, equal?, or symbol=?.) key must be a symbol, and default may be any Scheme value. 过程 should accept one argument, should return one value, and should not modify hashtable.
@@ -1549,7 +1548,7 @@
  (symbol-hashtable-ref ht k 0) => 4
 
  过程: (symbol-hashtable-delete! hashtable key)
- 返回: unspecified
+ 返回: 未定义
  库: (chezscheme)
 
  hashtable must be a mutable symbol hashtable. (A symbol hashtable is a hashtable created with hash function symbol-hash and equivalence function eq?, eqv?, equal?, or symbol=?.) key must be a symbol.
@@ -1568,7 +1567,7 @@
 
 *** 7.13. Record Types
 
- Chez Scheme extends the Revised6 Report's define-record-type syntax in one way, which is that it allows a generative record type to be declared explicitly as such (in a double-negative sort of way) by including a nongenerative clause with #f as the uid, i.e.:
+ /Chez Scheme/ extends the Revised6 Report's define-record-type syntax in one way, which is that it allows a generative record type to be declared explicitly as such (in a double-negative sort of way) by including a nongenerative clause with #f as the uid, i.e.:
 
  (nongenerative #f)
 
@@ -1664,7 +1663,7 @@
  (hashtable-ref h graph3 #f) => #f
 
  过程: (record-type-equal-procedure rtd equal-proc)
- 返回: unspecified
+ 返回: 未定义
  过程: (record-type-equal-procedure rtd)
  返回: equality 过程 associated with rtd, if any, otherwise #f
  库: (chezscheme)
@@ -1682,7 +1681,7 @@
  record-equal-procedure traverses the inheritance chains for both record instances in an attempt to find the most specific type for each that is associated with an equality 过程, if any. If such type is found and is the same for both instances, the equality 过程 associated with the type is returned. Otherwise, #f is returned.
 
  过程: (record-type-hash-procedure rtd hash-proc)
- 返回: unspecified
+ 返回: 未定义
  过程: (record-type-hash-procedure rtd)
  返回: hash 过程 associated with rtd, if any, otherwise #f
  库: (chezscheme)
@@ -1711,7 +1710,7 @@
 
 *** 7.15. Legacy Record Types
 
- In addition to the Revised6 Report record-type creation and definition mechanisms, which are described in Chapter 9 of The Scheme Programming Language, 4th Edition, Chez Scheme continues to support pre-R6RS mechanisms for creating new data types, or record types, with fixed sets of named fields. Many of the procedures described in this section are available only when imported from the (chezscheme csv7) library.
+ In addition to the Revised6 Report record-type creation and definition mechanisms, which are described in Chapter 9 of The Scheme Programming Language, 4th Edition, /Chez Scheme/ continues to support pre-R6RS mechanisms for creating new data types, or record types, with fixed sets of named fields. Many of the procedures described in this section are available only when imported from the (chezscheme csv7) library.
 
  Code intended to be portable should use the R6RS mechanism instead.
 
@@ -1777,7 +1776,7 @@
 
  syntax: (define-record name (fld1 ...) ((fld2 init) ...) (opt ...))
  syntax: (define-record name parent (fld1 ...) ((fld2 init) ...) (opt ...))
- 返回: unspecified
+ 返回: 未定义
  库: (chezscheme)
 
  A define-record form is a definition and may appear anywhere and only where other definitions may appear.
@@ -1987,11 +1986,11 @@
  过程: (record-reader rtd)
  返回: the first name associated with rtd
  过程: (record-reader name rtd)
- 返回: unspecified
+ 返回: 未定义
  过程: (record-reader name #f)
- 返回: unspecified
+ 返回: 未定义
  过程: (record-reader rtd #f)
- 返回: unspecified
+ 返回: 未定义
  库: (chezscheme)
 
  name must be a symbol, and rtd must be a record-type descriptor.
@@ -2032,7 +2031,7 @@
  过程: (record-writer rtd)
  返回: the record writer associated with rtd
  过程: (record-writer rtd 过程)
- 返回: unspecified
+ 返回: 未定义
  库: (chezscheme)
 
  rtd must be a record-type descriptor, and 过程 should accept three arguments, as described below.
@@ -2112,7 +2111,7 @@
 
  If a type is specified, the field can contain objects only of the specified type. If no type is specified, the field is of type ptr, meaning that it can contain any Scheme object.
 
- The behavior of a program that modifies the string type-name or the list fields or any of its sublists is unspecified.
+ The behavior of a program that modifies the string type-name or the list fields or any of its sublists is 未定义.
 
  The record-type descriptor may be passed as an argument to any of the Revised6 Report procedures
 
@@ -2121,7 +2120,7 @@
      record-accessor, and
      record-mutator, 
 
- or to the Chez Scheme variants
+ or to the /Chez Scheme/ variants
 
      record-constructor,
      record-field-accessor, and
@@ -2165,7 +2164,7 @@
  ((record-field-accessor r3 0) x) => a
  ((record-field-accessor r3 2) x) => c
  ((record-field-accessor r3 4) x) => e
- ((record-field-accessor r3 't) x) => unspecified
+ ((record-field-accessor r3 't) x) => 未定义
 
  过程: (record-constructor rcd)
  过程: (record-constructor rtd)
@@ -2284,7 +2283,7 @@
  rtd => #<record type frob>
  (define x ((record-constructor rtd) 1 2))
  (record-type-descriptor x) => #<record type frob>
- (eq? (record-type-descriptor x) rtd) => unspecified
+ (eq? (record-type-descriptor x) rtd) => 未定义
 
 *** 7.16. Procedures
 
@@ -2306,8 +2305,8 @@
  (logbit? 2 (procedure-arity-mask pair?)) => #f
  (logbit? 2 (procedure-arity-mask cons)) => #t
 
- Chez Scheme Version 9 User's Guide
+ /Chez Scheme/ Version 9 User's Guide
  Copyright © 2018 Cisco Systems, Inc.
  Licensed under the Apache License Version 2.0 (full copyright notice.).
- Revised October 2018 for Chez Scheme Version 9.5.1
+ Revised October 2018 for /Chez Scheme/ Version 9.5.1
  about this book 
