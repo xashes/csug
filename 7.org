@@ -326,7 +326,7 @@
 
 *** 7.4. 字符串 (Strings)
 
- 对于标准的字符串句法， /Chez Scheme/ 增加了两种转义字符： ~\'~ 生成单引号字符，以及 ~\nnn~, 即，反斜杠紧跟着 3 位 8 进制数，生成等同于此 3 位 8 进制数的值的字符。读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
+ 基于标准的字符串句法， /Chez Scheme/ 增加了两种转义字符： ~\'~ 生成单引号字符，以及 ~\nnn~, 即，反斜杠紧跟着 3 位 8 进制数，生成等同于此 3 位 8 进制数的值的字符。读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
 
  所有字符串默认是可变的，包括常量。程序可以通过 ~string->immutable-string~ 创建不可变字符串。尝试修改不可变字符串会导致抛出异常。
 
@@ -958,48 +958,69 @@
  读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
 
  All boxes are mutable by default, including constants. A program can create immutable boxes via box-immutable. Any attempt to modify an immutable box causes an exception to be raised.
+ 所有盒子默认是可变的，包括常量。程序可以通过 ~box-immutable~ 创建不可变盒子。尝试修改不可变盒子会导致抛出异常。
 
  过程: (box? obj)
- 返回: #t if obj is a box, #f otherwise
+
+ 返回: 如果 ~obj~ 是盒子，则为 ~#t~, 否则为 ~#f~.
+
  库: (chezscheme)
 
- (box? '#&a) => #t
- (box? 'a) => #f
- (box? (box 3)) => #t
+ #+BEGIN_SRC scheme
+   (box? '#&a) => #t
+   (box? 'a) => #f
+   (box? (box 3)) => #t
+ #+END_SRC
+
 
  过程: (box obj)
- 返回: a new box containing obj
+
+ 返回: 一个包含 ~obj~ 的新的盒子
+
  库: (chezscheme)
 
- (box 'a) => #&a
- (box (box '(a b c))) => #&#&(a b c)
+ #+BEGIN_SRC scheme
+   (box 'a) => #&a
+   (box (box '(a b c))) => #&#&(a b c)
+ #+END_SRC
+
 
  过程: (unbox box)
- 返回: contents of box
+
+ 返回: ~box~ 的内容
+
  库: (chezscheme)
 
- (unbox #&a) => a
- (unbox #&#&(a b c)) => #&(a b c)
+ #+BEGIN_SRC scheme
+   (unbox #&a) => a
+   (unbox #&#&(a b c)) => #&(a b c)
 
- (let ([b (box "hi")])
-   (unbox b)) => "hi"
+   (let ([b (box "hi")])
+     (unbox b)) => "hi"
+ #+END_SRC
+
 
  过程: (set-box! box obj)
+
  返回: 未定义
+
  库: (chezscheme)
 
- box must be mutable. set-box! sets the contents of box to obj.
+ ~box~ 必须是可变的。 ~set-box!~ 把 ~box~ 的内容设置为 ~obj~.
 
- (let ([b (box 'x)])
-   (set-box! b 'y)
-   b) => #&y
+ #+BEGIN_SRC scheme
+   (let ([b (box 'x)])
+     (set-box! b 'y)
+     b) => #&y
 
- (let ([incr!
-        (lambda (x)
-          (set-box! x (+ (unbox x) 1)))])
-   (let ([b (box 3)])
-     (incr! b)
-     (unbox b))) => 4
+   (let ([incr!
+          (lambda (x)
+            (set-box! x (+ (unbox x) 1)))])
+     (let ([b (box 3)])
+       (incr! b)
+       (unbox b))) => 4
+ #+END_SRC
+
 
  过程: (box-cas! box old-obj new-obj)
  返回: #t if box is changed, #f otherwise
@@ -1036,166 +1057,223 @@
 
 *** 7.9. Symbols
 
- /Chez Scheme/ extends the standard symbol syntax in several ways:
+ /Chez Scheme/ 对标准符号句法进行了多方面的扩展：
 
-     Symbol names may begin with @, but ,@abc is parsed as (unquote-splicing abc); to produce (unquote @abc) one can type , @abc, \x40;abc, or ,|@abc|.
+     符号名可以以 ~@~ 开始，但是， ~,@abc~ 被解析为 ~(unquote-splicing abc)~; 如果要生成 ~(unquote @abc)~ ，可以键入 ~, @abc~, ~\x40;abc~, 或者 ~,|@abc|~.
 
-     The single-character sequences { and } are read as symbols.
+     单字符 ~{~ 和 ~}~ 被读取为符号。
 
-     A symbol's name may begin with any character that might normally start a number, including a digit, ., +, -, as long as the delimited sequence of characters starting with that character cannot be parsed as a number.
+     通常作为数字起始的任意字符，可以作为符号名的开头，包括数字， ~.~, ~+~, ~-~, 只要此字符和其后的字符序列总体不会被解析成一个数字就可以。
 
-     A symbol whose name contains arbitrary characters may be written by escaping them with \ or with |. \ is used to escape a single character (except 'x', since \x marks the start of a hex scalar value), whereas | is used to escape the group of characters that follow it up through the matching |. 
+     名字包含任意字符的符号可以通过转义符 ~\~ 或 ~|~ 来书写。 ~\~ 用来转义单个字符（除了 'x'，因为 ~\x~ 是 16 进制数的起始标记），而 ~|~ 用来转义一组字符，直到配对的 ~|~ 为止。
 
- The printer always prints symbols using the standard R6RS syntax, so that, e.g., @abc prints as \x40;abc and 1- prints as \x31;-. '
+ printer 总是依标准 R6RS 句法打印符号，所以，如 ~@abc~ 会被打印为 ~\x40;abc~, ~1-~ 会被打印为 ~\x31;-~.
 
- Gensyms are printed #{ and } brackets that enclose both the "pretty" and "unique" names, e.g., #{g1426 e5g1c94g642dssw-a}. They may also be printed using the pretty name only with the prefix #:, e.g., #:g1426.
+ ~gensym~ 过程族把“美观”版和“唯一”版名字放到 ~#{~ 和 ~}~ 之间打印出来，形如 ~#{g1426 e5g1c94g642dssw-a}~. 它们也可以以前缀 ~#:~ 来只打印美观版名字，如 ~#:g1426~.
 
- These extensions are disabled in an input stream after #!r6rs has been seen by the reader, unless #!chezscheme has been seen more recently.
  读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
 
  过程: (gensym)
+
  过程: (gensym pretty-name)
+
  过程: (gensym pretty-name unique-name)
- 返回: a unique generated symbol
+
+ 返回: 一个唯一生成的符号
+
  库: (chezscheme)
 
- Each call to gensym 返回 a unique generated symbol, or gensym. Each generated symbol has two names: a "pretty" name and a "unique" name.
+ 每个 ~gensym~ 调用返回一个唯一生成的符号，或 /gensym/. 每个生成的符号有两个名字：一个“美观”版名字和一个“唯一”版名字。
 
  In the first form above, the pretty name is formed (lazily---see below) by combining an internal prefix with the value of an internal counter. After each name is formed, the internal counter is incremented. The parameters gensym-prefix and gensym-count, described below, may be used to access and set the internal prefix and counter. By default, the prefix is the single-character string "g". In the second and third forms, the pretty name of the new gensym is pretty-name, which must be a string. The pretty name of a gensym is returned by the 过程 symbol->string.
+ 在上文的第一个形式中，美观版名字是通过组合一个内部的前缀和一个内部计数器的值来形成（惰性的──参见下文）。在每个名字形成之后，内部计数器会增加。下文将提及的参数 ~gensym-prefix~ 和 ~gensym-count~, 可以用来访问和设置内部前缀和计数器。前缀默认为单字符字符串 ~"g".~ 在第二和第三种形式中，新的生成符号的美观版名字是 ~pretty-name~, 其必须为一字符串。生成符号的美观版名字由过程 ~symbol->string~ 返回。
 
  In both the first and second forms, the unique name is an automatically generated globally unique name. Globally unique names are constructed (lazily---see below) from the combination of a universally unique identifier and an internal counter. In the third form of gensym, the unique name of the new gensym is unique-name, which must be a string. The unique name of a gensym may be obtained via the 过程 gensym->unique-string.
+ 在前两种形式中，唯一版名字是一个自动生成的全局唯一名字。全局唯一名字是通过组合一个全局唯一标识符和一个内部计数器来构造的（惰性的──参见下文）。在第三种生成符号的形式中，新生成符号的唯一版名字是 ~unique-name~, 其必须为一字符串。生成符号的唯一版名字可以通过过程 ~gensym->unique-string~ 获得。
 
  The unique name allows gensyms to be written in such a way that they can be read back and reliably commonized on input. The syntax for gensyms includes both the pretty name and the unique name, as shown in the example below:
 
- (gensym) => #{g0 bcsfg5eq4e9b3h9o-a}
+ #+BEGIN_SRC scheme
+   (gensym) => #{g0 bcsfg5eq4e9b3h9o-a}
+ #+END_SRC
 
  When the parameter print-gensym is set to pretty, the printer prints the pretty name only, with a #: syntax, so
+ 当参数 ~print-gensym~ 被设为 ~pretty~, 则 printer 只输出美观版名字，使用 ~#:~ 句法，所以
 
- (parameterize ([print-gensym 'pretty])
-   (write (gensym)))
+ #+BEGIN_SRC scheme
+   (parameterize ([print-gensym 'pretty])
+     (write (gensym)))
+ #+END_SRC
 
- prints #:g0.
+ 输出 ~#:g0~.
 
- When the reader sees the #: syntax, it produces a gensym with the given pretty name, but the original unique name is lost.
+ 当读取器遇到 ~#:~ 句法，便以其提供的美观名字产生一个生成符号，但是最初的唯一名字就遗失了。
 
  When the parameter is set to #f, the printer prints just the pretty name, so
+ 当此参数被设为 ~#f~, 则 printer 只输出美观版名字，所以
 
- (parameterize ([print-gensym #f])
-   (write (gensym)))
+ #+BEGIN_SRC scheme
+   (parameterize ([print-gensym #f])
+     (write (gensym)))
+ #+END_SRC
 
- prints g0. This is useful only when gensyms do not need to be read back in as gensyms.
+ 输出 ~g0~. 只有在生成符号不需要再作为生成符号被读取回来时，这种做法才有益。
 
  In order to reduce construction and (when threaded) synchronization overhead when gensyms are frequently created but rarely printed or stored in an object file, generated pretty and unique names are created lazily, i.e., not until first requested, either by the printer, fasl writer, or explicitly by one of the procedures symbol->string or gensym->unique-string. In addition, a gensym is not placed into the system's internal symbol table (the oblist; see page 156) until the unique name is requested. This allows a gensym to be reclaimed by the storage manager if no references to the gensym exist and no unique name exists by which to access it, even if it has a top-level binding or a nonempty property list.
+ 当生成符号被频繁创建，但很少被输出或存储在一个对象文件中时，为了减小构造和（线程）同步消耗，美观和唯一名字的生成是惰性的，即，直到第一次请求时才创建，不论是被 printer, fasl writer, 或显式地被过程 ~symbol->string~ 或 ~gensym->unique-string~ 所请求。此外，在唯一名字被请求之前，生成符号不会被放入系统的内部符号表（oblist; 参见第 156 页）。这使得一个生成符号可以在下列情况下被存储管理器回收：如果不存在对这个生成符号的引用，且不存在可访问的唯一名字，即使它有一个顶层绑定，或非空的属性列表。
 
- (define x (gensym))
- x                         => #{g2 bcsfg5eq4e9b3h9o-c}
- (symbol->string x)        => "g2"
- (gensym->unique-string x) => "bcsfg5eq4e9b3h9o-c"
+ #+BEGIN_SRC scheme
+   (define x (gensym))
+   x                         => #{g2 bcsfg5eq4e9b3h9o-c}
+   (symbol->string x)        => "g2"
+   (gensym->unique-string x) => "bcsfg5eq4e9b3h9o-c"
+ #+END_SRC
 
  Gensyms subsume the notion of uninterned symbols supported by earlier versions of /Chez Scheme/. Similarly, the predicate uninterned-symbol? has been replaced by gensym?.
+ 生成符号包括之前版本 /Chez Scheme/ 支持的 uninterned symbols 的概念。同样，谓词 ~gensym?~ 也取代了 ~uninterned-symbol?~.
 
- thread parameter: gensym-prefix
- thread parameter: gensym-count
+ thread parameter: ~gensym-prefix~
+
+ thread parameter: ~gensym-count~
+
  库: (chezscheme)
 
- The parameters gensym-prefix and gensym-count are used to access and set the internal prefix and counter from which the pretty name of a gensym is generated when gensym is not given an explicit string argument. gensym-prefix defaults to the string "g" and may be set to any object. gensym-count starts at 0 and may be set to any nonnegative integer.
+ 当 ~gensym~ 没有传入显式的字符串参数时，参数 ~gensym-prefix~ 和 ~gensym-count~ 被用来访问和设置用来生成美观名字的内部前缀和计数器。 ~gensym-prefix~ 默认为字符串 ~"g"~ , 并且可以被设置为任何对象。 ~gensym-count~ 起始于 0, 并且可以被设置为任何非负整数。
 
- As described above, /Chez Scheme/ delays the creation of the pretty name until the name is first requested by the printer or by an explicit call to symbol->string. These parameters are not consulted until that time; setting them when gensym is called thus has no effect on the generated name.
+ 如上所述， /Chez Scheme/ 把美观名字的创建延迟到其第一次被请求时──被 printer 或通过显式调用 ~symbol->string~ 。在那之前，这些参数并不会起作用；因此，在调用 ~gensym~ 时设置它们，对生成的名字并没有影响。
 
- (let ([x (parameterize ([gensym-prefix "genny"]
-                         [gensym-count 17]
-                         [print-gensym 'pretty])
-            (gensym))])
-   (format "~s" x))                       => "#{g4 bcsfg5eq4e9b3h9o-e}"
- (let ([x (gensym)])
-   (parameterize ([gensym-prefix "genny"]
-                  [gensym-count 17]
-                  [print-gensym #f])
-     (format "~s" (gensym))))             => "genny17"
+ #+BEGIN_SRC scheme
+   (let ([x (parameterize ([gensym-prefix "genny"]
+                           [gensym-count 17]
+                           [print-gensym 'pretty])
+              (gensym))])
+     (format "~s" x))                       => "#{g4 bcsfg5eq4e9b3h9o-e}"
+   (let ([x (gensym)])
+     (parameterize ([gensym-prefix "genny"]
+                    [gensym-count 17]
+                    [print-gensym #f])
+       (format "~s" (gensym))))             => "genny17"
+ #+END_SRC
+
 
  过程: (gensym->unique-string gensym)
- 返回: the unique name of gensym
+
+ 返回: ~gensym~ 的唯一名字
+
  库: (chezscheme)
 
- (gensym->unique-string (gensym)) => "bd3kufa7ypjcuvut-g"
+ #+BEGIN_SRC scheme
+   (gensym->unique-string (gensym)) => "bd3kufa7ypjcuvut-g"
+ #+END_SRC
+
 
  过程: (gensym? obj)
- 返回: #t if obj is gensym, #f otherwise
+
+ 返回: 如果 ~obj~ 是生成符号，则为 ~#t~, 否则为 ~#f~.
+
  库: (chezscheme)
 
- (gensym? (string->symbol "z")) => #f
- (gensym? (gensym "z")) => #t
- (gensym? 'a) => #f
- (gensym? 3) => #f
- (gensym? (gensym)) => #t
- (gensym? '#{g2 bcsfg5eq4e9b3h9o-c}) => #t
+ #+BEGIN_SRC scheme
+   (gensym? (string->symbol "z")) => #f
+   (gensym? (gensym "z")) => #t
+   (gensym? 'a) => #f
+   (gensym? 3) => #f
+   (gensym? (gensym)) => #t
+   (gensym? '#{g2 bcsfg5eq4e9b3h9o-c}) => #t
+ #+END_SRC
+
 
  过程: (putprop symbol key value)
+
  返回: 未定义
+
  库: (chezscheme)
 
- /Chez Scheme/ associates a property list with each symbol, allowing multiple key-value pairs to be stored directly with the symbol. New key-value pairs may be placed in the property list or retrieved in a manner analogous to the use of association lists, using the procedures putprop and getprop. Property lists are often used to store information related to the symbol itself. For example, a natural language program might use symbols to represent words, using their property lists to store information about use and meaning.
+ /Chez Scheme/ 给每个符号关联一个属性列表，允许多个键值对直接和符号存储在一起。使用过程 ~putprop~ 和 ~getprop~, 可以把新的键值对存入属性列表，或以类似关联列表的使用方式获取值。属性列表通常用来存储与符号自身相关的信息。比如，一个自然语言程序，可以使用符号来表示单词，利用它们的属性列表来存储有关用法和词意的信息。
 
- putprop associates value with key on the property list of symbol. key and value may be any types of object, although key is typically a symbol.
+ ~putprop~ 在符号的属性列表中把键值关联起来。虽然键通常是符号，但键和值实际可以是任意类型的对象。
 
- putprop may be used to establish a new property or to change an existing property.
+ ~putprop~ 可以用来创建新属性，或改变已有属性。
 
- See the examples under getprop below.
+ 参见 ~getprop~ 后面的例子。
+
 
  过程: (getprop symbol key)
+
  过程: (getprop symbol key default)
- 返回: the value associated with key on the property list of symbol
+
+ 返回: ~symbol~ 属性列表中与 ~key~ 关联的值
+
  库: (chezscheme)
 
- getprop searches the property list of symbol for a key identical to key (in the sense of eq?), and 返回 the value associated with this key, if any. If no value is associated with key on the property list of symbol, getprop 返回 default, or #f if the default argument is not supplied.
+ ~getprop~ 在 ~symbol~ 的属性列表中搜索，寻找与 ~key~ 相同 (基于 ~eq?~) 的键，如果存在，则返回与此键关联的值。如果在 ~symbol~ 的属性列表中，没有与 ~key~ 相关联的值， ~getprop~ 返回 ~default~, 若没有提供 ~default~ 参数，则返回 ~#f~.
 
- (putprop 'fred 'species 'snurd)
- (putprop 'fred 'age 4)  
- (putprop 'fred 'colors '(black white))
+ #+BEGIN_SRC scheme
+   (putprop 'fred 'species 'snurd)
+   (putprop 'fred 'age 4)  
+   (putprop 'fred 'colors '(black white))
 
- (getprop 'fred 'species) => snurd
- (getprop 'fred 'colors) => (black white)
- (getprop 'fred 'nonkey) => #f
- (getprop 'fred 'nonkey 'unknown) => unknown
- 
- (putprop 'fred 'species #f)
- (getprop 'fred 'species 'unknown) => #f
+   (getprop 'fred 'species) => snurd
+   (getprop 'fred 'colors) => (black white)
+   (getprop 'fred 'nonkey) => #f
+   (getprop 'fred 'nonkey 'unknown) => unknown
+
+   (putprop 'fred 'species #f)
+   (getprop 'fred 'species 'unknown) => #f
+ #+END_SRC
+
 
  过程: (remprop symbol key)
+
  返回: 未定义
+
  库: (chezscheme)
 
- remprop removes the property with key key from the property list of symbol, if such a property exists.
+ 如果键 ~key~ 对应的属性存在，则 ~remprop~ 从 ~symbol~ 的属性列表中移除此属性。
 
- (putprop 'fred 'species 'snurd)
- (getprop 'fred 'species) => snurd
+ #+BEGIN_SRC scheme
+   (putprop 'fred 'species 'snurd)
+   (getprop 'fred 'species) => snurd
 
- (remprop 'fred 'species)
- (getprop 'fred 'species 'unknown) => unknown
+   (remprop 'fred 'species)
+   (getprop 'fred 'species 'unknown) => unknown
+ #+END_SRC
+
 
  过程: (property-list symbol)
- 返回: a copy of the internal property list for symbol
+
+ 返回: ~symbol~ 内部属性列表的一份拷贝
+
  库: (chezscheme)
 
  A property list is a list of alternating keys and values, i.e., (key value ...).
+ 属性列表是一个键和值交替排列的列表，即， ~(key value ...)~.
 
- (putprop 'fred 'species 'snurd)
- (putprop 'fred 'colors '(black white))
- (property-list 'fred) => (colors (black white) species snurd)
+ #+BEGIN_SRC scheme
+   (putprop 'fred 'species 'snurd)
+   (putprop 'fred 'colors '(black white))
+   (property-list 'fred) => (colors (black white) species snurd)
+ #+END_SRC
+
 
  过程: (oblist)
- 返回: a list of interned symbols
+
+ 返回: 内部符号列表
+
  库: (chezscheme)
 
- The system maintains an internal symbol table used to insure that any two occurrences of the same symbol name resolve to the same symbol object. The oblist 过程 返回 a list of the symbols currently in this symbol table.
+ 系统维护着一份内部符号表，以确保同一符号名在任意两处出现时会被解析为同一个符号对象。 ~oblist~ 过程返回当前处于此符号表中的符号列表。
 
  The list of interned symbols grows when a new symbol is introduced into the system or when the unique name of a gensym (see page 152) is requested. It shrinks when the garbage collector determines that it is safe to discard a symbol. It is safe to discard a symbol only if the symbol is not accessible except through the oblist, has no top-level binding, and has no properties on its property list.
+ 当一个新的符号被引入系统，或一个生成符号（参见 152 页）的唯一名字被请求时，内部符号列表变长。当垃圾收集器判断可以安全地丢弃一个符号时，列表缩短。可以安全丢弃一个符号的条件为：除了通过 ~oblist~, 在别处均无法访问此符号，符号没有顶层绑定，属性列表中没有任何属性。
 
- (if (memq 'tiger (oblist)) 'yes 'no) => yes
- (equal? (oblist) (oblist)) => #t
- (= (length (oblist)) (length (oblist))) => #t or #f
+ #+BEGIN_SRC scheme
+   (if (memq 'tiger (oblist)) 'yes 'no) => yes
+   (equal? (oblist) (oblist)) => #t
+   (= (length (oblist)) (length (oblist))) => #t or #f
+ #+END_SRC
 
- The first example above follows from the property that all interned symbols are in the oblist from the time they are read, which happens prior to evaluation. The second example follows from the fact that no symbols can be removed from the oblist while references to those symbols exist, in this case, within the list returned by the first call to oblist (whichever call is performed first). The expression in the third example can return #f only if a garbage collection occurs sometime between the two calls to oblist, and only if one or more symbols are removed from the oblist by that collection.
+ 上面的第一个例子体现了，所有内部符号从它们被读取时即纳入内部列表，早于被求值。第二个例子体现了，当对符号的引用存在时，没有符号可以从内部列表中被移除，在当前情况下，即为对 ~oblist~ 的第一次调用（无论哪个调用先被执行）时返回的列表中的符号。第三个例子中的表达式，只有当垃圾收集发生在两次对 ~oblist~ 的调用之间时，且仅在这次收集从内部列表中移除了一个或更多符号时，才会返回 ~#f~.
 
 *** 7.10. Void
 
