@@ -1290,30 +1290,42 @@
 *** 7.11. Sorting
 
  过程: (sort predicate list)
+
  过程: (sort! predicate list)
- 返回: a list containing the elements of list sorted according to predicate
+
+ 返回: ~list~ 中元素根据 ~predicate~ 排序后组成的列表
+
  库: (chezscheme)
 
- sort is identical to the Revised6 Report list-sort, and sort! is a destructive version of sort, i.e., it reuses pairs from the input list to form the output list.
+ ~sort~ 和第 6 修订版中的 ~list-sort~ 是一样的，而 ~sort!~ 是 ~sort~ 的破坏性版本，即，它重用输入列表中的点对来构造输出列表。
 
- (sort < '(3 4 2 1 2 5)) => (1 2 2 3 4 5)
- (sort! < '(3 4 2 1 2 5)) => (1 2 2 3 4 5)
+ #+BEGIN_SRC scheme
+   (sort < '(3 4 2 1 2 5)) => (1 2 2 3 4 5)
+   (sort! < '(3 4 2 1 2 5)) => (1 2 2 3 4 5)
+ #+END_SRC
+
 
  过程: (merge predicate list1 list2)
+
  过程: (merge! predicate list1 list2)
- 返回: list1 merged with list2 in the order specified by predicate
+
+ 返回: 依 ~predicate~ 指定的顺序融合 ~list1~ 和 ~list2~.
+
  库: (chezscheme)
 
- predicate should be a 过程 that expects two arguments and 返回 #t if its first argument must precede its second in the merged list. It should not have any side effects. That is, if predicate is applied to two objects x and y, where x is taken from the second list and y is taken from the first list, it should return true only if x should appear before y in the output list. If this constraint is met, merge and merge! are stable, in that items from list1 are placed in front of equivalent items from list2 in the output list. Duplicate elements are included in the merged list.
+ ~predicate~ 应该是一个接收两个参数的过程，当它的第一个参数在融合后的列表中要排在第二个参数之前时返回 ~#t~. 它不应有任何负作用。即，如果把 ~predicate~ 作用于两个对象 /x/ 和 /y/, /x/ 来自于第一个列表，而 /y/ 来自于第二个列表，它应该只在 /x/ 应在输出列表中排在 /y/ 之前时返回 ~#t~. 如果满足这个限制条件， ~merge~ 和 ~merge!~ 就是可靠的，其中来自 ~list1~ 的项在输出列表中排在来自 ~list2~ 的相等项的前面。融合后的列表中包含重复元素。
 
- merge! combines the lists destructively, using pairs from the input lists to form the output list.
+ ~merge!~ 破坏性地组合列表，使用输入列表中的点对来构造输出列表。
 
- (merge char<?
-        '(#\a #\c)
-        '(#\b #\c #\d)) => (#\a #\b #\c #\c #\d)
- (merge <
-        '(1/2 2/3 3/4)
-        '(0.5 0.6 0.7)) => (1/2 0.5 0.6 2/3 0.7 3/4)
+ #+BEGIN_SRC scheme
+   (merge char<?
+          '(#\a #\c)
+          '(#\b #\c #\d)) => (#\a #\b #\c #\c #\d)
+   (merge <
+          '(1/2 2/3 3/4)
+          '(0.5 0.6 0.7)) => (1/2 0.5 0.6 2/3 0.7 3/4)
+ #+END_SRC
+
 
 *** 7.12. Hashtables
 
