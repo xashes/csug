@@ -547,23 +547,22 @@
  #+END_SRC
 
 
-*** 7.6. 全定长数向量 (Fixnum-Only Vectors)
+*** 7.6. 定长数向量 (Fixnum-Only Vectors)
 
- Fixnum-only 向量, 即 "fxvectors", 类似于向量，但只包含 ~fixnums~. Fxvectors 的写法是以前缀 =#vfx= 替换向量的前缀 =#=, 例如， ~#vfx(1 2 3)~ 或 ~#10vfx(2)~. The fxvector syntax is disabled in an input stream after #!r6rs has been seen by the reader, unless #!chezscheme has been seen more recently.
- 读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
+ 定长数向量, 即 "fxvectors", 类似于向量，但只包含定长数。定长数向量的输出形式以前缀 =#vfx= 替换向量的前缀 =#=, 例如， ~#vfx(1 2 3)~ 或 ~#10vfx(2)~. 读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用定长数向量的句法，除非在更近的位置遇到 ~#!chezscheme~.
 
- ~fxvector~ 的长度和索引总是定长数。
+ 定长数向量的长度和索引总是定长数。
 
- Updating an fxvector is generally less expensive than updating a vector, since for vectors, the system records potential assignments from older to younger objects to support generational garbage collection. The storage management system also takes advantage of the fact that fxvectors contain no pointers to place them in an area of memory that does not have to be traced during collection.
- 更新 ~fxvector~ 通常比更新向量节省资源，因为对于向量来说，系统需要记录从老到新的各个对象的潜在分配，以支持分代垃圾回收。 =fxvectors= 不包含任何指针，受益于此，存储管理系统 TODO
+ 更新定长数向量通常比更新向量节省资源，因为对于向量来说，系统需要记录从老到新的各个对象的潜在分配，以支持分代垃圾回收。定长数向量不包含要指向内存某一区域的指针，受益于此，存储管理系统不需要在垃圾收集期间对这些指针进行追踪。
 
- 所有 ~fxvectors~ 默认是可变的，包括常量。程序可以通过 ~fxvector->immutable-fxvector~ 创建不可变的 ~fxvectors~. 尝试修改一个不可变的 ~fxvector~ 会导致异常抛出。
+ 定长数向量默认是可变的，包括常量。程序可以通过 ~fxvector->immutable-fxvector~ 创建不可变的定长数向量。尝试修改一个不可变的定长数向量会导致异常抛出。
 
  可参考前述的 ~vector-set-fixnum!~.
 
+
  过程: (fxvector? obj)
 
- 返回: 如果 ~obj~ 是一个 ~fxvector~, 则为 ~#t~, 否则为 ~#f~.
+ 返回: 如果 ~obj~ 是一个定长数向量，则为 ~#t~, 否则为 ~#f~.
 
  库: (chezscheme)
 
@@ -579,7 +578,7 @@
 
  过程: (fxvector fixnum ...)
 
- 返回: 一个由参数中的所有定长数组成的 ~fxvector~.
+ 返回: 一个由参数中的所有定长数 ~fixnum ...~ 组成的定长数向量
 
  库: (chezscheme)
 
@@ -593,12 +592,11 @@
 
  过程: (make-fxvector n fixnum)
 
- 返回: 一个长度为 ~n~ 的 ~fxvector~.
+ 返回: 一个长度为 ~n~ 的定长数向量
 
  库: (chezscheme)
 
- n must be a fixnum. If fixnum is supplied, each element of the fxvector is initialized to fixnum; otherwise, the elements are 未定义.
- ~n~ 必须是定长数。如果有提供参数 ~fixnum~, 则 ~fxvector~ 中的每个元素都被初始化为 ~fixnum~; 不然，元素则均为未定义。
+ ~n~ 必须是定长数。如果有提供参数 ~fixnum~, 则定长数向量中的每个元素都被初始化为 ~fixnum~; 不然，其中元素则均为未定义。
 
  #+BEGIN_SRC scheme
    (make-fxvector 0) => #vfx()
@@ -684,7 +682,7 @@
 
  过程: (list->fxvector list)
 
- 返回: 列表中所有元素组成的 ~fxvector~
+ 返回: ~list~ 中所有元素组成的定长数向量
 
  库: (chezscheme)
 
@@ -706,7 +704,7 @@
 
  库: (chezscheme)
 
- ~fxvector-copy~ 生成一个与原 ~fxvector~ 长度和内容都一样的新的 ~fxvector~.
+ ~fxvector-copy~ 生成一个与 ~fxvector~ 长度和内容都一样的新的定长数向量。
 
  #+BEGIN_SRC scheme
    (fxvector-copy #vfx(3 4 5)) => #vfx(3 4 5)
@@ -718,11 +716,11 @@
 
  过程: (mutable-fxvector? obj)
 
- 返回: 如果 ~obj~ 是一个可变的 ~fxvector~, 则为 ~#t~, 否则为 ~#f~.
+ 返回: 如果 ~obj~ 是一个可变的定长数向量，则为 ~#t~, 否则为 ~#f~.
 
  过程: (immutable-fxvector? obj)
 
- 返回: 如果 ~obj~ 是一个不可变的 ~fxvector~, 则为 ~#t~, 否则为 ~#f~.
+ 返回: 如果 ~obj~ 是一个不可变的定长数向量，则为 ~#t~, 否则为 ~#f~.
 
  库: (chezscheme)
 
@@ -741,7 +739,7 @@
 
  库: (chezscheme)
 
- 如果 ~fxvector~ 是不可变的，则结果为其本身；否则，结果是与原 ~fxvector~ 内容相同的一个不可变 ~fxvector~.
+ 如果 ~fxvector~ 是不可变的，则结果为其本身；否则，结果是与 ~fxvector~ 内容相同的一个不可变定长数向量。
 
  #+BEGIN_SRC scheme
    (define v (fxvector->immutable-fxvector (fxvector 1 2 3)))
