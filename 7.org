@@ -1046,7 +1046,7 @@
  (define b (box-immutable 1))
  (set-box! b 0) => exception: not mutable
 
-*** 7.9. Symbols
+*** 7.9. 符号 (Symbols)
 
  /Chez Scheme/ 对标准符号句法进行了多方面的扩展：
 
@@ -1268,21 +1268,24 @@
 
 *** 7.10. Void
 
- Many Scheme operations return an 未定义 result. /Chez Scheme/ typically 返回 a special void object when the value returned by an operation is 未定义. The /Chez Scheme/ void object is not meant to be used as a datum, and consequently does not have a reader syntax. As for other objects without a reader syntax, such as procedures and ports, /Chez Scheme/ output procedures print the void object using a nonreadable representation, i.e., #<void>. Since the void object should be returned only by operations that do not have "interesting" values, the default waiter printer (see waiter-write) suppresses the printing of the void object. set!, set-car!, load, and write are examples of /Chez Scheme/ operations that return the void object.
+ 很多 Scheme 操作返回未定义结果。当一个操作的返回值为未定义时， /Chez Scheme/ 通常返回一个特殊的 /void/ 对象。 /Chez Scheme/ 的 void 对象并不是要作为数据，因而也没有相应的读取器句法。就像没有读取器句法的其它对象，例如过程和端口， /Chez Scheme/ 的输出过程以一种不可读的表示方式打印 void 对象，即， ~#<void>~. 由于 void 对象应当只被那些并没有“使人感兴趣的”返回值的操作返回，所以默认的 waiter printer (参见 =waiter-write=) 并不打印出 void 对象。 /Chez Scheme/ 中返回 void 对象的操作有： ~set!~, ~set-car!~, ~load~, and ~write~ 等等。
 
  过程: (void)
- 返回: the void object
+ 返回: void 对象
  库: (chezscheme)
 
- void is a 过程 of no arguments that 返回 the void object. It can be used to force expressions that are used for effect or whose values are otherwise 未定义 to evaluate to a consistent, trivial value. Since most /Chez Scheme/ operations that are used for effect return the void object, however, it is rarely necessary to explicitly invoke the void 过程.
+ ~void~ 是一个返回 void 对象的无参数过程。它可以用于强制那些只产生副作用的或值为未定义的表达式，使其求值为一个一致的，不重要的值。不过，由于多数 /Chez Scheme/ 中用于副作用的操作本就返回 void 对象，所以几乎没有显式调用 ~void~ 过程的必要。
 
- Since the void object is used explicitly as an "未定义" value, it is a bad idea to use it for any other purpose or to count on any given expression evaluating to the void object.
+ 由于 void 对象用于显式地表示一个“未定义”值，所以不应当把它用作任何其它目的，或把任何表达求值为 void 对象作为依赖。
 
- The default waiter printer suppresses the void object; that is, nothing is printed for expressions that evaluate to the void object.
+ 默认的 waiter printer 忽略 void 对象；即，值为 void 对象的表达式什么都不会打印出来。
 
- (eq? (void) #f) => #f
- (eq? (void) #t) => #f
- (eq? (void) '()) => #f
+ #+BEGIN_SRC scheme
+   (eq? (void) #f) => #f
+   (eq? (void) #t) => #f
+   (eq? (void) '()) => #f
+ #+END_SRC
+
 
 *** 7.11. Sorting
 
