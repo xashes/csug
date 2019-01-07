@@ -749,15 +749,14 @@
 
 *** 7.7. Bytevectors
 
- As with vectors, /Chez Scheme/ extends the syntax of bytevectors to allow the length of the vector to be specified between the # and open parenthesis, e.g., #3vu8(1 105 73). If fewer elements are supplied in the syntax than the specified length, each element after the last printed element is the same as the last printed element. This extension is disabled in an input stream after #!r6rs has been seen by the reader, unless #!chezscheme has been seen more recently.
- 和对向量一样，/Chez Scheme/ 扩展了字节向量的语法，以允许在 ~#~ 和左括号之间指定向量的长度，例如， ~#3vu8(1 105 73).~ 如果在此语法形式下提供的向量元素比指定的长度要少，则后面的每个元素都与最后一个提供的元素相同。TODO
- 读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
+ 如同向量， /Chez Scheme/ 也扩展了字节向量的句法，以允许在 ~#~ 和左括号之间指定向量的长度，例如， ~#3vu8(1 105 73).~ 如果在此语法形式下提供的向量元素比指定的长度要少，则之后的每个元素都与最后一个提供的元素相同。读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
 
  /Chez Scheme/ 同时扩展了字节向量的基本操作集，包括了加载和存储 3, 5, 6, 7 字节长度的基本操作。
 
  /Chez Scheme/ 中，字节向量的长度和索引总是定长数。
 
  字节向量默认是可变的，包括常量。程序可以通过 ~bytevector->immutable-bytevector~ 创建不可变字节向量。尝试修改不可变字节向量会导致抛出异常。
+
 
  过程: (bytevector fill ...)
 
@@ -766,7 +765,7 @@
  库: (chezscheme)
 
  Each fill value must be an exact integer representing a signed or unsigned 8-bit value, i.e., a value in the range -128 to 255 inclusive. A negative fill value is treated as its two's complement equivalent.
- 每个填充值必须为一个表示 8 位有符号或无符号值的精确整数，即，一个在范围 -128 至 255（两端均包含）之间的值。负的填充数被视为与其等价的补码。
+ 每个填充值必须为一个表示 8 位有符号或无符号值的精确整数，即，一个在范围 -128 至 255（两端均包含）之间的值。负的填充值被视为与其等价的补码。
 
  #+BEGIN_SRC scheme
    (bytevector) => #vu8()
@@ -781,7 +780,6 @@
 
  库: (chezscheme)
 
- The values in the returned list are exact eight-bit signed integers, i.e., values in the range -128 to 127 inclusive. bytevector->s8-list is similar to the Revised6 Report bytevector->u8-list except the values in the returned list are signed rather than unsigned.
  返回列表中的值均为精确的 8 位有符号整数，即，在范围 -128 至 127（两端均包含）之间的值。 ~bytevector->s8-list~ 与第 6 修订版中的 ~bytevector->u8-list~ 相似，只是返回列表中的值是有符号数，而非无符号数。
 
  #+BEGIN_SRC scheme
@@ -799,7 +797,7 @@
 
  库: (chezscheme)
 
- 列表必须完全由精确 8 位有符号整数组成，即，在范围 -128 至 127（两端均包含）之间的值。 ~s8-list->bytevector~ 与第 6 修订版中的过程 ~u8-list->bytevector~ 相似，只是输入列表中的元素是有符号数，而非无符号数。
+ ~list~ 必须完全由精确的 8 位有符号整数组成，即，在范围 -128 至 127（两端均包含）之间的值。 ~s8-list->bytevector~ 与第 6 修订版中的过程 ~u8-list->bytevector~ 相似，只是输入列表中的元素是有符号数，而非无符号数。
 
  #+BEGIN_SRC scheme
    (s8-list->bytevector '()) => #vu8()
@@ -813,12 +811,12 @@
 
  过程: (bytevector-truncate! bytevector n)
 
- 返回: 字节向量，或空字节向量
+ 返回: ~bytevector~, 或空字节向量
 
  库: (chezscheme)
 
  bytevector must be mutable. n must be an exact nonnegative fixnum not greater than the length of bytevector. 
- ~bytevector~ 必须是可变的。 ~n~ 必须是一个精确的非负定长数，且不大于 ~bytevector~ 的长度。如果 ~n~ 是 0, ~bytevector-truncate!~ 返回空字节向量，否则， ~bytevector-truncate!~ 破坏性地把 ~bytevector~ 缩短为其前 ~n~ 个字节，并返回此字节向量。
+ ~bytevector~ 必须是可变的。 ~n~ 必须是一个精确的非负定长数，且不大于 ~bytevector~ 的长度。如果 ~n~ 是 0, ~bytevector-truncate!~ 返回空字节向量，否则， ~bytevector-truncate!~ 破坏性地把 ~bytevector~ 缩短为其前 ~n~ 个字节，并返回 ~bytevector~.
 
  #+BEGIN_SRC scheme
    (define bv (make-bytevector 7 19))
@@ -863,10 +861,9 @@
 
  库: (chezscheme)
 
- ~n~ 必须是一个精确的非负整数，并且索引数值的起始字节。 ~n~ 和数值占用的字节之和 (24 位数值为 3 个字节，40 位数值为 5 个字节，48 位数值为 6 个字节，56 位数值为 7 个字节) 一定不能超过 ~bytevector~ 的长度。 ~eness~ 必须是一个命名此字节序(endianness)的有效的字节序符号(symbol)。
+ ~n~ 必须是一个精确的非负整数，并且指示数值的起始字节。 ~n~ 和数值占用的字节之和 (24 位数值为 3 个字节，40 位数值为 5 个字节，48 位数值为 6 个字节，56 位数值为 7 个字节) 一定不能超过 ~bytevector~ 的长度。 ~eness~ 必须是一个命名此字节序(endianness)的有效的字节序符号(symbol)。
 
- The return value is an exact integer in the appropriate range for the number of bytes occupied by the value. Signed values are the equivalent of the stored value treated as a two's complement value.
- 返回值是一个精确整数，根据数值所占用的字节数处于适当的区间。TODO
+ 返回值是一个精确整数，根据数值所占用的字节数处于适当的区间。有符号数是作为其补码存储的等价值。
 
  过程: (bytevector-u24-set! bytevector n u24 eness)
 
@@ -888,10 +885,9 @@
 
  库: (chezscheme)
 
- ~bytevector~ 必须是不可变的。 ~n~ 必须是一个精确的非负整数，并且索引数值的起始字节。 ~n~ 和数值占用的字节之和一定不能超过 ~bytevector~ 的长度。 ~u24~ 必须是一个 24 位无符号值，即，在 0 至 2^24 - 1 (两端均包含) 区间中的值； ~s24~ 必须是一个 24 位有符号值，即，在 -2^23 至 2^23 - 1 (两端均包含) 区间中的值； ~u40~ 必须是一个 40 位无符号值，即，在 0 至 2^40 - 1 (两端均包含) 区间中的值； ~s40~ 必须是一个 40 位有符号值，即，在 -2^39 至 2^39 - 1 (两端均包含) 区间中的值； ~u48~ 必须是一个 48 位无符号值，即，在 0 至 2^48 - 1 (两端均包含) 区间中的值； ~s48~ 必须是一个 48 位有符号值，即，在 -2^47 至 2^47 - 1 (两端均包含) 区间中的值； ~u56~ 必须是一个 56 位无符号值，即，在 0 至 2^56 - 1 (两端均包含) 区间中的值； ~s56~ 必须是一个 56 位有符号值，即，在 -2^55 至 2^55 - 1 (两端均包含) 区间中的值。 ~eness~ 必须是一个命名此字节序(endianness)的有效的字节序符号(symbol)。
+ ~bytevector~ 必须是不可变的。 ~n~ 必须是一个精确的非负整数，并且指示数值的起始字节。 ~n~ 和数值占用的字节之和一定不能超过 ~bytevector~ 的长度。 ~u24~ 必须是一个 24 位无符号值，即，在 0 至 2^24 - 1 (两端均包含) 区间中的值； ~s24~ 必须是一个 24 位有符号值，即，在 -2^23 至 2^23 - 1 (两端均包含) 区间中的值； ~u40~ 必须是一个 40 位无符号值，即，在 0 至 2^40 - 1 (两端均包含) 区间中的值； ~s40~ 必须是一个 40 位有符号值，即，在 -2^39 至 2^39 - 1 (两端均包含) 区间中的值； ~u48~ 必须是一个 48 位无符号值，即，在 0 至 2^48 - 1 (两端均包含) 区间中的值； ~s48~ 必须是一个 48 位有符号值，即，在 -2^47 至 2^47 - 1 (两端均包含) 区间中的值； ~u56~ 必须是一个 56 位无符号值，即，在 0 至 2^56 - 1 (两端均包含) 区间中的值； ~s56~ 必须是一个 56 位有符号值，即，在 -2^55 至 2^55 - 1 (两端均包含) 区间中的值。 ~eness~ 必须是一个命名此字节序(endianness)的有效的字节序符号(symbol)。
 
- These procedures store the given value in the 3, 5, 6, or 7 bytes starting at index n (zero-based) of bytevector. Negative values are stored as their two's complement equivalent.
- 这些过程把给定值存储到 ~bytevector~ 的索引 ~n~ (基于 0)处起始的 3, 5, 6, 7 字节中。负值存储为其等价的补码。
+ 这些过程把给定值存储到 ~bytevector~ 的索引 ~n~ (基于 0)处起始的 3, 5, 6, 7 字节中。负值存储为与其等价的补码。
 
  过程: (mutable-bytevector? obj)
 
@@ -920,7 +916,6 @@
 
  库: (chezscheme)
 
- The result is bytevector itself if bytevector is immutable; otherwise, the result is an immutable bytevector with the same content as bytevector.
  如果 ~bytevector~ 是不可变的，则结果为其本身；否则，结果是与 ~bytevector~ 内容相同的一个不可变字节向量。
 
  #+BEGIN_SRC scheme
@@ -935,7 +930,7 @@
 
  库: (chezscheme)
 
- The result is the raw compressed data with a minimal header to record the uncompressed size and the compression mode. The result does not include the header that is written by port-based compression using the compressed option.
+ 结果是原始的压缩数据，以最精简的头部信息记录了压缩前的大小和压缩模式。结果并未包含使用压缩选项通过 /port-based/ 压缩所写入的头部信息。
 
  过程: (bytevector-uncompress bytevector)
 
@@ -943,7 +938,7 @@
 
  库: (chezscheme)
 
- 把一个由 ~bytevector-compress~ 生成的 ~bytevector~, 解压为一个新的字节向量，其内容与最初传递给 ~bytevector-compress~ 的 ~bytevector~ 相同。
+ 把一个由 ~bytevector-compress~ 生成的 ~bytevector~, 解压为一个新的字节向量，其内容与最初传递给 ~bytevector-compress~ 的 字节向量相同。
  
 
 *** 7.8. Boxes
