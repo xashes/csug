@@ -941,17 +941,15 @@
 
 *** 7.8. Boxes
 
- Boxes are single-cell objects that are primarily useful for providing an "extra level of indirection." This extra level of indirection is typically used to allow more than one body of code or data structure to share a reference, or pointer, to an object. For example, boxes may be used to implement call-by-reference semantics in an interpreter for a language employing this parameter passing discipline.
+ /Boxes/ 是一种单元素对象，主要用于提供一个“额外的间接层”。这个额外的间接层，通常用于使多个代码块或数据结构可以共享指向一个对象的引用，或指针。例如，在采用此种参数传递规则的语言的解释器中，可以用 /boxes/ 实现 ~call-by-reference~ 的语义。
 
- Boxes are written with the prefix #& (pronounced "hash-ampersand"). For example, #&(a b c) is a box holding the list (a b c). The box syntax is disabled in an input stream after #!r6rs has been seen by the reader, unless #!chezscheme has been seen more recently.
- 读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
+ /Boxes/ 的字面形式带有前缀 ~#&~ (发音为 "hash-ampersand"). 例如， ~#&(a b c)~ 是一个 /box，内容为列表/ ~(a b c)~. 读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用 /box/ 句法，除非在更近的位置遇到 ~#!chezscheme~.
 
- All boxes are mutable by default, including constants. A program can create immutable boxes via box-immutable. Any attempt to modify an immutable box causes an exception to be raised.
- 所有盒子默认是可变的，包括常量。程序可以通过 ~box-immutable~ 创建不可变盒子。尝试修改不可变盒子会导致抛出异常。
+ 所有 /boxes/ 默认是可变的，包括常量。程序可以通过 ~box-immutable~ 创建不可变 /boxes/. 尝试修改不可变 /box/ 会导致抛出异常。
 
  过程: (box? obj)
 
- 返回: 如果 ~obj~ 是盒子，则为 ~#t~, 否则为 ~#f~.
+ 返回: 如果 ~obj~ 是 /box/, 则为 ~#t~, 否则为 ~#f~.
 
  库: (chezscheme)
 
@@ -964,7 +962,7 @@
 
  过程: (box obj)
 
- 返回: 一个包含 ~obj~ 的新的盒子
+ 返回: 一个包含 ~obj~ 的新的 /box/
 
  库: (chezscheme)
 
@@ -1012,37 +1010,54 @@
 
 
  过程: (box-cas! box old-obj new-obj)
- 返回: #t if box is changed, #f otherwise
+
+ 返回: 如果 ~box~ 被改变，则为 ~#t~, 否则为 ~#f~.
+
  库: (chezscheme)
 
- box must be mutable. box-cas! atomically changes the content of box to new-obj if the replaced content is eq? to old-obj. If the content of box that would be replaced is not eq? to old-obj, then box is unchanged.
+ ~box~ 必须是可变的。 若 ~box~ 待替换的内容和 ~old-obj~ 相同(基于 ~eq?~), 则 ~box-cas!~ 自动将 ~box~ 的内容替换为 ~new-obj~; 若不相同，则 ~box~ 保持不变。
 
- (define b (box 'old))
- (box-cas! b 'old 'new) => #t
- (unbox b) => 'new
- (box-cas! b 'other 'wrong) => #f
- (unbox b) => 'new
+ #+BEGIN_SRC scheme
+   (define b (box 'old))
+   (box-cas! b 'old 'new) => #t
+   (unbox b) => 'new
+   (box-cas! b 'other 'wrong) => #f
+   (unbox b) => 'new
+ #+END_SRC
+
 
  过程: (mutable-box? obj)
- 返回: #t if obj is a mutable box, #f otherwise
+
+ 返回: 如果 ~obj~ 是可变的 /box/ ，则为 ~#t~, 否则为 ~#f~.
+
  过程: (immutable-box? obj)
- 返回: #t if obj is an immutable box, #f otherwise
+
+ 返回: 如果 ~obj~ 是不可变的 /box/ ，则为 ~#t~, 否则为 ~#f~.
+
  库: (chezscheme)
 
- (mutable-box? (box 1)) => #t
- (mutable-box? (box-immutable 1)) => #f
- (immutable-box? (box 1)) => #f
- (immutable-box? (box-immutable 1)) => #t
- (mutable-box? (cons 3 4)) => #f
+ #+BEGIN_SRC scheme
+   (mutable-box? (box 1)) => #t
+   (mutable-box? (box-immutable 1)) => #f
+   (immutable-box? (box 1)) => #f
+   (immutable-box? (box-immutable 1)) => #t
+   (mutable-box? (cons 3 4)) => #f
+ #+END_SRC
+
 
  过程: (box-immutable obj)
- 返回: a new immutable box containing obj
+
+ 返回: 一个内容为 ~obj~ 的新的不可变 /box/
+
  库: (chezscheme)
 
- Boxes are typically intended to support shared, mutable structure, so immutable boxes are not often useful.
+ /Boxes/ 通常用来支持共享的，可变的结构，所以不可变的 /box/ 一般没什么用。
 
- (define b (box-immutable 1))
- (set-box! b 0) => exception: not mutable
+ #+BEGIN_SRC scheme
+   (define b (box-immutable 1))
+   (set-box! b 0) => exception: not mutable
+ #+END_SRC
+
 
 *** 7.9. 符号 (Symbols)
 
