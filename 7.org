@@ -747,7 +747,7 @@
  #+END_SRC
 
 
-*** 7.7. Bytevectors
+*** 7.7. 字节向量 (Bytevectors)
 
  如同向量， /Chez Scheme/ 也扩展了字节向量的句法，以允许在 ~#~ 和左括号之间指定向量的长度，例如， ~#3vu8(1 105 73).~ 如果在此语法形式下提供的向量元素比指定的长度要少，则之后的每个元素都与最后一个提供的元素相同。读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
 
@@ -764,7 +764,6 @@
 
  库: (chezscheme)
 
- Each fill value must be an exact integer representing a signed or unsigned 8-bit value, i.e., a value in the range -128 to 255 inclusive. A negative fill value is treated as its two's complement equivalent.
  每个填充值必须为一个表示 8 位有符号或无符号值的精确整数，即，一个在范围 -128 至 255（两端均包含）之间的值。负的填充值被视为与其等价的补码。
 
  #+BEGIN_SRC scheme
@@ -815,7 +814,6 @@
 
  库: (chezscheme)
 
- bytevector must be mutable. n must be an exact nonnegative fixnum not greater than the length of bytevector. 
  ~bytevector~ 必须是可变的。 ~n~ 必须是一个精确的非负定长数，且不大于 ~bytevector~ 的长度。如果 ~n~ 是 0, ~bytevector-truncate!~ 返回空字节向量，否则， ~bytevector-truncate!~ 破坏性地把 ~bytevector~ 缩短为其前 ~n~ 个字节，并返回 ~bytevector~.
 
  #+BEGIN_SRC scheme
@@ -1278,7 +1276,7 @@
 
  由于 void 对象用于显式地表示一个“未定义”值，所以不应当把它用作任何其它目的，或把任何表达求值为 void 对象作为依赖。
 
- 默认的 waiter printer 忽略 void 对象；即，值为 void 对象的表达式什么都不会打印出来。
+ 默认的交互环境输出会忽略 void 对象；即，值为 void 对象的表达式什么都不会打印出来。
 
  #+BEGIN_SRC scheme
    (eq? (void) #f) => #f
@@ -1327,121 +1325,182 @@
  #+END_SRC
 
 
-*** 7.12. Hashtables
+*** 7.12. 哈希表 (Hashtables)
 
- /Chez Scheme/ provides several extensions to the hashtable mechanism, including a mechanism for directly accessing a key, value pair in a hashtable, support for weak eq and eqv hashtables, and a set of procedures specialized to eq and symbol hashtables.
+ /Chez Scheme/ 对哈希表机制进行了多方面的扩展，包括一种直接访问哈希表中键值对的方法，对弱 eq 和 eqv 哈希表的支持，及一些为 eq 哈希表和符号哈希表定制的过程。
+
 
  过程: (hashtable-cell hashtable key default)
- 返回: a pair (see below)
+
+ 返回: 一个点对 (参见下文)
+
  库: (chezscheme)
 
- hashtable must be a hashtable. key and default may be any Scheme values.
+ ~hashtable~ 必须是一个哈希表。 ~key~ 和 ~default~ 可以是任意 Scheme 值。
 
- If no value is associated with key in hashtable, hashtable-cell modifies hashtable to associate key with default. It 返回 a pair whose car is key and whose cdr is the associated value. Changing the cdr of this pair effectively updates the table to associate key with a new value. The key in the car field should not be changed. The advantage of this 过程 over the Revised6 Report procedures for manipulating hashtable entries is that the value associated with a key may be read or written many times with only a single hashtable lookup.
+ 如果 ~hashtable~ 中没有值与 ~key~ 相关联， ~hashtable-cell~ 修改 ~hashtable~ 以使 ~key~ 关联到 ~default~. 它返回一个点对， /car/ 是 ~key~, /cdr/ 是关联的值。改变这个点对的 /cdr/ 会关联一个新值到 ~key~ 上，从而有效地更新这个表。在 /car/ 字段的 ~key~ 不应被修改。相对于第 6 修订版中的相应过程对哈希表条目的操作，这个过程的优势是，只通过一次哈希表查询，关联到一个键的值就可以被读写任意多次。
 
- (define ht (make-eq-hashtable))
- (define v (vector 'a 'b 'c))
- (define cell (hashtable-cell ht v 3))
- cell => (#(a b c) . 3)
- (hashtable-ref ht v 0) => 3
- (set-cdr! cell 4)
- (hashtable-ref ht v 0) => 4
+ #+BEGIN_SRC scheme
+   (define ht (make-eq-hashtable))
+   (define v (vector 'a 'b 'c))
+   (define cell (hashtable-cell ht v 3))
+   cell => (#(a b c) . 3)
+   (hashtable-ref ht v 0) => 3
+   (set-cdr! cell 4)
+   (hashtable-ref ht v 0) => 4
+ #+END_SRC
+
 
  过程: (hashtable-values hashtable)
- 返回: a vector containing the values in hashtable
+
+ 返回: ~hashtable~ 中的值组成的向量
+
  库: (chezscheme)
 
- Each value is the value of one of the keys in hashtable. Duplicate values are not removed. The values may appear in any order in the returned vector.
+ 各值是 ~hashtable~ 中各个键的值。未移除重复的值。返回向量中的值的顺序是不定的。
+ 
+ #+BEGIN_SRC scheme
+   (define ht (make-eq-hashtable))
+   (define p1 (cons 'a 'b))
+   (define p2 (cons 'a 'b))
+   (hashtable-set! ht p1 "one")
+   (hashtable-set! ht p2 "two")
+   (hashtable-set! ht 'q "two")
+   (hashtable-values ht) => #("one" "two" "two")
+ #+END_SRC
 
- (define ht (make-eq-hashtable))
- (define p1 (cons 'a 'b))
- (define p2 (cons 'a 'b))
- (hashtable-set! ht p1 "one")
- (hashtable-set! ht p2 "two")
- (hashtable-set! ht 'q "two")
- (hashtable-values ht) => #("one" "two" "two")
 
- This 过程 is equivalent to:
+ 这个过程等价于：
 
- (lambda (ht)
-   (let-values ([(keys values) (hashtable-entries ht)])
-     values))
+ #+BEGIN_SRC scheme
+   (lambda (ht)
+     (let-values ([(keys values) (hashtable-entries ht)])
+       values))
+ #+END_SRC
 
- but more efficient since the separate vector of keys need not be created.
+ 但更高效，因为那个键向量并不需要被创建。
 
  过程: (make-weak-eq-hashtable)
+
  过程: (make-weak-eq-hashtable size)
+
  过程: (make-weak-eqv-hashtable)
+
  过程: (make-weak-eqv-hashtable size)
- 返回: a new weak eq hashtable
+
+ 返回: 一个新的弱 eq 哈希表
+
  库: (chezscheme)
 
- These procedures are like the Revised6 Report procedures make-eq-hashtable and make-eqv-hashtable except the keys of the hashtable are held weakly, i.e., they are not protected from the garbage collector. Keys reclaimed by the garbage collector are removed from the table, and their associated values are dropped the next time the table is modified, if not sooner.
+ 这些过程与第 6 修订版中的过程 ~make-eq-hashtable~ 和 ~make-eqv-hashtable~ 是类似的，只是哈希表中的键是弱保留的，即，面对垃圾回收，它们并不受到保护。被垃圾收集器回收的键会从表中移除，而它们的关联值最晚会在下次表被修改时丢弃。
 
  Values in the hashtable are referenced normally as long as the key is not reclaimed, since keys are paired values using weak pairs. Consequently, if a value in the hashtable refers to its own key, then garbage collection is prevented from reclaiming the key. See make-ephemeron-eq-hashtable and make-ephemeron-eqv-hashtable.
+ 只要键没有被回收，哈希表中的值就能被正常引用，因为键和值是使用弱对配对在一起的。因此，如果哈希表中的一个值回指向它自己的键，就会防止垃圾收集器回收这个键。参见 ~make-ephemeron-eq-hashtable~ 和 ~make-ephemeron-eqv-hashtable~.
 
  A copy of a weak eq or eqv hashtable created by hashtable-copy is also weak. If the copy is immutable, inaccessible keys may still be dropped from the hashtable, even though the contents of the table is otherwise unchanging. The effect of this can be observed via hashtable-keys and hashtable-entries.
+ 通过 ~hashtable-copy~ 复制一个弱 eq 或 eqv 哈希表产生的拷贝也是弱的。如果此拷贝是不可变的，不可访问的键仍然可以从表中被丢弃，即使表中的内容在其它情况下是不变的。这种效果可以通过 ~hashtable-keys~ 和 ~hashtable-entries~ 来观察。
+ 
+ #+BEGIN_SRC scheme
+   (define ht1 (make-weak-eq-hashtable))
+   (define ht2 (make-weak-eq-hashtable 32))
+ #+END_SRC
 
- (define ht1 (make-weak-eq-hashtable))
- (define ht2 (make-weak-eq-hashtable 32))
 
  过程: (make-ephemeron-eq-hashtable)
+
  过程: (make-ephemeron-eq-hashtable size)
+
  过程: (make-ephemeron-eqv-hashtable)
+
  过程: (make-ephemeron-eqv-hashtable size)
+
  返回: a new ephemeron eq hashtable
+
  库: (chezscheme)
 
- These procedures are like make-weak-eq-hashtable and make-weak-eqv-hashtable, but a value in the hashtable can refer to a key in the hashtable (directly or indirectly) without preventing garbage collection from reclaiming the key, because keys are paired with values using ephemeron pairs.
+ 这些过程类似于 ~make-weak-eq-hashtable~ 和 ~make-weak-eqv-hashtable~, 但表中的值可以在指向表中的键（直接或间接）时，却不阻止垃圾收集器回收此键，因为键与值是通过 ephemeron pairs 配对的。
 
  A copy of an ephemeron eq or eqv hashtable created by hashtable-copy is also an ephemeron table, and an inaccesible key can be dropped from an immutable ephemeron hashtable in the same way as for an immutable weak hashtable.
+ 通过 ~hashtable-copy~ 复制一个 ephemeron eq 或 eqv 哈希表产生的拷贝也是 ephemeron 表。一个不可访问的键从一个不可变的 ephemeron 哈希表中被丢弃的方式，和不可变的弱哈希表相同。
 
- (define ht1 (make-ephemeron-eq-hashtable))
- (define ht2 (make-ephemeron-eq-hashtable 32))
+ #+BEGIN_SRC scheme
+   (define ht1 (make-ephemeron-eq-hashtable))
+   (define ht2 (make-ephemeron-eq-hashtable 32))
+ #+END_SRC
+
 
  过程: (hashtable-weak? obj)
- 返回: #t if obj is a weak eq or eqv hashtable, #f otherwise
+
+ 返回: 如果 ~obj~ 是弱 eq 或 eqv 哈希表，则为 ~#t~, 否则为 ~#f~.
+
  库: (chezscheme)
 
- (define ht1 (make-weak-eq-hashtable))
- (define ht2 (hashtable-copy ht1))
- (hashtable-weak? ht2) => #t
+ #+BEGIN_SRC scheme
+   (define ht1 (make-weak-eq-hashtable))
+   (define ht2 (hashtable-copy ht1))
+   (hashtable-weak? ht2) => #t
+ #+END_SRC
+
 
  过程: (hashtable-ephemeron? obj)
- 返回: #t if obj is an ephemeron eq or eqv hashtable, #f otherwise
+
+ 返回: 如果 ~obj~ 是 ephemeron eq or eqv hashtable，则为 ~#t~, 否则为 ~#f~.
+
  库: (chezscheme)
 
- (define ht1 (make-ephemeron-eq-hashtable))
- (define ht2 (hashtable-copy ht1))
- (hashtable-ephemeron? ht2) => #t
+ #+BEGIN_SRC scheme
+   (define ht1 (make-ephemeron-eq-hashtable))
+   (define ht2 (hashtable-copy ht1))
+   (hashtable-ephemeron? ht2) => #t
+ #+END_SRC
+
 
  过程: (eq-hashtable? obj)
+
  返回: #t if obj is an eq hashtable, #f otherwise
+ 返回: 如果 ~obj~ 是 eq hashtable，则为 ~#t~, 否则为 ~#f~.
+
  库: (chezscheme)
 
- (eq-hashtable? (make-eq-hashtable)) => #t
- (eq-hashtable? '(not a hash table)) => #f
+ #+BEGIN_SRC scheme
+   (eq-hashtable? (make-eq-hashtable)) => #t
+   (eq-hashtable? '(not a hash table)) => #f
+ #+END_SRC
+
 
  过程: (eq-hashtable-weak? hashtable)
+
  返回: #t if hashtable is weak, #f otherwise
+ 返回: 如果 ~hashtable~ weak，则为 ~#t~, 否则为 ~#f~.
+
  库: (chezscheme)
 
- hashtable must be an eq hashtable.
+ ~hashtable~ 必须是一个 eq hashtable.
+ 
+ #+BEGIN_SRC scheme
+   (eq-hashtable-weak? (make-eq-hashtable)) => #f
+   (eq-hashtable-weak? (make-weak-eq-hashtable)) => #t
+ #+END_SRC
 
- (eq-hashtable-weak? (make-eq-hashtable)) => #f
- (eq-hashtable-weak? (make-weak-eq-hashtable)) => #t
 
  过程: (eq-hashtable-ephemeron? hashtable)
+
  返回: #t if hashtable uses ephemeron pairs, #f otherwise
+
  库: (chezscheme)
 
- hashtable must be an eq hashtable.
+ ~hashtable~ must be an eq hashtable.
 
- (eq-hashtable-ephemeron? (make-eq-hashtable)) => #f
- (eq-hashtable-ephemeron? (make-ephemeron-eq-hashtable)) => #t
+ #+BEGIN_SRC scheme
+   (eq-hashtable-ephemeron? (make-eq-hashtable)) => #f
+   (eq-hashtable-ephemeron? (make-ephemeron-eq-hashtable)) => #t
+ #+END_SRC
+
 
  过程: (eq-hashtable-set! hashtable key value)
+
  返回: 未定义
+
  库: (chezscheme)
 
  hashtable must be a mutable eq hashtable. key and value may be any Scheme values.
@@ -1651,7 +1710,7 @@
 
 *** 7.13. Record Types
 
- /Chez Scheme/ extends the Revised6 Report's define-record-type syntax in one way, which is that it allows a generative record type to be declared explicitly as such (in a double-negative sort of way) by including a nongenerative clause with #f as the uid, i.e.:
+ /Chez Scheme/ 以一种方式扩展了 R^{6}RS 中的 ~define-record-type~ 句法，which is that it allows a generative record type to be declared explicitly as such (in a double-negative sort of way) by including a nongenerative clause with #f as the uid, i.e.:
 
  (nongenerative #f)
 
