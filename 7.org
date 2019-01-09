@@ -8,7 +8,7 @@
 
  过程: (enum-set? obj)
 
- 返回: 如果 ~obj~ 为 =enum set= 则为 =#t=, 否则为 =#f=. 
+ 返回: 如果 ~obj~ 为 =enum set= 则为 =#t=, 否则为 =#f=.
 
  库: (chezscheme)
 
@@ -316,7 +316,7 @@
  #+END_SRC
 
  ~char-~ 可依如下定义。
- 
+
  #+BEGIN_SRC scheme
    (define char-
      (lambda (c1 c2)
@@ -449,7 +449,7 @@
 
  如果 ~string~ 是不可变字符串，则结果为其本身；否则，结果是个不可变字符串，其内容与 ~string~ 相同。
 
- #+BEGIN_SRC scheme 
+ #+BEGIN_SRC scheme
    (define s (string->immutable-string (string #\x #\y #\z)))
    (string-set! s 0 #\a) => exception: not mutable
  #+END_SRC
@@ -826,7 +826,7 @@
 
 
  过程: (bytevector-u24-ref bytevector n eness)
- 
+
  返回: ~bytevector~ 的索引 ~n~ (始于 0) 处的 24 位无符号整数
 
  过程: (bytevector-s24-ref bytevector n eness)
@@ -937,7 +937,7 @@
  库: (chezscheme)
 
  把一个由 ~bytevector-compress~ 生成的 ~bytevector~, 解压为一个新的字节向量，其内容与最初传递给 ~bytevector-compress~ 的 字节向量相同。
- 
+
 
 *** 7.8. Boxes
 
@@ -1208,7 +1208,7 @@
 
  #+BEGIN_SRC scheme
    (putprop 'fred 'species 'snurd)
-   (putprop 'fred 'age 4)  
+   (putprop 'fred 'age 4)
    (putprop 'fred 'colors '(black white))
 
    (getprop 'fred 'species) => snurd
@@ -1367,7 +1367,7 @@
  库: (chezscheme)
 
  各值是 ~hashtable~ 中各个键的值。未移除重复的值。返回向量中的值的顺序是不定的。
- 
+
  #+BEGIN_SRC scheme
    (define ht (make-eq-hashtable))
    (define p1 (cons 'a 'b))
@@ -1408,7 +1408,7 @@
 
  A copy of a weak eq or eqv hashtable created by hashtable-copy is also weak. If the copy is immutable, inaccessible keys may still be dropped from the hashtable, even though the contents of the table is otherwise unchanging. The effect of this can be observed via hashtable-keys and hashtable-entries.
  通过 ~hashtable-copy~ 复制一个弱 eq 或 eqv 哈希表产生的拷贝也是弱的。如果此拷贝是不可变的，不可访问的键仍然可以从表中被丢弃，即使表中的内容在其它情况下是不变的。这种效果可以通过 ~hashtable-keys~ 和 ~hashtable-entries~ 来观察。
- 
+
  #+BEGIN_SRC scheme
    (define ht1 (make-weak-eq-hashtable))
    (define ht2 (make-weak-eq-hashtable 32))
@@ -1485,7 +1485,7 @@
  库: (chezscheme)
 
  ~hashtable~ 必须是一个 eq hashtable.
- 
+
  #+BEGIN_SRC scheme
    (eq-hashtable-weak? (make-eq-hashtable)) => #f
    (eq-hashtable-weak? (make-weak-eq-hashtable)) => #t
@@ -1996,7 +1996,7 @@
 
      an access 过程 whose name is name-fieldname for each noninherited field, and
 
-     an assignment 过程 whose name is set-name-fieldname! for each noninherited mutable field. 
+     an assignment 过程 whose name is set-name-fieldname! for each noninherited mutable field.
 
  If no parent record type is specified, the constructor behaves as if defined as
 
@@ -2286,13 +2286,13 @@
      record-constructor,
      record-predicate,
      record-accessor, and
-     record-mutator, 
+     record-mutator,
 
  or to the /Chez Scheme/ variants
 
      record-constructor,
      record-field-accessor, and
-     record-field-mutator 
+     record-field-mutator
 
  to obtain procedures for creating and manipulating records of the new type.
 
@@ -2477,4 +2477,4 @@
  Copyright © 2018 Cisco Systems, Inc.
  Licensed under the Apache License Version 2.0 (full copyright notice.).
  Revised October 2018 for /Chez Scheme/ Version 9.5.1
- about this book 
+ about this book
