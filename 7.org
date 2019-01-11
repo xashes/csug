@@ -1336,7 +1336,7 @@
 
 *** 7.12. 哈希表 (Hashtables)
 
- /Chez Scheme/ 对哈希表机制进行了多方面的扩展，包括一种直接访问哈希表中键值对的方法，对弱 eq 和 eqv 哈希表的支持，及一些为 eq 哈希表和符号哈希表定制的过程。
+ /Chez Scheme/ 对 /hashtable/ 机制进行了多方面的扩展，包括一种直接访问 /hashtable/ 中键值对的方法，对 /weak(弱引用) eq hashtable/ 和 /weak eqv hashtable/ 的支持，及一些为 /eq hashtable/ 和 /symbol hashtable/ 定制的过程。
 
 
  过程: (hashtable-cell hashtable key default)
@@ -1345,9 +1345,9 @@
 
  库: (chezscheme)
 
- ~hashtable~ 必须是一个哈希表。 ~key~ 和 ~default~ 可以是任意 Scheme 值。
+ ~hashtable~ 必须是一个 /hashtable/. ~key~ 和 ~default~ 可以是任意 Scheme 值。
 
- 如果 ~hashtable~ 中没有值与 ~key~ 相关联， ~hashtable-cell~ 修改 ~hashtable~ 以使 ~key~ 关联到 ~default~. 它返回一个点对， /car/ 是 ~key~, /cdr/ 是关联的值。改变这个点对的 /cdr/ 会关联一个新值到 ~key~ 上，从而有效地更新这个表。在 /car/ 字段的 ~key~ 不应被修改。相对于第 6 修订版中的相应过程对哈希表条目的操作，这个过程的优势是，只通过一次哈希表查询，关联到一个键的值就可以被读写任意多次。
+ 如果 ~hashtable~ 中没有值与 ~key~ 相关联， ~hashtable-cell~ 修改 ~hashtable~ 以使 ~key~ 关联到 ~default~. 它返回一个点对， /car/ 是 ~key~, /cdr/ 是关联的值。改变这个点对的 cdr 字段，事实上会更改这个表，使 ~key~ 关联到一个新值。car 字段中的 ~key~ 是不应该被改动的。相对于第 6 修订版中的相应过程对 /hashtable/ 条目的操作，这个过程的优势是，只通过一次 /hashtable/ 查询，关联到一个键的值就可以被读写任意多次。
 
  #+BEGIN_SRC scheme
    (define ht (make-eq-hashtable))
@@ -1366,7 +1366,7 @@
 
  库: (chezscheme)
 
- 各值是 ~hashtable~ 中各个键的值。未移除重复的值。返回向量中的值的顺序是不定的。
+ 各值是 ~hashtable~ 中各个键的值。结果中未移除重复的值。返回向量中的值的顺序是不定的。
 
  #+BEGIN_SRC scheme
    (define ht (make-eq-hashtable))
@@ -1389,6 +1389,7 @@
 
  但更高效，因为那个键向量并不需要被创建。
 
+
  过程: (make-weak-eq-hashtable)
 
  过程: (make-weak-eq-hashtable size)
@@ -1397,17 +1398,15 @@
 
  过程: (make-weak-eqv-hashtable size)
 
- 返回: 一个新的弱 eq 哈希表
+ 返回: 一个新的 /weak eq hashtable/
 
  库: (chezscheme)
 
- 这些过程与第 6 修订版中的过程 ~make-eq-hashtable~ 和 ~make-eqv-hashtable~ 是类似的，只是哈希表中的键是弱保留的，即，面对垃圾回收，它们并不受到保护。被垃圾收集器回收的键会从表中移除，而它们的关联值最晚会在下次表被修改时丢弃。
+ 这些过程与第 6 修订版中的过程 ~make-eq-hashtable~ 和 ~make-eqv-hashtable~ 是类似的，只是 /hashtable/ 中的键是弱引用的，即，面对垃圾回收，它们并不受到保护。被垃圾收集器回收的键会从表中移除，而它们的关联值最晚会在下次表被修改时丢弃。
 
- Values in the hashtable are referenced normally as long as the key is not reclaimed, since keys are paired values using weak pairs. Consequently, if a value in the hashtable refers to its own key, then garbage collection is prevented from reclaiming the key. See make-ephemeron-eq-hashtable and make-ephemeron-eqv-hashtable.
- 只要键没有被回收，哈希表中的值就能被正常引用，因为键和值是使用弱对配对在一起的。因此，如果哈希表中的一个值回指向它自己的键，就会防止垃圾收集器回收这个键。参见 ~make-ephemeron-eq-hashtable~ 和 ~make-ephemeron-eqv-hashtable~.
+ 只要键没有被回收， /hashtable/ 中的值就能被正常引用，因为键和值是使用弱引用点对(weak pair)配对在一起的。因此，如果 /hashtable/ 中的一个值反向指回它自己的键，就会阻止垃圾收集器回收这个键。参见 ~make-ephemeron-eq-hashtable~ 和 ~make-ephemeron-eqv-hashtable~.
 
- A copy of a weak eq or eqv hashtable created by hashtable-copy is also weak. If the copy is immutable, inaccessible keys may still be dropped from the hashtable, even though the contents of the table is otherwise unchanging. The effect of this can be observed via hashtable-keys and hashtable-entries.
- 通过 ~hashtable-copy~ 复制一个弱 eq 或 eqv 哈希表产生的拷贝也是弱的。如果此拷贝是不可变的，不可访问的键仍然可以从表中被丢弃，即使表中的内容在其它情况下是不变的。这种效果可以通过 ~hashtable-keys~ 和 ~hashtable-entries~ 来观察。
+ 通过 ~hashtable-copy~ 复制一个 /weak eq hashtable/ 或 /weak eqv hashtable/ 产生的拷贝也是弱引用的。如果此拷贝是不可变的，不可访问的键仍然可以从表中被丢弃，即使表中的内容在其它情况下是不变的。这种效果可以通过 ~hashtable-keys~ 和 ~hashtable-entries~ 来观察。
 
  #+BEGIN_SRC scheme
    (define ht1 (make-weak-eq-hashtable))
@@ -1423,14 +1422,13 @@
 
  过程: (make-ephemeron-eqv-hashtable size)
 
- 返回: a new ephemeron eq hashtable
+ 返回: 一个新的 /ephemeron eq hashtable/
 
  库: (chezscheme)
 
- 这些过程类似于 ~make-weak-eq-hashtable~ 和 ~make-weak-eqv-hashtable~, 但表中的值可以在指向表中的键（直接或间接）时，却不阻止垃圾收集器回收此键，因为键与值是通过 ephemeron pairs 配对的。
+ 这些过程类似于 ~make-weak-eq-hashtable~ 和 ~make-weak-eqv-hashtable~, 但表中的值可以在（直接或间接）指向表中的键时，却不阻止垃圾收集器回收此键，因为键与值是通过 /ephemeron pairs/ 配对的。
 
- A copy of an ephemeron eq or eqv hashtable created by hashtable-copy is also an ephemeron table, and an inaccesible key can be dropped from an immutable ephemeron hashtable in the same way as for an immutable weak hashtable.
- 通过 ~hashtable-copy~ 复制一个 ephemeron eq 或 eqv 哈希表产生的拷贝也是 ephemeron 表。一个不可访问的键从一个不可变的 ephemeron 哈希表中被丢弃的方式，和不可变的弱哈希表相同。
+ 通过 ~hashtable-copy~ 复制一个 /ephemeron eq hashtable/ 或 /ephemeron eqv hashtable/ 产生的拷贝也是 /ephemeron table/. 一个不可访问的键从一个不可变的 /ephemeron hashtable/ 中被丢弃的方式，和在不可变的 /weak hashtable/ 中相同。
 
  #+BEGIN_SRC scheme
    (define ht1 (make-ephemeron-eq-hashtable))
@@ -1440,7 +1438,7 @@
 
  过程: (hashtable-weak? obj)
 
- 返回: 如果 ~obj~ 是弱 eq 或 eqv 哈希表，则为 ~#t~, 否则为 ~#f~.
+ 返回: 如果 ~obj~ 是 /weak eq hashtable/ 或 /weak eqv hashtable/, 则为 ~#t~, 否则为 ~#f~.
 
  库: (chezscheme)
 
@@ -1453,7 +1451,7 @@
 
  过程: (hashtable-ephemeron? obj)
 
- 返回: 如果 ~obj~ 是 ephemeron eq or eqv hashtable，则为 ~#t~, 否则为 ~#f~.
+ 返回: 如果 ~obj~ 是 /ephemeron eq hashtable/ 或 /ephemeron eqv hashtable/, 则为 ~#t~, 否则为 ~#f~.
 
  库: (chezscheme)
 
@@ -1466,8 +1464,7 @@
 
  过程: (eq-hashtable? obj)
 
- 返回: #t if obj is an eq hashtable, #f otherwise
- 返回: 如果 ~obj~ 是 eq hashtable，则为 ~#t~, 否则为 ~#f~.
+ 返回: 如果 ~obj~ 是 /eq hashtable/, 则为 ~#t~, 否则为 ~#f~.
 
  库: (chezscheme)
 
@@ -1479,12 +1476,11 @@
 
  过程: (eq-hashtable-weak? hashtable)
 
- 返回: #t if hashtable is weak, #f otherwise
- 返回: 如果 ~hashtable~ weak，则为 ~#t~, 否则为 ~#f~.
+ 返回: 如果 ~hashtable~ 是弱引用(weak)的，则为 ~#t~, 否则为 ~#f~.
 
  库: (chezscheme)
 
- ~hashtable~ 必须是一个 eq hashtable.
+ ~hashtable~ 必须是一个 /eq hashtable/.
 
  #+BEGIN_SRC scheme
    (eq-hashtable-weak? (make-eq-hashtable)) => #f
@@ -1494,11 +1490,11 @@
 
  过程: (eq-hashtable-ephemeron? hashtable)
 
- 返回: #t if hashtable uses ephemeron pairs, #f otherwise
+ 返回: 如果 ~hashtable~ 使用 /ephemeron pairs/, 则为 ~#t~, 否则为 ~#f~.
 
  库: (chezscheme)
 
- ~hashtable~ must be an eq hashtable.
+ ~hashtable~ 必须是 /eq hashtable/.
 
  #+BEGIN_SRC scheme
    (eq-hashtable-ephemeron? (make-eq-hashtable)) => #f
@@ -1512,210 +1508,277 @@
 
  库: (chezscheme)
 
- hashtable must be a mutable eq hashtable. key and value may be any Scheme values.
+ /hashtable/ 必须是一个可变的 /eq hashtable/. ~key~ 和 ~value~ 可以是任何 scheme 值。
 
- eq-hashtable-set! associates the value value with the key key in hashtable.
+ ~eq-hashtable-set!~ 在 ~hashtable~ 中把值 ~value~ 和键 ~key~ 关联起来。
 
- (define ht (make-eq-hashtable))
- (eq-hashtable-set! ht 'a 73)
+ #+BEGIN_SRC scheme
+   (define ht (make-eq-hashtable))
+   (eq-hashtable-set! ht 'a 73)
+ #+END_SRC
+
 
  过程: (eq-hashtable-ref hashtable key default)
- 返回: see below
+
+ 返回: 参见下文
+
  库: (chezscheme)
 
- hashtable must be an eq hashtable. key and default may be any Scheme values.
+ ~hashtable~ 必须是一个 /eq hashtable/. ~key~ 和 ~default~ 可以是任何 scheme 值。
 
- eq-hashtable-ref 返回 the value associated with key in hashtable. If no value is associated with key in hashtable, eq-hashtable-ref 返回 default.
+ ~eq-hashtable-ref~ 返回 ~hashtable~ 中和 ~key~ 关联的值。如果在 ~hashtable~ 中没有值和 ~key~ 相关联，则 ~eq-hashtable-ref~ 返回 ~default~.
 
- (define ht (make-eq-hashtable))
- (define p1 (cons 'a 'b))
- (define p2 (cons 'a 'b))
- (eq-hashtable-set! ht p1 73)
- (eq-hashtable-ref ht p1 55) => 73
- (eq-hashtable-ref ht p2 55) => 55
+ #+BEGIN_SRC scheme
+   (define ht (make-eq-hashtable))
+   (define p1 (cons 'a 'b))
+   (define p2 (cons 'a 'b))
+   (eq-hashtable-set! ht p1 73)
+   (eq-hashtable-ref ht p1 55) => 73
+   (eq-hashtable-ref ht p2 55) => 55
+ #+END_SRC
+
 
  过程: (eq-hashtable-contains? hashtable key)
- 返回: #t if an association for key exists in hashtable, #f otherwise
+
+ 返回: 如果在 ~hashtable~ 中 ~key~ 有关联值，则为 ~#t~, 否则为 ~#f~.
+
  库: (chezscheme)
 
- hashtable must be an eq hashtable. key may be any Scheme value.
+ ~hashtable~ 必须是一个 /eq hashtable/. ~key~ 可以是任何 scheme 值。
 
- (define ht (make-eq-hashtable))
- (define p1 (cons 'a 'b))
- (define p2 (cons 'a 'b))
- (eq-hashtable-set! ht p1 73)
- (eq-hashtable-contains? ht p1) => #t
- (eq-hashtable-contains? ht p2) => #f
+ #+BEGIN_SRC scheme
+   (define ht (make-eq-hashtable))
+   (define p1 (cons 'a 'b))
+   (define p2 (cons 'a 'b))
+   (eq-hashtable-set! ht p1 73)
+   (eq-hashtable-contains? ht p1) => #t
+   (eq-hashtable-contains? ht p2) => #f
+ #+END_SRC
 
- 过程: (eq-hashtable-update! hashtable key 过程 default)
+
+ 过程: (eq-hashtable-update! hashtable key procedure default)
+
  返回: 未定义
+
  库: (chezscheme)
 
- hashtable must be a mutable eq hashtable. key and default may be any Scheme values. 过程 should accept one argument, should return one value, and should not modify hashtable.
+ ~hashtable~ 必须是一个可变的 /eq hashtable/. ~key~ 和 ~default~ 可以是任何 scheme 值。 ~procedure~ 应该接受一个参数，返回一个值，并且不应当修改 ~hashtable~.
 
- eq-hashtable-update! applies 过程 to the value associated with key in hashtable, or to default if no value is associated with key in hashtable. If 过程 返回, eq-hashtable-update! associates key with the value returned by 过程, replacing the old association, if any.
+ ~eq-hashtable-update!~ 把 ~procedure~ 应用于 ~hashtable~ 中 ~key~ 关联的值上，如果 ~key~ 没有关联值，则应用于 ~default~. 如果 ~procedure~ 正常返回，则 ~eq-hashtable-update!~ 把 ~procedure~ 返回的值关联到 ~key~ 上，如果旧的关联存在，则取代旧的关联。
 
- A version of eq-hashtable-update! that does not verify that it receives arguments of the proper type might be defined as follows.
+ 一个不检查所接收参数是否是正确类型的 ~eq-hashtable-update!~ 版本可依如下定义。
 
- (define eq-hashtable-update!
-   (lambda (ht key proc value)
-     (eq-hashtable-set! ht key
-       (proc (eq-hashtable-ref ht key value)))))
+ #+BEGIN_SRC scheme
+   (define eq-hashtable-update!
+     (lambda (ht key proc value)
+       (eq-hashtable-set! ht key
+                          (proc (eq-hashtable-ref ht key value)))))
+ #+END_SRC
 
- An implementation may, however, be able to implement eq-hashtable-update! more efficiently by avoiding multiple hash computations and hashtable lookups.
+ 一个可以避免多次哈希计算和哈希查找的更高效的 ~eq-hashtable-update!~ 实现如下：
 
- (define ht (make-eq-hashtable))
- (eq-hashtable-update! ht 'a
-   (lambda (x) (* x 2))
-   55)
- (eq-hashtable-ref ht 'a 0) => 110
- (eq-hashtable-update! ht 'a
-   (lambda (x) (* x 2))
-   0)
- (eq-hashtable-ref ht 'a 0) => 220
+ #+BEGIN_SRC scheme
+   (define ht (make-eq-hashtable))
+   (eq-hashtable-update! ht 'a
+                         (lambda (x) (* x 2))
+                         55)
+   (eq-hashtable-ref ht 'a 0) => 110
+   (eq-hashtable-update! ht 'a
+                         (lambda (x) (* x 2))
+                         0)
+   (eq-hashtable-ref ht 'a 0) => 220
+ #+END_SRC
+
 
  过程: (eq-hashtable-cell hashtable key default)
- 返回: a pair (see below)
+
+ 返回: 一个点对（参见下文）
+
  库: (chezscheme)
 
- hashtable must be an eq hashtable. key and default may be any Scheme values.
+ ~hashtable~ 必须是一个 /eq hashtable/. ~key~ 和 ~default~ 可以是任何 scheme 值。
 
- If no value is associated with key in hashtable, eq-hashtable-cell modifies hashtable to associate key with default. It 返回 a pair whose car is key and whose cdr is the associated value. Changing the cdr of this pair effectively updates the table to associate key with a new value. The key should not be changed.
+ 如果在 ~hashtable~ 中没有值与 ~key~ 相关联， ~eq-hashtable-cell~ 修改 ~hashtable~, 把 ~default~ 关联到 ~key~. 它返回一个点对，其 car 是 ~key~, 而 cdr 是 ~key~ 关联的值。改变这个点对的 cdr 字段，事实上会更改这个表，使 ~key~ 关联到一个新值。 ~key~ 是不应该被改动的。
 
- (define ht (make-eq-hashtable))
- (define v (vector 'a 'b 'c))
- (define cell (eq-hashtable-cell ht v 3))
- cell => (#(a b c) . 3)
- (eq-hashtable-ref ht v 0) => 3
- (set-cdr! cell 4)
- (eq-hashtable-ref ht v 0) => 4
+ #+BEGIN_SRC scheme
+   (define ht (make-eq-hashtable))
+   (define v (vector 'a 'b 'c))
+   (define cell (eq-hashtable-cell ht v 3))
+   cell => (#(a b c) . 3)
+   (eq-hashtable-ref ht v 0) => 3
+   (set-cdr! cell 4)
+   (eq-hashtable-ref ht v 0) => 4
+ #+END_SRC
+
 
  过程: (eq-hashtable-delete! hashtable key)
+
  返回: 未定义
+
  库: (chezscheme)
 
- hashtable must be a mutable eq hashtable. key may be any Scheme value.
+ ~hashtable~ 必须是一个不可变的 /eq hashtable/. ~key~ 可以是任何 scheme 值。
 
- eq-hashtable-delete! drops any association for key from hashtable.
+ ~eq-hashtable-delete!~ 会删除 ~key~ 在 ~hashtable~ 中的任何关联。
 
- (define ht (make-eq-hashtable))
- (define p1 (cons 'a 'b))
- (define p2 (cons 'a 'b))
- (eq-hashtable-set! ht p1 73)
- (eq-hashtable-contains? ht p1) => #t
- (eq-hashtable-delete! ht p1)
- (eq-hashtable-contains? ht p1) => #f
- (eq-hashtable-contains? ht p2) => #f
- (eq-hashtable-delete! ht p2)
+ #+BEGIN_SRC scheme
+   (define ht (make-eq-hashtable))
+   (define p1 (cons 'a 'b))
+   (define p2 (cons 'a 'b))
+   (eq-hashtable-set! ht p1 73)
+   (eq-hashtable-contains? ht p1) => #t
+   (eq-hashtable-delete! ht p1)
+   (eq-hashtable-contains? ht p1) => #f
+   (eq-hashtable-contains? ht p2) => #f
+   (eq-hashtable-delete! ht p2)
+ #+END_SRC
+
 
  过程: (symbol-hashtable? obj)
- 返回: #t if obj is an eq hashtable, #f otherwise
+
+ 返回: 如果 ~obj~ 是 /symbol hashtable/, 则为 ~#t~, 否则为 ~#f~.
+
  库: (chezscheme)
 
- (symbol-hashtable? (make-hashtable symbol-hash eq?)) => #t
- (symbol-hashtable? (make-eq-hashtable)) => #f
+ #+BEGIN_SRC scheme
+   (symbol-hashtable? (make-hashtable symbol-hash eq?)) => #t
+   (symbol-hashtable? (make-eq-hashtable)) => #f
+ #+END_SRC
+
 
  过程: (symbol-hashtable-set! hashtable key value)
+
  返回: 未定义
+
  库: (chezscheme)
 
- hashtable must be a mutable symbol hashtable. (A symbol hashtable is a hashtable created with hash function symbol-hash and equivalence function eq?, eqv?, equal?, or symbol=?.) key must be a symbol, and value may be any Scheme value.
+ ~hashtable~ 必须是一个可变的 /symbol hashtable/. (/symbol hashtable/ 是通过哈希函数 ~symbol-hash~ 和相等性函数 ~eq?~, ~eqv?~, ~equal?~, 或 ~symbol=?~ 创建的 ~hashtable~.) ~key~ 必须是一个符号， ~value~ 可以是任何 scheme 值。
 
- symbol-hashtable-set! associates the value value with the key key in hashtable.
+ ~symbol-hashtable-set!~ 把 ~hashtable~ 中的键 ~key~ 和值 ~value~ 关联起来。
 
- (define ht (make-hashtable symbol-hash eq?))
- (symbol-hashtable-ref ht 'a #f) => #f
- (symbol-hashtable-set! ht 'a 73)
- (symbol-hashtable-ref ht 'a #f) => 73
+ #+BEGIN_SRC scheme
+   (define ht (make-hashtable symbol-hash eq?))
+   (symbol-hashtable-ref ht 'a #f) => #f
+   (symbol-hashtable-set! ht 'a 73)
+   (symbol-hashtable-ref ht 'a #f) => 73
+ #+END_SRC
+
 
  过程: (symbol-hashtable-ref hashtable key default)
- 返回: see below
+
+ 返回: 参见下文
+
  库: (chezscheme)
 
- hashtable must be a symbol hashtable. (A symbol hashtable is a hashtable created with hash function symbol-hash and equivalence function eq?, eqv?, equal?, or symbol=?.) key must be a symbol, and default may be any Scheme value.
+ ~hashtable~ 必须是一个 /symbol hashtable/. (/symbol hashtable/ 是通过哈希函数 ~symbol-hash~ 和相等性函数 ~eq?~, ~eqv?~, ~equal?~, 或 ~symbol=?~ 创建的 ~hashtable~.) ~key~ 必须是一个符号， ~default~ 可以是任何 scheme 值。
 
- symbol-hashtable-ref 返回 the value associated with key in hashtable. If no value is associated with key in hashtable, symbol-hashtable-ref 返回 default.
+ ~symbol-hashtable-ref~ 返回 ~hashtable~ 中与 key 关联的值。如果 ~hashtable~ 中没有值与 ~key~ 相关联，则 ~symbol-hashtable-ref~ 返回 ~default~.
 
- (define ht (make-hashtable symbol-hash eq?))
- (define k1 'abcd)
- (define k2 'not-abcd)
- (symbol-hashtable-set! ht k1 "hi")
- (symbol-hashtable-ref ht k1 "bye") => "hi"
- (symbol-hashtable-ref ht k2 "bye") => "bye"
+ #+BEGIN_SRC scheme
+   (define ht (make-hashtable symbol-hash eq?))
+   (define k1 'abcd)
+   (define k2 'not-abcd)
+   (symbol-hashtable-set! ht k1 "hi")
+   (symbol-hashtable-ref ht k1 "bye") => "hi"
+   (symbol-hashtable-ref ht k2 "bye") => "bye"
+ #+END_SRC
+
 
  过程: (symbol-hashtable-contains? hashtable key)
- 返回: #t if an association for key exists in hashtable, #f otherwise
+
+ 返回: 如果在 ~hashtable~ 中 ~key~ 存在关联值，则为 ~#t~, 否则为 ~#f~.
+
  库: (chezscheme)
 
- hashtable must be a symbol hashtable. (A symbol hashtable is a hashtable created with hash function symbol-hash and equivalence function eq?, eqv?, equal?, or symbol=?.) key must be a symbol.
+ ~hashtable~ 必须是一个 /symbol hashtable/. (/symbol hashtable/ 是通过哈希函数 ~symbol-hash~ 和相等性函数 ~eq?~, ~eqv?~, ~equal?~, 或 ~symbol=?~ 创建的 ~hashtable~.) ~key~ 必须是一个符号。
 
- (define ht (make-hashtable symbol-hash eq?))
- (define k1 'abcd)
- (define k2 'not-abcd)
- (symbol-hashtable-set! ht k1 "hi")
- (symbol-hashtable-contains? ht k1) => #t
- (symbol-hashtable-contains? ht k2 ) => #f
+ #+BEGIN_SRC scheme
+   (define ht (make-hashtable symbol-hash eq?))
+   (define k1 'abcd)
+   (define k2 'not-abcd)
+   (symbol-hashtable-set! ht k1 "hi")
+   (symbol-hashtable-contains? ht k1) => #t
+   (symbol-hashtable-contains? ht k2 ) => #f
+ #+END_SRC
 
- 过程: (symbol-hashtable-update! hashtable key 过程 default)
+
+ 过程: (symbol-hashtable-update! hashtable key procedure default)
+
  返回: 未定义
+
  库: (chezscheme)
 
- hashtable must be a mutable symbol hashtable. (A symbol hashtable is a hashtable created with hash function symbol-hash and equivalence function eq?, eqv?, equal?, or symbol=?.) key must be a symbol, and default may be any Scheme value. 过程 should accept one argument, should return one value, and should not modify hashtable.
+ ~hashtable~ 必须是一个可变的 /symbol hashtable/. (/symbol hashtable/ 是通过哈希函数 ~symbol-hash~ 和相等性函数 ~eq?~, ~eqv?~, ~equal?~, 或 ~symbol=?~ 创建的 ~hashtable~.) ~key~ 必须是一个符号， ~default~ 可以是任何 Scheme 值。 ~procedure~ 应该接受一个参数，返回一个值，且不应修改 ~hashtable~.
 
- symbol-hashtable-update! applies 过程 to the value associated with key in hashtable, or to default if no value is associated with key in hashtable. If 过程 返回, symbol-hashtable-update! associates key with the value returned by 过程, replacing the old association, if any.
+ ~symbol-hashtable-update!~ 把 ~procedure~ 应用于 ~hashtable~ 中 ~key~ 关联的值上，如果 ~key~ 没有关联值，则应用于 ~default~. 如果 ~procedure~ 正常返回，则 ~symbol-hashtable-update!~ 把 ~procedure~ 返回的值关联到 ~key~ 上，如果旧的关联存在，则取代旧的关联。
 
- A version of symbol-hashtable-update! that does not verify that it receives arguments of the proper type might be defined as follows.
+ 一个不检查所接收参数是否是正确类型的 ~symbol-hashtable-update!~ 版本可依如下定义。
 
- (define symbol-hashtable-update!
-   (lambda (ht key proc value)
-     (symbol-hashtable-set! ht key
-       (proc (symbol-hashtable-ref ht key value)))))
+ #+BEGIN_SRC scheme
+   (define symbol-hashtable-update!
+     (lambda (ht key proc value)
+       (symbol-hashtable-set! ht key
+                              (proc (symbol-hashtable-ref ht key value)))))
+ #+END_SRC
 
- An implementation may, however, be able to implement symbol-hashtable-update! more efficiently by avoiding multiple hash computations and hashtable lookups.
+ 一个可以避免多次哈希计算和哈希查找的更高效的 ~symbol-hashtable-update!~ 实现如下：
 
- (define ht (make-hashtable symbol-hash eq?))
- (symbol-hashtable-update! ht 'a
-   (lambda (x) (* x 2))
-   55)
- (symbol-hashtable-ref ht 'a 0) => 110
- (symbol-hashtable-update! ht 'a
-   (lambda (x) (* x 2))
-   0)
- (symbol-hashtable-ref ht 'a 0) => 220
+ #+BEGIN_SRC scheme
+   (define ht (make-hashtable symbol-hash eq?))
+   (symbol-hashtable-update! ht 'a
+                             (lambda (x) (* x 2))
+                             55)
+   (symbol-hashtable-ref ht 'a 0) => 110
+   (symbol-hashtable-update! ht 'a
+                             (lambda (x) (* x 2))
+                             0)
+   (symbol-hashtable-ref ht 'a 0) => 220
+ #+END_SRC
+
 
  过程: (symbol-hashtable-cell hashtable key default)
- 返回: a pair (see below)
+
+ 返回: 一个点对（参见下文）
+
  库: (chezscheme)
 
- hashtable must be a mutable symbol hashtable. (A symbol hashtable is a hashtable created with hash function symbol-hash and equivalence function eq?, eqv?, equal?, or symbol=?.) key must be a symbol, and default may be any Scheme value.
+ ~hashtable~ 必须是一个可变的 /symbol hashtable/. (/symbol hashtable/ 是通过哈希函数 ~symbol-hash~ 和相等性函数 ~eq?~, ~eqv?~, ~equal?~, 或 ~symbol=?~ 创建的 ~hashtable~.) ~key~ 必须是一个符号， ~default~ 可以是任何 Scheme 值。
 
- If no value is associated with key in hashtable, symbol-hashtable-cell modifies hashtable to associate key with default. It 返回 a pair whose car is key and whose cdr is the associated value. Changing the cdr of this pair effectively updates the table to associate key with a new value. The key should not be changed.
+ 如果在 ~hashtable~ 中没有值与 ~key~ 相关联， ~symbol-hashtable-cell~ 修改 ~hashtable~, 把 ~default~ 关联到 ~key~. 它返回一个点对，其 car 是 ~key~, 而 cdr 是 ~key~ 关联的值。改变这个点对的 cdr 字段，事实上会更改这个表，使 ~key~ 关联到一个新值。 ~key~ 是不应该被改动的。
 
- (define ht (make-hashtable symbol-hash eq?))
- (define k 'a-key)
- (define cell (symbol-hashtable-cell ht k 3))
- cell => (a-key . 3)
- (symbol-hashtable-ref ht k 0) => 3
- (set-cdr! cell 4)
- (symbol-hashtable-ref ht k 0) => 4
+ #+BEGIN_SRC scheme
+   (define ht (make-hashtable symbol-hash eq?))
+   (define k 'a-key)
+   (define cell (symbol-hashtable-cell ht k 3))
+   cell => (a-key . 3)
+   (symbol-hashtable-ref ht k 0) => 3
+   (set-cdr! cell 4)
+   (symbol-hashtable-ref ht k 0) => 4
+ #+END_SRC
+
 
  过程: (symbol-hashtable-delete! hashtable key)
+
  返回: 未定义
+
  库: (chezscheme)
 
- hashtable must be a mutable symbol hashtable. (A symbol hashtable is a hashtable created with hash function symbol-hash and equivalence function eq?, eqv?, equal?, or symbol=?.) key must be a symbol.
+ ~hashtable~ 必须是一个可变的 /symbol hashtable/. (/symbol hashtable/ 是通过哈希函数 ~symbol-hash~ 和相等性函数 ~eq?~, ~eqv?~, ~equal?~, 或 ~symbol=?~ 创建的 ~hashtable~.) ~key~ 必须是一个符号。
 
- symbol-hashtable-delete! drops any association for key from hashtable.
+ ~symbol-hashtable-delete!~ 从 ~hashtable~ 中删除 ~key~ 的任何关联值。
 
- (define ht (make-hashtable symbol-hash eq?))
- (define k1 (gensym))
- (define k2 (gensym))
- (symbol-hashtable-set! ht k1 73)
- (symbol-hashtable-contains? ht k1) => #t
- (symbol-hashtable-delete! ht k1)
- (symbol-hashtable-contains? ht k1) => #f
- (symbol-hashtable-contains? ht k2) => #f
- (symbol-hashtable-delete! ht k2)
+ #+BEGIN_SRC scheme
+   (define ht (make-hashtable symbol-hash eq?))
+   (define k1 (gensym))
+   (define k2 (gensym))
+   (symbol-hashtable-set! ht k1 73)
+   (symbol-hashtable-contains? ht k1) => #t
+   (symbol-hashtable-delete! ht k1)
+   (symbol-hashtable-contains? ht k1) => #f
+   (symbol-hashtable-contains? ht k2) => #f
+   (symbol-hashtable-delete! ht k2)
+ #+END_SRC
+
 
 *** 7.13. Record Types
 
