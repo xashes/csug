@@ -1782,17 +1782,16 @@
 
 *** 7.13. Record Types
 
- /Chez Scheme/ 以一种方式扩展了 R^{6}RS 中的 ~define-record-type~ 句法，其通过包含一个以 ~#f~ 作为 /uid/ 值的 ~nongenerative~ 子句，支持显式声明一个生成的 /record/ 类型（以一种类似双重否定的方式），即，
+ /Chez Scheme/ 以一种方式扩展了 R^{6}RS 中的 ~define-record-type~ 句法，其通过包含一个以 ~#f~ 作为 /uid/ 值的 ~nongenerative~ 子句，支持以如下方式显式声明一个 /generative record/ 类型（以一种类似双重否定的方式），即，
 
  ~(nongenerative #f)~
 
- This can be used in conjunction with the parameter require-nongenerative-clause to catch the accidental use of generative record types while avoiding spurious errors for record types that must be generative. Generative record types are rarely needed and are generally less efficient since a run-time representation of the type is created each time the define-record-clause is evaluated, rather than once at compile (expansion) time.
- 这种方式可以和环境参数 ~require-nongenerative-clause~ 结合使用，
+ 这种方式可以和环境参数 ~require-nongenerative-clause~ 结合使用，以捕获对 /generative record/ 类型的意外使用，同时避免在必须使用 /generative record/ 类型时的错误误报。 /Generative record/ 类型很少需要被用到，而且通常比较低效，因为每次求值 ~define-record-clause~ 时，都要创建一次类型的运行时形式，而不是只在编译（展开）时创建一次。
 
  thread parameter: require-nongenerative-clause
  库: (chezscheme)
 
- This parameter holds a boolean value that determines whether define-record-type requires a nongenerative clause. The default value is #f. The lead-in above describes why one might want to set this to #t.
+ 这个环境参数存有一个布尔值，用来判定 ~define-record-type~ 是否必须有一个 /nongenerative/ 子句。默认值是 ~#f~. 上方的引言说明了为什么有人可能会想把它设置为 ~#t~.
 
 *** 7.14. Record Equality and Hashing
 
