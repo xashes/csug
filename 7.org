@@ -1782,7 +1782,7 @@
  #+END_SRC
 
 
-*** 7.13. Record Types
+*** 7.13. Record 类型 (Record Types)
 
  /Chez Scheme/ 以一种方式扩展了 R^{6}RS 中的 ~define-record-type~ 句法，其通过包含一个以 ~#f~ 作为 /uid/ 值的 ~nongenerative~ 子句，支持以如下方式显式声明一个 /generative record/ 类型（一种类似双重否定的方式），即，
 
@@ -1796,7 +1796,7 @@
  这个环境参数存有一个布尔值，用来判定 ~define-record-type~ 是否必须有一个 /nongenerative/ 子句。默认值是 ~#f~. 上方的引言说明了为什么有人可能会想把它设置为 ~#t~.
 
 
-*** 7.14. Record Equality and Hashing
+*** 7.14. Record 相等性和哈希化 (Record Equality and Hashing)
 
  默认情况下， 基本过程 ~equal?~ 使用 ~eq?~ 比较 /record/ 实例，即，它区分不是同一个对象 (non-eq?) 的实例，即使它们是同一个类型且有相同的内容。对一个 /record/ 类型（及它没有实现自己专有的相等性比较过程的子类型）的实例，程序可以通过使用 ~record-type-equal-procedure~ 来把相等性比较过程和描述这种 /record/ 类型的 /record/ 类型描述符(rtd)关联起来，以重载这种行为。
 
