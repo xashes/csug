@@ -1,8 +1,9 @@
-# #+OPTIONS: toc:nil
+#+OPTIONS: toc:nil
 
 * 7. 对象操作
 
 本章介绍了 /Chez Scheme/ 中针对非数值对象的特定操作，包括 pairs, numbers 等标准对象，以及 boxes, records 等 /Chez Scheme/ 扩展对象。第 8 章介绍了针对数字的操作。关于对象的标准操作的更多描述，参见“The Scheme Programming Language，第 4 版”的第 6 章，或 Scheme R^{6}RS 报告。
+
 
 *** 7.1. R6RS 中缺少的类型判断
 
@@ -1271,6 +1272,7 @@
 
  上面的第一个例子体现了，所有驻留符号从它们被读取时即纳入驻留列表，早于被求值。第二个例子体现了，当对符号的引用存在时，没有符号可以从驻留列表中被移除，在当前情况下，即为对 ~oblist~ 的第一次调用（无论哪个调用先被执行）时返回的列表中的符号。第三个例子中的表达式，只有当垃圾收集发生在两次对 ~oblist~ 的调用之间时，且仅在这次收集从驻留列表中移除了一个或更多符号时，才会返回 ~#f~.
 
+
 *** 7.10. Void
 
  很多 Scheme 操作返回未定义结果。当一个操作的返回值为未定义时， /Chez Scheme/ 通常返回一个特殊的 /void/ 对象。 /Chez Scheme/ 的 void 对象并不是要作为数据，因而也没有相应的读取器句法。就像没有读取器句法的其它对象，例如过程和端口， /Chez Scheme/ 的输出过程以一种不可读的表示方式打印 void 对象，即， ~#<void>~. 由于 void 对象应当只被那些并没有有意义的返回值的操作返回，所以默认的交互环境 (参见 =waiter-write=) 并不打印出 void 对象。 /Chez Scheme/ 中返回 void 对象的操作有： ~set!~, ~set-car!~, ~load~, and ~write~ 等等。
@@ -1294,7 +1296,7 @@
  #+END_SRC
 
 
-*** 7.11. Sorting
+*** 7.11. 排序 (Sorting)
 
  过程: (sort predicate list)
 
@@ -1792,6 +1794,7 @@
  库: (chezscheme)
 
  这个环境参数存有一个布尔值，用来判定 ~define-record-type~ 是否必须有一个 /nongenerative/ 子句。默认值是 ~#f~. 上方的引言说明了为什么有人可能会想把它设置为 ~#t~.
+
 
 *** 7.14. Record Equality and Hashing
 
