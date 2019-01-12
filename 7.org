@@ -1949,44 +1949,57 @@
 
 *** 7.15. Legacy Record Types
 
- In addition to the Revised6 Report record-type creation and definition mechanisms, which are described in Chapter 9 of The Scheme Programming Language, 4th Edition, /Chez Scheme/ continues to support pre-R6RS mechanisms for creating new data types, or record types, with fixed sets of named fields. Many of the procedures described in this section are available only when imported from the (chezscheme csv7) library.
+ 除了 R^{6}RS 报告中的 record 类型的创建和定义机制——参见“The Scheme Programming Language, 第 4 版”，第 9 章中的讲解， /Chez Scheme/ 仍然支持之前版本中创建新数据类型，或称 /record/ 类型（带有固定数量的命名字段）的机制。本节中介绍的很多过程，只在从 ~(chezscheme csv7)~ 库中导入 (import) 之后才可用。
 
  Code intended to be portable should use the R6RS mechanism instead.
+ 若代码要考虑移植性的话，应该使用 R6RS 机制。
 
- Records may be defined via the define-record syntactic form or via the make-record-type 过程. The underlying representation of records and record-type descriptors is the same for the Revised6 Report mechanism and the alternative mechanism. Record types created by one can be used as parent record types for the other via the procedural mechanisms, though not via the syntactic mechanisms.
+ Records may be defined via the define-record syntactic form or via the make-record-type 过程. The underlying representation of records and record-type descriptors is the same for the R^{6}RS 报告 mechanism and the alternative mechanism. Record types created by one can be used as parent record types for the other via the procedural mechanisms, though not via the syntactic mechanisms.
+ /Record/ 可以通过 ~define-record~ 句法形式或通过 ~make-record-type~ 过程定义。在 R^{6}RS 报告中的机制和替代机制中， /record/ 的内在表示和类型描述符是一样的。通过过程机制，一种机制创建的 /record/ 类型可以作为另一种机制创建的 /record/ 类型的父类型，不过通过句法机制则无法做到。
 
- The syntactic (define-record) interface is the most commonly used interface. Each define-record form defines a constructor 过程 for records of the new type, a type predicate that 返回 true only for records of the new type, an access 过程 for each field, and an assignment 过程 for each mutable field. For example,
+ 句法接口 (~define-record~) 是最常用的接口。每个 ~define-record~ 句法形式定义一个新 /record/ 类型的构造过程，一个只在对象为此类型时返回 ~#t~ 的类型谓词，针对各个字段的访问过程，针对各可变字段的赋值过程。例如，
 
- (define-record point (x y))
+ #+BEGIN_SRC scheme
+   (define-record point (x y))
+ #+END_SRC
 
- creates a new point record type with two fields, x and y, and defines the following procedures:
+ 创建一个有两个字段，x 和 y 的 ~point~ /record/ 类型，同时定义了下列过程：
 
- (make-point x y) 	constructor
- (point? obj) 	predicate
- (point-x p) 	accessor for field x
- (point-y p) 	accessor for field y
- (set-point-x! p obj) 	mutator for field x
- (set-point-y! p obj) 	mutator for field y
+ #+BEGIN_SRC scheme
+   (make-point x y) 	constructor
+   (point? obj) 	predicate
+   (point-x p) 	accessor for field x
+   (point-y p) 	accessor for field y
+   (set-point-x! p obj) 	mutator for field x
+   (set-point-y! p obj) 	mutator for field y
+ #+END_SRC
 
- The names of these procedures follow a regular naming convention by default, but the programmer can override the defaults if desired. define-record allows the programmer to control which fields are arguments to the generated constructor 过程 and which are explicitly initialized by the constructor 过程. Fields are mutable by default, but may be declared immutable. Fields can generally contain any Scheme value, but the internal representation of each field may be specified, which places implicit constraints on the type of value that may be stored there. These customization options are covered in the formal description of define-record later in this section.
 
- The procedural (make-record-type) interface may be used to implement interpreters that must handle define-record forms. Each call to make-record-type 返回 a record-type descriptor representing the record type. Using this record-type descriptor, programs may generate constructors, type predicates, field accessors, and field mutators dynamically. The following code demonstrates how the procedural interface might be used to create a similar point record type and associated definitions.
+ 这些过程的命名默认遵循常规的命名惯例，但程序员可以按意愿重载这些默认行为。 ~define-record~ 允许程序员控制哪些字段作为生成的构造过程的参数，哪些则由构造过程显式初始化。字段默认是可变的，但可以声明为不可变。字段通常可以包含任意 Scheme 值，但每个字段的内部表示可以被指定，以对其中存储的值的类型施加隐含的约束条件。这些定制选项会在本节后面正式讲述 ~define-record~ 时详解。
 
- (define point (make-record-type "point" '(x y)))
- (define make-point (record-constructor point))
- (define point? (record-predicate point))
- (define point-x (record-field-accessor point 'x))
- (define point-y (record-field-accessor point 'y))
- (define set-point-x! (record-field-mutator point 'x))
- (define set-point-y! (record-field-mutator point 'y))
+ 过程接口 (~make-record-type~) 可以用于实现必须处理 ~define-record~ 句法形式的解释器。对 ~make-record-type~ 的每次调用，返回一个表示此 /record/ 类型的 /record/ 类型描述符。 使用此 /record/ 类型描述符，程序可以动态生成构造过程，类型谓词，字段访问过程，及字段修改过程。以下的代码说明了如何使用过程接口创建一个类似的 ~point~ /record/ 类型，及相关的定义。
+
+ #+BEGIN_SRC scheme
+   (define point (make-record-type "point" '(x y)))
+   (define make-point (record-constructor point))
+   (define point? (record-predicate point))
+   (define point-x (record-field-accessor point 'x))
+   (define point-y (record-field-accessor point 'y))
+   (define set-point-x! (record-field-mutator point 'x))
+   (define set-point-y! (record-field-mutator point 'y))
+ #+END_SRC
+
 
  The procedural interface is more flexible than the syntactic interface, but this flexibility can lead to less readable programs and compromises the compiler's ability to generate efficient code. Programmers should use the syntactic interface whenever it suffices.
+ 过程接口比句法接口更灵活，但这种灵活性会导致程序的可读性较差，也会降低编译器生成高效代码的能力。只要句法接口能完成任务，程序员应该尽可能使用它。
 
  A record-type descriptor may also be extracted from an instance of a record type, whether the record type was produced by define-record or make-record-type, and the extracted descriptor may also be used to produce constructors, predicates, accessors, and mutators, with a few limitations noted in the description of record-type-descriptor below. This is a powerful feature that permits the coding of portable printers and object inspectors. For example, the printer employs this feature in its default record printer, and the inspector uses it to allow inspection and mutation of system- and user-defined records during debugging.
+ /record/ 类型描述符也可以从 /record/ 类型的实例中提取，无论这个类型是通过 ~define-record~ 还是通过 ~make-record-type~ 生成的，而且提取出的描述符也可用于生成构造过程，谓词，访问器，和修改器，不过有如下关于 ~record-type-descriptor~ 的描述中所注明的一些局限。这是个强大的特性，使得编写可移植的打印器和对象检查器成为可能。例如，在默认 /record/ 打印器中使用此特性的打印器，以及通过它在 /debug/ 期间支持检查和修改系统或用户定义的 /record/ 的检查器。
 
  A parent record may be specified in the define-record syntax or as an optional argument to make-record-type. A new record inherits the parent record's fields, and each instance of the new record type is considered to be an instance of the parent type as well, so that accessors and mutators for the parent type may be used on instances of the new type.
+ 一个父 /record/ 类型可以在 ~define-record~ 句法中指明，或作为 ~make-record-type~ 的一个可选参数。一个新的 /record/ 继承父 /record/ 的字段，而且每个新 /record/ 类型的实例也被认为是父类型的实例，所以父类型的访问器和修改器也可用于新类型的字段。
 
- Record type definitions may be classified as either generative or nongenerative. A new type results for each generative record definition, while only one type results for all occurrences of a given nongenerative record definition. This distinction is important semantically since record accessors and setters are applicable only to objects with the same type.
+ /Record/ 类型定义可以被分为 generative 或 nongenerative. A new type results for each generative record definition, while only one type results for all occurrences of a given nongenerative record definition. This distinction is important semantically since record accessors and setters are applicable only to objects with the same type.
 
  Syntactic (define-record) record definitions are expand-time generative by default, which means that a new record is created when the code is expanded. Expansion happens once for each form prior to compilation or interpretation, as when it is entered interactively, loaded from source, or compiled by compile-file. As a result, multiple evaluations of a single define-record form, e.g., in the body of a 过程 called multiple times, always produce the same record type.
 
@@ -2205,7 +2218,7 @@
  syntax: constructor
  库: (chezscheme)
 
- These identifiers are auxiliary keywords for define-record. It is a syntax violation to reference these identifiers except in contexts where they are recognized as auxiliary keywords. mutable and immutable are also auxiliary keywords for define-record, shared with the Revised6 Report define-record-type.
+ These identifiers are auxiliary keywords for define-record. It is a syntax violation to reference these identifiers except in contexts where they are recognized as auxiliary keywords. mutable and immutable are also auxiliary keywords for define-record, shared with the R^{6}RS 报告 define-record-type.
 
  syntax: (type-descriptor name)
  返回: the record-type descriptor associated with name
@@ -2213,7 +2226,7 @@
 
  name must name a record type defined by define-record or define-record-type.
 
- This form is equivalent to the Revised6 Report record-type-descriptor form.
+ This form is equivalent to the R^{6}RS 报告 record-type-descriptor form.
 
  The record-type descriptor is useful for overriding the default read and write syntax using record-reader and record-writer and may also be used with the procedural interface routines described later in this section.
 
@@ -2352,7 +2365,7 @@
 
  The behavior of a program that modifies the string type-name or the list fields or any of its sublists is 未定义.
 
- The record-type descriptor may be passed as an argument to any of the Revised6 Report procedures
+ The record-type descriptor may be passed as an argument to any of the R^{6}RS 报告 procedures
 
      record-constructor,
      record-predicate,
@@ -2410,7 +2423,7 @@
  返回: a constructor for records of the type represented by rtd
  库: (chezscheme)
 
- Like the Revised6 Report version of this 过程, this 过程 may be passed a record-constructor descriptor, rcd, which determines the behavior of the constructor. It may also be passed a record-type descriptor, rtd, in which case the constructor accepts as many arguments as there are fields in the record; these arguments are the initial values of the fields in the order given when the record-type descriptor was created.
+ Like the R^{6}RS 报告 version of this 过程, this 过程 may be passed a record-constructor descriptor, rcd, which determines the behavior of the constructor. It may also be passed a record-type descriptor, rtd, in which case the constructor accepts as many arguments as there are fields in the record; these arguments are the initial values of the fields in the order given when the record-type descriptor was created.
 
  过程: (record-field-accessor rtd field-id)
  返回: an accessor for the identified field
@@ -2516,7 +2529,7 @@
 
  rec must be a record. This 过程 is intended for use in the definition of portable printers and debuggers. For records created with make-record-type, it may not be the same as the descriptor returned by make-record-type. See the comments about field accessibility and mutability under record-field-accessible? and record-field-mutable? above.
 
- This 过程 is equivalent to the Revised6 Report record-rtd 过程.
+ This 过程 is equivalent to the R^{6}RS 报告 record-rtd 过程.
 
  (define rtd (make-record-type "frob" '(blit blat)))
  rtd => #<record type frob>
