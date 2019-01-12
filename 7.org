@@ -2,7 +2,7 @@
 
 * 7. 对象操作
 
-本章介绍了 /Chez Scheme/ 中针对非数值对象的特定操作，包括 pairs, numbers 等标准对象，以及 boxes, records 等 /Chez Scheme/ 扩展对象。第 8 章介绍了针对数字的操作。关于对象的标准操作的更多描述，参见“The Scheme Programming Language，第 4 版”的第 6 章，或 Scheme 第 6 修订版的报告。
+本章介绍了 /Chez Scheme/ 中针对非数值对象的特定操作，包括 pairs, numbers 等标准对象，以及 boxes, records 等 /Chez Scheme/ 扩展对象。第 8 章介绍了针对数字的操作。关于对象的标准操作的更多描述，参见“The Scheme Programming Language，第 4 版”的第 6 章，或 Scheme R^{6}RS 报告。
 
 *** 7.1. R6RS 中缺少的类型判断
 
@@ -12,7 +12,7 @@
 
  库: (chezscheme)
 
- 此一谓词应当被定义，但缺失于第 6 修订版中。
+ 此一谓词应当被定义，但缺失于 R^{6}RS 报告中。
 
 
  过程: (record-constructor-descriptor? obj)
@@ -21,7 +21,7 @@
 
  库: (chezscheme)
 
- 此一谓词应当被定义，但缺失于第 6 修订版中。
+ 此一谓词应当被定义，但缺失于 R^{6}RS 报告中。
 
 
 *** 7.2. 点对和列表 (Pair and List)
@@ -109,7 +109,7 @@
 
  库: (chezscheme)
 
- ~list*~ 和第 6 修订版中的 ~cons*~ 是一样的。
+ ~list*~ 和 R^{6}RS 报告中的 ~cons*~ 是一样的。
 
  过程: (make-list n)
 
@@ -164,7 +164,7 @@
 
  库: (chezscheme)
 
- 这些过程与第 6 修订版中的 ~remq~, ~remv~, 及 ~remove~ 过程类似，只是 ~remq!~, ~remv!~ 和 ~remove!~ 使用输入列表中的点对来构成输出列表。它们进行较少的空间分配，但并不一定比它们非破坏性的相应版本更快。如果滥用，很容易导致混乱或错误的结果。
+ 这些过程与 R^{6}RS 报告中的 ~remq~, ~remv~, 及 ~remove~ 过程类似，只是 ~remq!~, ~remv!~ 和 ~remove!~ 使用输入列表中的点对来构成输出列表。它们进行较少的空间分配，但并不一定比它们非破坏性的相应版本更快。如果滥用，很容易导致混乱或错误的结果。
 
  #+BEGIN_SRC scheme
    (remq! 'a '(a b a c a d)) => (b c d)
@@ -281,7 +281,7 @@
 
  库: (chezscheme)
 
- 这些谓词与第 6 修订版中的对应版本是一样的，只是被扩展为接受一个以上参数，而非两个以上参数。当只传入一个参数时，这些谓词均返回 ~#t~.
+ 这些谓词与 R^{6}RS 报告中的对应版本是一样的，只是被扩展为接受一个以上参数，而非两个以上参数。当只传入一个参数时，这些谓词均返回 ~#t~.
 
  #+BEGIN_SRC scheme
    (char>? #\a) => #t
@@ -356,7 +356,7 @@
 
  库: (chezscheme)
 
- 这些谓词与第 6 修订版中的对应版本是一样的，只是被扩展为接受一个以上参数，而非两个以上参数。当只传入一个参数时，这些谓词均返回 ~#t~.
+ 这些谓词与 R^{6}RS 报告中的对应版本是一样的，只是被扩展为接受一个以上参数，而非两个以上参数。当只传入一个参数时，这些谓词均返回 ~#t~.
 
  #+BEGIN_SRC scheme
    (string>? "a") => #t
@@ -779,7 +779,7 @@
 
  库: (chezscheme)
 
- 返回列表中的值均为精确的 8 位有符号整数，即，在范围 -128 至 127（两端均包含）之间的值。 ~bytevector->s8-list~ 与第 6 修订版中的 ~bytevector->u8-list~ 相似，只是返回列表中的值是有符号数，而非无符号数。
+ 返回列表中的值均为精确的 8 位有符号整数，即，在范围 -128 至 127（两端均包含）之间的值。 ~bytevector->s8-list~ 与 R^{6}RS 报告中的 ~bytevector->u8-list~ 相似，只是返回列表中的值是有符号数，而非无符号数。
 
  #+BEGIN_SRC scheme
    (bytevector->s8-list (make-bytevector 0)) => ()
@@ -796,7 +796,7 @@
 
  库: (chezscheme)
 
- ~list~ 必须完全由精确的 8 位有符号整数组成，即，在范围 -128 至 127（两端均包含）之间的值。 ~s8-list->bytevector~ 与第 6 修订版中的过程 ~u8-list->bytevector~ 相似，只是输入列表中的元素是有符号数，而非无符号数。
+ ~list~ 必须完全由精确的 8 位有符号整数组成，即，在范围 -128 至 127（两端均包含）之间的值。 ~s8-list->bytevector~ 与 R^{6}RS 报告中的过程 ~u8-list->bytevector~ 相似，只是输入列表中的元素是有符号数，而非无符号数。
 
  #+BEGIN_SRC scheme
    (s8-list->bytevector '()) => #vu8()
@@ -1304,7 +1304,7 @@
 
  库: (chezscheme)
 
- ~sort~ 和第 6 修订版中的 ~list-sort~ 是一样的，而 ~sort!~ 是 ~sort~ 的破坏性版本，即，它重用输入列表中的点对来构造输出列表。
+ ~sort~ 和 R^{6}RS 报告中的 ~list-sort~ 是一样的，而 ~sort!~ 是 ~sort~ 的破坏性版本，即，它重用输入列表中的点对来构造输出列表。
 
  #+BEGIN_SRC scheme
    (sort < '(3 4 2 1 2 5)) => (1 2 2 3 4 5)
@@ -1347,7 +1347,7 @@
 
  ~hashtable~ 必须是一个 /hashtable/. ~key~ 和 ~default~ 可以是任意 Scheme 值。
 
- 如果 ~hashtable~ 中没有值与 ~key~ 相关联， ~hashtable-cell~ 修改 ~hashtable~ 以使 ~key~ 关联到 ~default~. 它返回一个点对， /car/ 是 ~key~, /cdr/ 是关联的值。改变这个点对的 cdr 字段，事实上会更改这个表，使 ~key~ 关联到一个新值。car 字段中的 ~key~ 是不应该被改动的。相对于第 6 修订版中的相应过程对 /hashtable/ 条目的操作，这个过程的优势是，只通过一次 /hashtable/ 查询，关联到一个键的值就可以被读写任意多次。
+ 如果 ~hashtable~ 中没有值与 ~key~ 相关联， ~hashtable-cell~ 修改 ~hashtable~ 以使 ~key~ 关联到 ~default~. 它返回一个点对， /car/ 是 ~key~, /cdr/ 是关联的值。改变这个点对的 cdr 字段，事实上会更改这个表，使 ~key~ 关联到一个新值。car 字段中的 ~key~ 是不应该被改动的。相对于 R^{6}RS 报告中的相应过程对 /hashtable/ 条目的操作，这个过程的优势是，只通过一次 /hashtable/ 查询，关联到一个键的值就可以被读写任意多次。
 
  #+BEGIN_SRC scheme
    (define ht (make-eq-hashtable))
@@ -1402,7 +1402,7 @@
 
  库: (chezscheme)
 
- 这些过程与第 6 修订版中的过程 ~make-eq-hashtable~ 和 ~make-eqv-hashtable~ 是类似的，只是 /hashtable/ 中的键是弱引用的，即，面对垃圾回收，它们并不受到保护。被垃圾收集器回收的键会从表中移除，而它们的关联值最晚会在下次表被修改时丢弃。
+ 这些过程与 R^{6}RS 报告中的过程 ~make-eq-hashtable~ 和 ~make-eqv-hashtable~ 是类似的，只是 /hashtable/ 中的键是弱引用的，即，面对垃圾回收，它们并不受到保护。被垃圾收集器回收的键会从表中移除，而它们的关联值最晚会在下次表被修改时丢弃。
 
  只要键没有被回收， /hashtable/ 中的值就能被正常引用，因为键和值是使用弱引用点对(weak pair)配对在一起的。因此，如果 /hashtable/ 中的一个值反向指回它自己的键，就会阻止垃圾收集器回收这个键。参见 ~make-ephemeron-eq-hashtable~ 和 ~make-ephemeron-eqv-hashtable~.
 
@@ -1803,12 +1803,12 @@
  通过环境参数 ~default-record-equal-procedure~ 可以指定一个用于所有 /record/ 类型（包括不透明类型）的默认相等性过程。只有在实例所属类型没有实现或继承一个类型特定的相等性过程时，这个默认过程才会被使用。
 
  Similarly, when the equal-hash primitive hashes a record instance, it defaults to a value that is independent of the record type and contents of the instance. A program can override this behavior for instances of a record type by using record-type-hash-procedure to associate a hash 过程 with the record-type descriptor (rtd) that describes the record type. The 过程 record-hash-procedure can be used to find the hash 过程 for a given record instance, following the inheritance chain. equal-hash passes the hash 过程 two arguments: the instance plus a hash 过程 that should be used for recursive hashing of values within the instance. Use of hash for recursive hashing is necessary to allow hashing of potentially cyclic structure and to make the hashing of shared structure more efficient.
- 类似的，当 ~equal-hash~ 简单地散列化一个 /record/ 实例，它默认为一个独立于实例所属类型和内容的值。对于一个 /record/ 类型的实例，通过使用 ~record-type-hash-procedure~ 把散列过程和描述这个 /record/ 类型的 /record/ 类型描述符（rtd）关联起来，程序可以重载这种行为。 ~record-hash-procedure~ 过程可以沿着继承链，找到一个特定 /record/ 实例的散列过程。 /equal-hash/ 传递给散列过程 2 个参数：实例，和一个可用于递归地散列化实例中的值的散列过程。递归地进行散列化是必要的，这样才能散列化潜在的循环结构，并使得对共享结构的散列化更为高效。
+ 类似的，当 ~equal-hash~ 简单地哈希化一个 /record/ 实例，它默认为一个独立于实例所属类型和内容的值。对于一个 /record/ 类型的实例，通过使用 ~record-type-hash-procedure~ 把哈希过程和描述这个 /record/ 类型的 /record/ 类型描述符（rtd）关联起来，程序可以重载这种行为。 ~record-hash-procedure~ 过程可以沿着继承链，找到一个特定 /record/ 实例的哈希过程。 /equal-hash/ 传递给哈希过程 2 个参数：实例，和一个可用于递归地哈希化实例中的值的哈希过程。递归地进行哈希化是必要的，这样才能哈希化潜在的循环结构，并使得对共享结构的哈希化更为高效。
 
  A default hash 过程 to be used for all record types (including opaque types) can be specified via the parameter default-record-hash-procedure. The default hash 过程 is used only if an instance's type does not have or inherit a type-specific hash 过程.
- 通过环境参数 ~default-record-hash-procedure~ 可以指定一个用于所有 /record/ 类型（包括不透明类型）的默认散列过程。只有当实例所属类型没有实现或继承一个类型特定的散列过程时，这个默认的散列过程才会被使用。
+ 通过环境参数 ~default-record-hash-procedure~ 可以指定一个用于所有 /record/ 类型（包括不透明类型）的默认哈希过程。只有当实例所属类型没有实现或继承一个类型特定的哈希过程时，这个默认的哈希过程才会被使用。
 
- 以下的例子说明了相等性过程和散列过程的设置。
+ 以下的例子说明了相等性过程和哈希过程的设置。
 
  #+BEGIN_SRC scheme
    (define-record-type marble
@@ -1845,7 +1845,7 @@
  #+END_SRC
 
 
- 下面的例子说明了相等性过程和散列过程在循环 /record/ 结构上的应用。
+ 下面的例子说明了相等性过程和哈希过程在循环 /record/ 结构上的应用。
 
  #+BEGIN_SRC scheme
     (define-record-type node
@@ -1900,7 +1900,7 @@
 
  第二种形式中， ~record-type-equal-procedure~ 返回 ~rtd~ 关联的相等性过程，如果不存在，则返回 ~#f~.
 
- 当改变一个 /record/ 类型的相等性过程时，如果这个 /record/ 类型有散列过程，则需要的话也应该更新，以确保为当前相等性过程认为相等的任意两个实例生成相同的散列值。
+ 当改变一个 /record/ 类型的相等性过程时，如果这个 /record/ 类型有哈希过程，则需要的话也应该更新，以确保为当前相等性过程认为相等的任意两个实例生成相同的哈希值。
 
 
  过程: (record-equal-procedure record1 record2)
