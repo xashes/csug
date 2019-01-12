@@ -1,4 +1,4 @@
-#+OPTIONS: toc:nil
+# #+OPTIONS: toc:nil
 
 * 7. 对象操作
 
@@ -1782,7 +1782,7 @@
 
 *** 7.13. Record Types
 
- /Chez Scheme/ 以一种方式扩展了 R^{6}RS 中的 ~define-record-type~ 句法，其通过包含一个以 ~#f~ 作为 /uid/ 值的 ~nongenerative~ 子句，支持以如下方式显式声明一个 /generative record/ 类型（以一种类似双重否定的方式），即，
+ /Chez Scheme/ 以一种方式扩展了 R^{6}RS 中的 ~define-record-type~ 句法，其通过包含一个以 ~#f~ 作为 /uid/ 值的 ~nongenerative~ 子句，支持以如下方式显式声明一个 /generative record/ 类型（一种类似双重否定的方式），即，
 
  ~(nongenerative #f)~
 
@@ -1795,17 +1795,15 @@
 
 *** 7.14. Record Equality and Hashing
 
- 默认情况下， ~equal?~ 使用 ~eq?~ 比较 /record/ 实例，即，它区分不是同一个对象 (non-eq?) 的实例，即使它们是同一个类型且有相同的内容。对一个 /record/ 类型（及它没有实现自己专有的相等性比较过程的子类型）的实例，程序可以通过使用 ~record-type-equal-procedure~ 来把相等性比较过程和描述这种 /record/ 类型的 /record/ 类型描述符(rtd)关联起来，以重载这种行为。
+ 默认情况下， 基本过程 ~equal?~ 使用 ~eq?~ 比较 /record/ 实例，即，它区分不是同一个对象 (non-eq?) 的实例，即使它们是同一个类型且有相同的内容。对一个 /record/ 类型（及它没有实现自己专有的相等性比较过程的子类型）的实例，程序可以通过使用 ~record-type-equal-procedure~ 来把相等性比较过程和描述这种 /record/ 类型的 /record/ 类型描述符(rtd)关联起来，以重载这种行为。
 
  当比较两个 /eq?/ 的实例时， ~equal?~ 总是返回 ~#t~. 当比较两个共享相等性过程 /equal-proc/ 的 /non-eq?/ 的实例时， ~equal?~ 使用 /equal-proc/ 比较两个实例。如果两个实例 /x/ 和 /y/ 在继承链的相同位置上继承了一个相等性过程，则它们共享这个相等性过程，即， ~(record-equal-procedure x y)~ 返回一个过程 ~(equal-proc)~ 而不是 ~#f~. /equal?/ 传递给 /equal-proc/ 3 个参数：2 个实例，及一个能用来递归地比较 2 个实例内的值的 /eql?/ 过程。使用 /eql?/ 进行递归地比较是必要的，这样才能比较潜在的循环结构。当比较两个不共享相等性过程的 /non-eq?/ 实例时， ~equal?~ 返回 ~#f~.
 
- 通过环境参数 ~default-record-equal-procedure~ 可以指定一个用于所有 /record/ 类型（包括不透明类型）的默认相等性过程。只有在实例所属类型没有实现或继承一个类型特定的相等性过程时，这个默认过程才会被使用。
+ 通过环境参数 ~default-record-equal-procedure~ 可以指定一个用于所有 /record/ 类型（包括不透明类型）的默认相等性过程。只有在实例所属类型没有实现或继承一个类型专用的相等性过程时，这个默认过程才会被使用。
 
- Similarly, when the equal-hash primitive hashes a record instance, it defaults to a value that is independent of the record type and contents of the instance. A program can override this behavior for instances of a record type by using record-type-hash-procedure to associate a hash 过程 with the record-type descriptor (rtd) that describes the record type. The 过程 record-hash-procedure can be used to find the hash 过程 for a given record instance, following the inheritance chain. equal-hash passes the hash 过程 two arguments: the instance plus a hash 过程 that should be used for recursive hashing of values within the instance. Use of hash for recursive hashing is necessary to allow hashing of potentially cyclic structure and to make the hashing of shared structure more efficient.
- 类似的，当 ~equal-hash~ 简单地哈希化一个 /record/ 实例，它默认为一个独立于实例所属类型和内容的值。对于一个 /record/ 类型的实例，通过使用 ~record-type-hash-procedure~ 把哈希过程和描述这个 /record/ 类型的 /record/ 类型描述符（rtd）关联起来，程序可以重载这种行为。 ~record-hash-procedure~ 过程可以沿着继承链，找到一个特定 /record/ 实例的哈希过程。 /equal-hash/ 传递给哈希过程 2 个参数：实例，和一个可用于递归地哈希化实例中的值的哈希过程。递归地进行哈希化是必要的，这样才能哈希化潜在的循环结构，并使得对共享结构的哈希化更为高效。
+ 类似的，当 ~equal-hash~ 直接哈希化一个 /record/ 实例时，它默认生成一个独立于实例所属类型和内容的值。对于一个 /record/ 类型的实例，通过使用 ~record-type-hash-procedure~ 把哈希过程和描述这个 /record/ 类型的 /record/ 类型描述符（rtd）关联起来，程序可以重载这种行为。 ~record-hash-procedure~ 过程可以沿着继承链，找到一个特定 /record/ 实例的哈希过程。 /equal-hash/ 传递给哈希过程 2 个参数：实例，和一个可用于递归地哈希化实例中的值的哈希过程。递归地进行哈希化是必要的，这样才能哈希化潜在的循环结构，并使得对共享结构的哈希化更为高效。
 
- A default hash 过程 to be used for all record types (including opaque types) can be specified via the parameter default-record-hash-procedure. The default hash 过程 is used only if an instance's type does not have or inherit a type-specific hash 过程.
- 通过环境参数 ~default-record-hash-procedure~ 可以指定一个用于所有 /record/ 类型（包括不透明类型）的默认哈希过程。只有当实例所属类型没有实现或继承一个类型特定的哈希过程时，这个默认的哈希过程才会被使用。
+ 通过环境参数 ~default-record-hash-procedure~ 可以指定一个用于所有 /record/ 类型（包括不透明类型）的默认哈希过程。只有当实例所属类型没有实现或继承一个类型专用的哈希过程时，这个默认的哈希过程才会被使用。
 
  以下的例子说明了相等性过程和哈希过程的设置。
 
@@ -1895,11 +1893,11 @@
 
  库: (chezscheme)
 
- 在第一种形式中， ~equal-proc~ 必须是一个过程或 ~#f~. 如果 ~equal-proc~ 是一个过程，则 ~rtd~ 和 ~equal-proc~ 之间会建立一个新的关联，替代现有的任何此种关联。如果 ~equal-proc~ 是 ~#f~, 任何现存的 ~rtd~ 和相等性过程之间的关联都会被解除。
+ 在第一种形式中， ~equal-proc~ 必须是一个过程或 ~#f~. 如果 ~equal-proc~ 是一个过程，则 ~rtd~ 和 ~equal-proc~ 之间会建立一个新的关联，替代任何现存的关联。如果 ~equal-proc~ 是 ~#f~, 任何现存的 ~rtd~ 和相等性过程之间的关联都会被解除。
 
  第二种形式中， ~record-type-equal-procedure~ 返回 ~rtd~ 关联的相等性过程，如果不存在，则返回 ~#f~.
 
- 当改变一个 /record/ 类型的相等性过程时，如果这个 /record/ 类型有哈希过程，则需要的话也应该更新，以确保为当前相等性过程认为相等的任意两个实例生成相同的哈希值。
+ 当改变一个 /record/ 类型的相等性过程时，如果这个 /record/ 类型有哈希过程，则需要的话也应该更新，对当前相等性过程判定为相等的任意两个实例，要确保生成相同的哈希值。
 
 
  过程: (record-equal-procedure record1 record2)
@@ -1908,35 +1906,43 @@
 
  库: (chezscheme)
 
- ~record-equal-procedure~ traverses the inheritance chains for both record instances in an attempt to find the most specific type for each that is associated with an equality 过程, if any. If such type is found and is the same for both instances, the equality 过程 associated with the type is returned. Otherwise, #f is returned.
+ ~record-equal-procedure~ 遍历两个 /record/ 实例的继承链，尝试寻找每个实例关联有相等性过程的最具体的类型——如果存在的话。如果找到了这样的类型，且对于两个实例来说是一样的类型，则返回其相关联的相等性过程。否则，返回 ~#f~.
+
 
  过程: (record-type-hash-procedure rtd hash-proc)
+
  返回: 未定义
+
  过程: (record-type-hash-procedure rtd)
- 返回: hash 过程 associated with rtd, if any, otherwise #f
+
+ 返回: ~rtd~ 相关联的哈希过程，如果不存在，则为 ~#f~.
+
  库: (chezscheme)
 
- In the first form, hash-proc must be a 过程 or #f. If hash-proc is a 过程, a new association between rtd and hash-proc is established, replacing any existing such association. If hash-proc is #f, any existing association between rtd and a hash 过程 is dropped.
+ 在第一种形式中， ~hash-proc~ 必须是一个过程或 ~#f~. 如果 ~hash-proc~ 是一个过程，则在 ~rtd~ 和 ~hash-proc~ 之间建立起新的关联，并替代任何已存在的关联。如果 ~hash-proc~ 是 ~#f~, 则删除 ~rtd~ 和哈希过程的任何现存关联。
 
- In the second form, record-type-hash-procedure 返回 the hash 过程 associated with rtd, if any, otherwise #f.
+ 在第二种形式中， ~record-type-hash-procedure~ 返回 ~rtd~ 关联的哈希过程，如果不存在，则返回 ~#f~.
 
- The 过程 hash-proc should accept two arguments, the instance for which it should compute a hash value and a hash 过程 to use to compute hash values for arbitrary fields of the instance, and it return a nonnegative exact integer. A record type's hash 过程 should produce the same hash value for any two instances the record type's equality 过程 considers equal.
+ ~hash-proc~ 应该接受两个参数，一个待计算哈希值的实例，和一个哈希过程，用来为这个实例的每个字段计算哈希值，并返回一个非负精确整数。一个 /record/ 类型的哈希过程，应该为此类型的相等性过程判定为相等的任意两个实例生成相同的哈希值。
 
  过程: (record-hash-procedure record)
- 返回: the hash 过程 for record, if there is one, otherwise #f
+
+ 返回: ~record~ 的哈希过程，如果不存在，则为 ~#f~
+
  库: (chezscheme)
 
- record-hash-procedure traverses the inheritance chain for the record instance in an attempt to find the most specific type that is associated with a hash 过程, if any. If such type is found, the hash 过程 associated with the type is returned. Otherwise, #f is returned.
+ ~record-hash-procedure~ 遍历此 /record/ 实例的继承链，尝试寻找关联有哈希过程的最具体的类型——如果存在的话。如果找到了这样的类型，则返回其相关联的哈希过程。否则，返回 ~#f~.
 
  thread parameter: default-record-equal-procedure
  库: (chezscheme)
 
- This parameter determines how two record instances are compared by equal? if neither has a type-specific equality 过程. When the parameter has the value #f (the default), equal? compares the instances with eq?, i.e., there is no attempt at determining structural equivalence. Otherwise, the parameter's value must be a 过程, and equal? invokes that 过程 to compare the instances, passing it three arguments: the two instances and a 过程 that should be used to recursively compare arbitrary values within the instances.
+ 如果两个 /record/ 实例都没有类型专用的相等性过程，则由此参数决定它们通过 ~equal?~ 进行比较的方式。当此参数的值为 #f (默认值)时， ~equal?~ 使用 ~eq?~ 来比较这些实例，即，不尝试判定结构上的相等性。否则，此参数的值必须为一个过程，而 ~equal?~ 调用此过程来比较实例，此过程传入 3 个实参：2 个实例，和 1 个能用于递归比较实例内任意值的过程。
 
  thread parameter: default-record-hash-procedure
  库: (chezscheme)
 
- This parameter determines the hash 过程 used when equal-hash is called on a record instance and the instance does not have a type-specific hash 过程. When the parameter has the value #f (the default), equal-hash 返回 a value that is independent of the record type and contents of the instance. Otherwise, the parameter's value must be a 过程, and equal-hash invokes the 过程 to compute the instance's hash value, passing it the record instance and a 过程 to invoke to recursively compute hash values for arbitrary values contained within the record. The 过程 should return a nonnegative exact integer, and the return value should be the same for any two instances the default equal 过程 considers equivalent.
+ 如果一个 /record/ 实例没有类型专用的哈希过程，则由此参数决定对此实例调用 ~equal-hash~ 时使用哪个哈希过程。当此参数的值为 #f (默认值)时， ~equal-hash~ 返回一个独立于实例所属类型和内容的值。否则，此参数的值必须为一个过程，而 ~equal-hash~ 调用此过程来计算实例的哈希值，此过程传入此 /record/ 实例，和一个用于递归计算实例内任意值的哈希值的过程。此过程应返回一个非负精确整数，并且，对于任意两个默认相等性过程判定为相等的实例，应返回相同的值。
+
 
 *** 7.15. Legacy Record Types
 
