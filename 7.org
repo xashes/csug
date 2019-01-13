@@ -2025,278 +2025,344 @@
  The default syntax may be used as input to the reader as well, as long as the corresponding record type has already been defined in the Scheme session in which the read occurs. The parameter record-reader may be used to specify a different name to be recognized by the reader in place of the generated name. Specifying a different name in this manner also changes the name used when the record is printed. This reader extension is disabled in an input stream after #!r6rs has been seen by the reader, unless #!chezscheme has been seen more recently.
  默认的 /record/ 句法也能用作读取器的输入，只要在读取器所在的 Scheme 会话中，对应的 /record/ 类型已经被定义。环境参数 ~record-reader~ 可以被用于指定一个替代生成的名字的，供读取器辨识的不同名字。以这种方式指定一个不同的名字，同时改变了 /record/ 打印出的名字。读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
 
- 标记 (~#n=~) 和引用 (~#n#~) 句法可在 /record/ 句法内使用，用于根据意图创建共享的或环状的结构。不过，所有环必须是可解析的，不能改变一个不可变 /record/ 字段。TODO
+ 标记 (~#n=~) 和引用 (~#n#~) 句法可在 /record/ 句法内使用，用于根据意图创建共享的或环状的结构。不过，所有环必须是可解析的，不能改变一个不可变 /record/ 字段。即，任何环必须包含至少一个指向一个可变字段的指针，不论它是个可变的 /record/ 字段，还是一个内置对象类型（如点对或向量）的可变字段。
  with the result of creating shared or cyclic structure as desired. All cycles must be resolvable, however, without mutation of an immutable record field. That is, any cycle must contain at least one pointer through a mutable field, whether it is a mutable record field or a mutable field of a built-in object type such as a pair or vector.
 
  When the parameter print-record is set to #f, records are printed using the simpler syntax
-
- #<record of type name>
+ 当环境参数 ~print-record~ 被设置为 ~#f~ 时， /record/ 使用更简单的句法打印
+ 
+ ~#<record of type name>~
 
  where name is the "pretty" name of the record (not the full gensym) or the reader name first assigned to the record type.
+ 其中 ~name~ 是 /record/ 的美观名字（不是完整的 /gensym/ ），或是首次分配给这个 /record/ 类型的读取器名字。
 
- syntax: (define-record name (fld1 ...) ((fld2 init) ...) (opt ...))
- syntax: (define-record name parent (fld1 ...) ((fld2 init) ...) (opt ...))
+
+ 句法: (define-record name (fld1 ...) ((fld2 init) ...) (opt ...))
+
+ 句法: (define-record name parent (fld1 ...) ((fld2 init) ...) (opt ...))
+
  返回: 未定义
+
  库: (chezscheme)
 
- A define-record form is a definition and may appear anywhere and only where other definitions may appear.
+ ~define-record~ 句法形式是一种定义，可以出现在，也只能出现在一切其它定义可以出现的地方。
 
- define-record creates a new record type containing a specified set of named fields and defines a set of procedures for creating and manipulating instances of the record type.
+ ~define-record~ 创建一个新的 /record/ 类型，包含一系列指定的具名字段，同时定义一系列过程，用于创建和操控此类型的实例。
 
- name must be an identifier. If name is a generated symbol (gensym), the record definition is nongenerative, otherwise it is expand-time generative. (See the discussion of generativity earlier in this section.)
+ ~name~ 必须是一个标识符。如果 ~name~ 是一个生成的符号 (/gensym/), 则 /record/ 定义是 /nongenerative/ 的，否则，它是展开期 /generative/ 的。（参见本节前部关于 /generativity/ 的讨论）。
 
- Each fld must be an identifier field-name, or it must take the form
+ 每个 ~fld~ 必须是一个字段名标识符，或必须采用以下句法形式
 
- (class type field-name)
+ ~(class type field-name)~
 
- where class and type are optional and field-name is an identifier. class, if present, must be the keyword immutable or the keyword mutable. If the immutable class specifier is present, the field is immutable; otherwise, the field is mutable. type, if present, specifies how the field is represented, as described below.
+ ~class~ 和 ~type~ 是可选的，而 ~field-name~ 是一个标识符。如果提供 ~class~, 则必须指定不可变关键字或可变关键字。如果指定不可变 class 批示符，则字段是不可变的；否则，字段是可变的。 ~type~, 如果存在的话，则指定字段如何表示，如下所示。
 
- ptr 	any Scheme object
- scheme-object 	same as ptr
- int 	a C int
- unsigned 	a C unsigned int
- short 	a C short
- unsigned-short 	a C unsigned short
- long 	a C long
- unsigned-long 	a C unsigned long
- iptr 	a signed integer the size of a ptr
- uptr 	an unsigned integer the size of a ptr
- float 	a C float
- double 	a C double
- integer-8 	an eight-bit signed integer
- unsigned-8 	an eight-bit unsigned integer
- integer-16 	a 16-bit signed integer
- unsigned-16 	a 16-bit unsigned integer
- integer-32 	a 32-bit signed integer
- unsigned-32 	a 32-bit unsigned integer
- integer-64 	a 64-bit signed integer
- unsigned-64 	a 64-bit unsigned integer
- single-float 	a 32-bit single floating point number
- double-float 	a 64-bit double floating point number
+ #+BEGIN_SRC scheme
+   ptr 	any Scheme object
+   scheme-object 	same as ptr
+   int 	a C int
+   unsigned 	a C unsigned int
+   short 	a C short
+   unsigned-short 	a C unsigned short
+   long 	a C long
+   unsigned-long 	a C unsigned long
+   iptr 	a signed integer the size of a ptr
+   uptr 	an unsigned integer the size of a ptr
+   float 	a C float
+   double 	a C double
+   integer-8 	an eight-bit signed integer
+   unsigned-8 	an eight-bit unsigned integer
+   integer-16 	a 16-bit signed integer
+   unsigned-16 	a 16-bit unsigned integer
+   integer-32 	a 32-bit signed integer
+   unsigned-32 	a 32-bit unsigned integer
+   integer-64 	a 64-bit signed integer
+   unsigned-64 	a 64-bit unsigned integer
+   single-float 	a 32-bit single floating point number
+   double-float 	a 64-bit double floating point number
+ #+END_SRC
 
- If a type is specified, the field can contain objects only of the specified type. If no type is specified, the field is of type ptr, meaning that it can contain any Scheme object.
+
+ 如果指定一个类型，则字段只能包含指定类型的对象。如果没有指定类型，则字段为 ~ptr~ 类型，意思是它可以包含任意 Scheme 对象。
 
  The field identifiers name the fields of the record. The values of the n fields described by fld1 ... are specified by the n arguments to the generated constructor 过程. The values of the remaining fields, fld2 ..., are given by the corresponding expressions, init .... Each init is evaluated within the scope of the set of field names given by fld1 ... and each field in fld2 ... that precedes it, as if within a let* expression. Each of these field names is bound to the value of the corresponding field during initialization.
+ 字段标识符命名 /record/ 的字段名。通过 ~fld1 ...~ 描述的 /n/ 个字段的值，由传递给生成的构造过程的 /n/ 个参数指定。剩余字段的值── ~fld2 ...~, 由对应的表达式── ~init ...~ 给出。每个 ~init~ 被求值时所处的作用域，为 ~fld1 ...~ 给出的字段名和 ~fld2 ...~ 中的字段名组成的集合中位于 ~init~ 之前的部分，就像在一个 ~let*~ 表达式中一样。这些字段名在初始化期间绑定到对应字段的值上。
 
  If parent is present, the record type named by parent is the parent of the record. The new record type inherits each of the parent record's fields, and records of the new type are considered records of the parent type. If parent is not present, the parent record type is a base record type with no fields.
+ 如果指定了 ~parent~ ，则 ~parent~ 命名的类型为 /record/ 的父类型。新的类型继承父类型的所有字段，并且新类型的实例同时也被判定为父类型。如果未指定 ~parent~ ，则父类型为一个没有字段的基础 /record/ 类型。
 
- The following procedures are defined by define-record:
+ ~define-record~ 定义了下列过程：
 
-     a constructor 过程 whose name is make-name,
+     - 一个名为 ~make-name~ 的构造过程
 
-     a type predicate whose name is name?,
+     - 一个名为 ~name?~ 的类型谓词
 
-     an access 过程 whose name is name-fieldname for each noninherited field, and
+     - 对每个非继承来的字段生成一个名为 ~name-fieldname~ 的访问过程
 
-     an assignment 过程 whose name is set-name-fieldname! for each noninherited mutable field.
+     - 对每个非继承来的可变字段生成一个名为 ~set-name-fieldname!~ 的赋值过程
 
- If no parent record type is specified, the constructor behaves as if defined as
+ 如果没有指定父类型，则构造过程的行为类似如下定义
 
- (define make-name
-   (lambda (id1 ...)
-     (let* ([id2 init] ...)
-       body)))
+ #+BEGIN_SRC scheme
+   (define make-name
+     (lambda (id1 ...)
+       (let* ([id2 init] ...)
+         body)))
+ #+END_SRC
 
- where id1 ... are the names of the fields defined by fld1 ..., id2 ... are the names of the fields defined by fld2 ..., and body builds the record from the values of the identifiers id1 ... and id2 ....
+
+ 其中 ~id1 ...~ 是由 ~fld1 ..~.定义的字段名， ~id2 ...~ 是由 ~fld2 ..~.定义的字段名，而 ~body~ 通过标识符 ~id1 ...~ 和 ~id2 ...~ 的值构造 /record/.
 
  If a parent record type is specified, the parent arguments appear first, and the parent fields are inserted into the record before the child fields.
+ 如果指定的父类型，则父类型的参数排在前面，同时，在 /record/ 中，父类型的字段也插入到子类型的字段前面。
 
  The options opt ... control the selection of names of the generated constructor, predicate, accessors, and mutators.
+ 选项 opt ...控制生成的构造过程，谓词，访问器和修改器的命名选择。
 
- (constructor id)
- (predicate id)
- (prefix string)
+ #+BEGIN_SRC scheme
+   (constructor id)
+   (predicate id)
+   (prefix string)
+ #+END_SRC
 
- The option (constructor id) causes the generated constructor's name to be id rather than make-name. The option (predicate id) likewise causes the generated predicate's name to be id rather than name?. The option (prefix string) determines the prefix to be used in the generated accessor and mutator names in place of name-.
 
- If no options are needed, the third subexpression, (opt ...), may be omitted. If no options and no fields other than those initialized by the arguments to the constructor 过程 are needed, both the second and third subexpressions may be omitted. If options are specified, the second subexpression must be present, even if it contains no field specifiers.
+ 选项 (~constructor id~) 使得生成的构造过程的名字是 ~id~ 而非 ~make-name~. 选项 (~predicate id~) 同样使得生成的谓词名是 ~id~ 而非 ~name?~. 选项 (~prefix string~) 决定在生成的访问器和修改器名字中，用什么前缀取代 ~name-~.
 
- Here is a simple example with no inheritance and no options.
+ 如果不需要选项，则第三个子表达式， (~opt ...~), 可以省略。如果除了通过构造过程的参数初始化的字段外，其它字段和选项都不需要的话，第二个和第三个子表达式都能省略。如果指定选项，则第二个子表达式必须存在，即使其不包含任何字段声明。may be omitted. If no options and no fields other than those initialized by the arguments to the constructor 过程 are needed, both the second and third subexpressions may be omitted. If options are specified, the second subexpression must be present, even if it contains no field specifiers.
 
- (define-record marble (color quality))
- (define x (make-marble 'blue 'medium))
- (marble? x) => #t
- (pair? x) => #f
- (vector? x) => #f
- (marble-color x) => blue
- (marble-quality x) => medium
- (set-marble-quality! x 'low)
- (marble-quality x) => low
+ 这里是一个不包含继承和选项的简单例子。
 
- (define-record marble ((immutable color) (mutable quality))
-   (((mutable shape) (if (eq? quality 'high) 'round 'unknown))))
- (marble-shape (make-marble 'blue 'high)) => round
- (marble-shape (make-marble 'blue 'low)) => unknown
- (define x (make-marble 'blue 'high))
- (set-marble-quality! x 'low)
- (marble-shape x) => round
- (set-marble-shape! x 'half-round)
- (marble-shape x) => half-round
+ #+BEGIN_SRC scheme
+   (define-record marble (color quality))
+   (define x (make-marble 'blue 'medium))
+   (marble? x) => #t
+   (pair? x) => #f
+   (vector? x) => #f
+   (marble-color x) => blue
+   (marble-quality x) => medium
+   (set-marble-quality! x 'low)
+   (marble-quality x) => low
 
- The following example illustrates inheritance.
+   (define-record marble ((immutable color) (mutable quality))
+     (((mutable shape) (if (eq? quality 'high) 'round 'unknown))))
+   (marble-shape (make-marble 'blue 'high)) => round
+   (marble-shape (make-marble 'blue 'low)) => unknown
+   (define x (make-marble 'blue 'high))
+   (set-marble-quality! x 'low)
+   (marble-shape x) => round
+   (set-marble-shape! x 'half-round)
+   (marble-shape x) => half-round
+ #+END_SRC
 
- (define-record shape (x y))
- (define-record point shape ())
- (define-record circle shape (radius))
 
- (define a (make-point 7 -3))
- (shape? a) => #t
- (point? a) => #t
- (circle? a) => #f
+ 以下是一个说明继承的例子。
 
- (shape-x a) => 7
- (set-shape-y! a (- (shape-y a) 1))
- (shape-y a) => -4
+ #+BEGIN_SRC scheme
+   (define-record shape (x y))
+   (define-record point shape ())
+   (define-record circle shape (radius))
 
- (define b (make-circle 7 -3 1))
- (shape? b) => #t
- (point? b) => #f
- (circle? b) => #t
+   (define a (make-point 7 -3))
+   (shape? a) => #t
+   (point? a) => #t
+   (circle? a) => #f
 
- (circle-radius b) => 1
- (circle-radius a) => exception: not of type circle
+   (shape-x a) => 7
+   (set-shape-y! a (- (shape-y a) 1))
+   (shape-y a) => -4
 
- (define c (make-shape 0 0))
- (shape? c) => #t
- (point? c) => #f
- (circle? c) => #f
+   (define b (make-circle 7 -3 1))
+   (shape? b) => #t
+   (point? b) => #f
+   (circle? b) => #t
 
- This example demonstrates the use of options:
+   (circle-radius b) => 1
+   (circle-radius a) => exception: not of type circle
 
- (define-record pair (car cdr)
-   ()
-   ((constructor cons)
-    (prefix "")))
+   (define c (make-shape 0 0))
+   (shape? c) => #t
+   (point? c) => #f
+   (circle? c) => #f
+ #+END_SRC
 
- (define x (cons 'a 'b))
- (car x) => a
- (cdr x) => b
- (pair? x) => #t
 
- (pair? '(a b c)) => #f
- x => #[#{pair bdhavk1bwafxyss1-a} a b]
+ 这个例子示范和选项的使用：
+
+ #+BEGIN_SRC scheme
+   (define-record pair (car cdr)
+     ()
+     ((constructor cons)
+      (prefix "")))
+
+   (define x (cons 'a 'b))
+   (car x) => a
+   (cdr x) => b
+   (pair? x) => #t
+
+   (pair? '(a b c)) => #f
+   x => #[#{pair bdhavk1bwafxyss1-a} a b]
+ #+END_SRC
+
 
  This example illustrates the use a specified reader name, immutable fields, and the graph mark and reference syntax.
+ 这个例子说明了指定读取器命名，不可变字段，以及图形标记和引用句法的用法。
 
- (define-record triple ((immutable x1) (mutable x2) (immutable x3)))
- (record-reader 'triple (type-descriptor triple))
+ #+BEGIN_SRC scheme
+   (define-record triple ((immutable x1) (mutable x2) (immutable x3)))
+   (record-reader 'triple (type-descriptor triple))
 
- (let ([t '#[triple #1=(1 2) (3 4) #1#]])
-   (eq? (triple-x1 t) (triple-x3 t))) => #t
- (let ([x '(#1=(1 2) . #[triple #1# b c])])
-   (eq? (car x) (triple-x1 (cdr x)))) => #t
- (let ([t #[triple #1# (3 4) #1=(1 2)]])
-   (eq? (triple-x1 t) (triple-x3 t))) => #t
- (let ([t '#1=#[triple a #1# c]])
-   (eq? t (triple-x2 t))) => #t
- (let ([t '#1=(#[triple #1# b #1#])])
-   (and (eq? t (triple-x1 (car t)))
-        (eq? t (triple-x1 (car t))))) => #t
+   (let ([t '#[triple #1=(1 2) (3 4) #1#]])
+     (eq? (triple-x1 t) (triple-x3 t))) => #t
+   (let ([x '(#1=(1 2) . #[triple #1# b c])])
+     (eq? (car x) (triple-x1 (cdr x)))) => #t
+   (let ([t #[triple #1# (3 4) #1=(1 2)]])
+     (eq? (triple-x1 t) (triple-x3 t))) => #t
+   (let ([t '#1=#[triple a #1# c]])
+     (eq? t (triple-x2 t))) => #t
+   (let ([t '#1=(#[triple #1# b #1#])])
+     (and (eq? t (triple-x1 (car t)))
+          (eq? t (triple-x1 (car t))))) => #t
+ #+END_SRC
+
 
  Cycles established with the mark and reference syntax can be resolved only if a mutable record field or mutable location of some other object is involved the cycle, as in the last two examples above. An exception is raised with condition type &lexical if only immutable fields are involved.
 
- '#1=#[triple #1# (3 4) #1#] => exception
+ ~'#1=#[triple #1# (3 4) #1#] => exception~
 
  The following example demonstrates the use of nongenerative record definitions.
+ 以下例子说明了 /nongenerative record/ 定义的用法。
 
- (module A (point-disp)
-   (define-record #{point bdhavk1bwafxyss1-b} (x y))
-   (define square (lambda (x) (* x x)))
-   (define point-disp
-     (lambda (p1 p2)
-       (sqrt (+ (square (- (point-x p1) (point-x p2)))
-                (square (- (point-y p1) (point-y p2))))))))
+ #+BEGIN_SRC scheme
+   (module A (point-disp)
+           (define-record #{point bdhavk1bwafxyss1-b} (x y))
+           (define square (lambda (x) (* x x)))
+           (define point-disp
+             (lambda (p1 p2)
+               (sqrt (+ (square (- (point-x p1) (point-x p2)))
+                        (square (- (point-y p1) (point-y p2))))))))
 
- (module B (base-disp)
-   (define-record #{point bdhavk1bwafxyss1-b} (x y))
-   (import A)
-   (define base-disp
-     (lambda (p)
-       (point-disp (make-point 0 0) p))))
+   (module B (base-disp)
+           (define-record #{point bdhavk1bwafxyss1-b} (x y))
+           (import A)
+           (define base-disp
+             (lambda (p)
+               (point-disp (make-point 0 0) p))))
 
- (let ()
-   (import B)
-   (define-record #{point bdhavk1bwafxyss1-b} (x y))
-   (base-disp (make-point 3 4))) => 5
+   (let ()
+     (import B)
+     (define-record #{point bdhavk1bwafxyss1-b} (x y))
+     (base-disp (make-point 3 4))) => 5
+ #+END_SRC
 
  This works even if the different program components are loaded from different source files or are compiled separately and loaded from different object files.
+ 即使程序的不同组件是从不同的源文件加载的，或从不同目标文件加载且是分别编译的，这也可以有效运行。
 
- syntax: predicate
- syntax: prefix
- syntax: constructor
+
+ 句法: predicate
+
+ 句法: prefix
+
+ 句法: constructor
+
  库: (chezscheme)
 
- These identifiers are auxiliary keywords for define-record. It is a syntax violation to reference these identifiers except in contexts where they are recognized as auxiliary keywords. mutable and immutable are also auxiliary keywords for define-record, shared with the R^{6}RS 报告 define-record-type.
+ 这些标识符是 ~define-record~ 的辅助关键字。除了在被识别为辅助关键字的上下文中，在其它任何地主引用这些标识符都是违反句法的。 ~mutable~ 和 ~immutable~ 也是 ~define-record~ 的辅助关键字，和 R^{6}RS 报告中的 ~define-record-type~ 一样。
 
- syntax: (type-descriptor name)
- 返回: the record-type descriptor associated with name
+
+ 句法: (type-descriptor name)
+
+ 返回: 与 ~name~ 相关联的 /record/ 类型描述符
+
  库: (chezscheme)
 
- name must name a record type defined by define-record or define-record-type.
+ ~name~ 必须命名一个由  ~define-record~  或  ~define-record-type~  定义的 /record/ 类型。
 
- This form is equivalent to the R^{6}RS 报告 record-type-descriptor form.
+ 这个句法形式等价于 R^{6}RS 报告中  ~record-type-descriptor~  的句法形式。
 
- The record-type descriptor is useful for overriding the default read and write syntax using record-reader and record-writer and may also be used with the procedural interface routines described later in this section.
+ /record/ 类型描述符在使用 ~record-reader~ 和 ~record-writer~ 重载默认读写句法时很有用，也可和本节后面将要讲述的过程接口 routines 配合使用。
 
- (define-record frob ())
- (type-descriptor frob) => #<record type frob>
+ #+BEGIN_SRC scheme
+   (define-record frob ())
+   (type-descriptor frob) => #<record type frob>
+ #+END_SRC
+
 
  过程: (record-reader name)
- 返回: the record-type descriptor associated with name
+
+ 返回: ~name~ 关联的 record 类型描述符
+
  过程: (record-reader rtd)
- 返回: the first name associated with rtd
+
+ 返回: ~rtd~ 关联的第一个名字
+
  过程: (record-reader name rtd)
+
  返回: 未定义
+
  过程: (record-reader name #f)
+
  返回: 未定义
+
  过程: (record-reader rtd #f)
+
  返回: 未定义
+
  库: (chezscheme)
 
- name must be a symbol, and rtd must be a record-type descriptor.
+ ~name~ 必须是一个符号， ~rtd~ 必须是一个 record 类型描述符。
 
- With one argument, record-reader is used to retrieve the record type associated with a name or name associated with a record type. If no association has been created, record-reader 返回 #f
+ 传入一个参数时， ~record-reader~ 用于获取 ~name~ 关联的 record 类型，或 record 类型关联的名字。如果没建立过关联，则 ~record-reader~ 返回 ~#f~.
 
- With arguments name and rtd, record-reader registers rtd as the record-type descriptor to be used whenever the read 过程 encounters a record named by name and printed in the default record syntax.
+ 传入参数 ~name~ 和 ~rtd~ 时， ~record-reader~ 把 ~rtd~ 注册为 record 类型描述符，用于在读取过程遇到一个用 ~name~ 命名的 record，并用默认 record 句法打印时。
 
- With arguments name and #f, record-reader removes any association for name to a record-type descriptor. Similarly, with arguments rtd and #f, record-reader removes any association for rtd to a name.
+ 传入参数 ~name~ 和 ~#f~ 时， ~record-reader~ 移除 name 和 record 类型描述符之间的任何关联。类似的，传入参数 ~rtd~ 和 ~#f~ 时， ~record-reader~ 移除 ~rtd~ 和一个名字间的任何关联。
 
- (define-record marble (color quality))
- (define m (make-marble 'blue 'perfect))
- m => #[#{marble bdhavk1bwafxyss1-c} blue perfect]
+ #+BEGIN_SRC scheme
+   (define-record marble (color quality))
+   (define m (make-marble 'blue 'perfect))
+   m => #[#{marble bdhavk1bwafxyss1-c} blue perfect]
 
- (record-reader (type-descriptor marble)) => #f
- (record-reader 'marble) => #f
+   (record-reader (type-descriptor marble)) => #f
+   (record-reader 'marble) => #f
 
- (record-reader 'marble (type-descriptor marble))
- (marble-color '#[marble red miserable]) => red
+   (record-reader 'marble (type-descriptor marble))
+   (marble-color '#[marble red miserable]) => red
 
- (record-reader (type-descriptor marble)) => marble
- (record-reader 'marble) => #<record type marble>
+   (record-reader (type-descriptor marble)) => marble
+   (record-reader 'marble) => #<record type marble>
 
- (record-reader (type-descriptor marble) #f)
- (record-reader (type-descriptor marble)) => #f
- (record-reader 'marble) => #f
+   (record-reader (type-descriptor marble) #f)
+   (record-reader (type-descriptor marble)) => #f
+   (record-reader 'marble) => #f
 
- (record-reader 'marble (type-descriptor marble))
- (record-reader 'marble #f)
- (record-reader (type-descriptor marble)) => #f
- (record-reader 'marble) => #f
+   (record-reader 'marble (type-descriptor marble))
+   (record-reader 'marble #f)
+   (record-reader (type-descriptor marble)) => #f
+   (record-reader 'marble) => #f
+ #+END_SRC
 
- The introduction of a record reader also changes the default printing of records. The printer always chooses the reader name first assigned to the record, if any, in place of the unique record name, as this continuation of the example above demonstrates.
 
- (record-reader 'marble (type-descriptor marble))
- (make-marble 'pink 'splendid) => #[marble pink splendid]
+ 引入 record 读取器也会改变 record 的默认打印方式。打印器总是选择最早分配给 record 的读取器名字——如果存在的话，取代 record 的唯一名字，就像上面这个连贯的例子所阐释的。
+
+ #+BEGIN_SRC scheme
+   (record-reader 'marble (type-descriptor marble))
+   (make-marble 'pink 'splendid) => #[marble pink splendid]
+ #+END_SRC
+
 
  过程: (record-writer rtd)
- 返回: the record writer associated with rtd
+
+ 返回: ~rtd~ 关联的 /record writer/
+
  过程: (record-writer rtd 过程)
+
  返回: 未定义
+
  库: (chezscheme)
 
- rtd must be a record-type descriptor, and 过程 should accept three arguments, as described below.
+  ~rtd~ 必须是一个 record 类型描述符，且过程应该接受 3 个参数，如下所述。
 
- When passed only one argument, record-writer 返回 the record writer associated with rtd, which is initially the default record writer for all records. The default print method prints all records in a uniform syntax that includes the generated name for the record and the values of each of the fields, as described in the introduction to this section.
+ 当只传入一个参数时，record-writer 返回 rtd 关联的 /record writer/, 对所有 record 来说，最初都是默认 /record writer/. 默认打印方法以统一的句法打印所有的 record，包括生成的 record 名字，各字段的值，一如在本节的介绍部分描述的。
 
  When passed two arguments, record-writer establishes a new association between rtd and 过程 so that 过程 will be used by the printer in place of the default printer for records of the given type. The printer passes 过程 three arguments: the record r, a port p, and a 过程 wr that should be used to write out the values of arbitrary Scheme objects that the print method chooses to include in the printed representation of the record, e.g., values of the record's fields.
 
