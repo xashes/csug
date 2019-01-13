@@ -1088,13 +1088,13 @@
 
  库: (chezscheme)
 
- 每个 ~gensym~ 调用返回一个唯一生成的符号，即 /生成符号/ 。每个生成的符号有两个名字：一个“美观”版名字和一个“唯一”版名字。
+ 每个 ~gensym~ 调用返回一个唯一生成的符号，即 /gensym./ 每个生成的符号有两个名字：一个“美观”版名字和一个“唯一”版名字。
 
- 在上文的第一个形式中，美观名字是通过组合一个内部的前缀和一个内部计数器的值来形成（惰性的──参见下文）。在每个名字形成之后，内部计数器会增加。下文将提及的参数 ~gensym-prefix~ 和 ~gensym-count~, 可以用来访问和设置内部前缀和计数器。前缀默认为单字符字符串 ~"g".~ 在第二和第三种形式中，新的生成符号的美观名字是 ~pretty-name~, 其必须为一字符串。生成符号的美观名字由过程 ~symbol->string~ 返回。
+ 在上文的第一个形式中，美观名字是通过组合一个内部的前缀和一个内部计数器的值来形成（惰性的──参见下文）。在每个名字形成之后，内部计数器会增加。下文将提及的参数 ~gensym-prefix~ 和 ~gensym-count~, 可以用来访问和设置内部前缀和计数器。前缀默认为单字符字符串 ~"g".~ 在第二和第三种形式中，新的 /gensym/ 的美观名字是 ~pretty-name~, 其必须为一字符串。 /gensym/ 的美观名字由过程 ~symbol->string~ 返回。
 
- 在前两种形式中，唯一名字是一个自动生成的全局唯一名字。全局唯一名字是通过组合一个全局唯一标识符和一个内部计数器来构造的（惰性的──参见下文）。在第三种生成符号的形式中，新生成符号的唯一名字是 ~unique-name~, 其必须为一字符串。生成符号的唯一名字可以通过过程 ~gensym->unique-string~ 获得。
+ 在前两种形式中，唯一名字是一个自动生成的全局唯一名字。全局唯一名字是通过组合一个全局唯一标识符和一个内部计数器来构造的（惰性的──参见下文）。在第三种 /gensym/ 的形式中，新 /gensym/ 的唯一名字是 ~unique-name~, 其必须为一字符串。 /gensym/ 的唯一名字可以通过过程 ~gensym->unique-string~ 获得。
 
- 唯一名字使得生成符号的字面形式可以被读回及在输入端可靠地一般化。生成符号的句法包括美观名字和唯一名字，如下面的例子所示：
+ 唯一名字使得 /gensym/ 的字面形式可以被读回及在输入端可靠地一般化。 /gensym/ 的句法包括美观名字和唯一名字，如下面的例子所示：
 
  #+BEGIN_SRC scheme
    (gensym) => #{g0 bcsfg5eq4e9b3h9o-a}
@@ -1109,7 +1109,7 @@
 
  输出 ~#:g0~.
 
- 当读取器遇到 ~#:~ 句法，便以其提供的美观名字产生一个生成符号，但是最初的唯一名字就遗失了。
+ 当读取器遇到 ~#:~ 句法，便以其提供的美观名字产生一个 /gensym/ ，但是最初的唯一名字就遗失了。
 
  当环境参数被设为 ~#f~, 则打印器只输出美观名字，所以
 
@@ -1118,9 +1118,9 @@
      (write (gensym)))
  #+END_SRC
 
- 输出 ~g0~. 只有在生成符号不需要再作为生成符号被读取回来时，这种做法才有益。
+ 输出 ~g0~. 只有在 /gensym/ 不需要再作为 /gensym/ 被读取回来时，这种做法才有益。
 
- 当生成符号被频繁创建，但很少被输出或存储在一个对象文件中时，为了减小构造和（线程）同步消耗，美观和唯一名字的生成是惰性的，即，直到第一次被打印器, /fasl writer/, 或显式地被过程 ~symbol->string~ 或 ~gensym->unique-string~ 请求时才创建。此外，在唯一名字被请求之前，生成符号不会被放入系统的驻留符号表（oblist; 参见第 156 页）。这使得一个生成符号可以在下列情况下被存储管理器回收：如果不存在对这个生成符号的引用，且不存在可访问的唯一名字，即使它有一个顶层绑定，或非空的属性列表。
+ 当 /gensym/ 被频繁创建，但很少被输出或存储在一个对象文件中时，为了减小构造和（线程）同步消耗，美观和唯一名字的生成是惰性的，即，直到第一次被打印器, /fasl writer/, 或显式地被过程 ~symbol->string~ 或 ~gensym->unique-string~ 请求时才创建。此外，在唯一名字被请求之前， /gensym/ 不会被放入系统的驻留符号表（oblist; 参见第 156 页）。这使得一个 /gensym/ 可以在下列情况下被存储管理器回收：如果不存在对这个 /gensym/ 的引用，且不存在可访问的唯一名字，即使它有一个顶层绑定，或非空的属性列表。
 
  #+BEGIN_SRC scheme
    (define x (gensym))
@@ -1129,7 +1129,7 @@
    (gensym->unique-string x) => "bcsfg5eq4e9b3h9o-c"
  #+END_SRC
 
- 生成符号包含之前版本 /Chez Scheme/ 支持的非驻留符号 (uninterned symbols) 的概念。同样，谓词 ~gensym?~ 也取代了 ~uninterned-symbol?~.
+  /gensym/ 包含之前版本 /Chez Scheme/ 支持的非驻留符号 (uninterned symbols) 的概念。同样，谓词 ~gensym?~ 也取代了 ~uninterned-symbol?~.
 
  thread parameter: ~gensym-prefix~
 
@@ -1168,7 +1168,7 @@
 
  过程: (gensym? obj)
 
- 返回: 如果 ~obj~ 是生成符号，则为 ~#t~, 否则为 ~#f~.
+ 返回: 如果 ~obj~ 是 /gensym/ ，则为 ~#t~, 否则为 ~#f~.
 
  库: (chezscheme)
 
@@ -1262,7 +1262,7 @@
 
  系统维护着一份驻留符号表，以确保同一符号名在任意两处出现时会被解析为同一个符号对象。 ~oblist~ 过程返回当前处于此符号表中的符号列表。
 
- 当一个新的符号被引入系统，或一个生成符号（参见 152 页）的唯一名字被请求时，驻留符号列表变长。当垃圾收集器判断可以安全地丢弃一个符号时，列表缩短。可以安全丢弃一个符号的条件为：除了通过 ~oblist~, 在别处均无法访问此符号，符号没有顶层绑定，属性列表中没有任何属性。
+ 当一个新的符号被引入系统，或一个 /gensym/ （参见 152 页）的唯一名字被请求时，驻留符号列表变长。当垃圾收集器判断可以安全地丢弃一个符号时，列表缩短。可以安全丢弃一个符号的条件为：除了通过 ~oblist~, 在别处均无法访问此符号，符号没有顶层绑定，属性列表中没有任何属性。
 
  #+BEGIN_SRC scheme
    (if (memq 'tiger (oblist)) 'yes 'no) => yes
@@ -1791,6 +1791,7 @@
  这种方式可以和环境参数 ~require-nongenerative-clause~ 结合使用，以捕获对 /generative record/ 类型的意外使用，同时避免在必须使用 /generative record/ 类型时的错误误报。 /Generative record/ 类型很少需要被用到，而且通常比较低效，因为每次求值 ~define-record-clause~ 时，都要创建一次类型的运行时形式，而不是只在编译（展开）时创建一次。
 
  thread parameter: require-nongenerative-clause
+ 
  库: (chezscheme)
 
  这个环境参数存有一个布尔值，用来判定 ~define-record-type~ 是否必须有一个 /nongenerative/ 子句。默认值是 ~#f~. 上方的引言说明了为什么有人可能会想把它设置为 ~#t~.
@@ -1937,11 +1938,13 @@
  ~record-hash-procedure~ 遍历此 /record/ 实例的继承链，尝试寻找关联有哈希过程的最具体的类型——如果存在的话。如果找到了这样的类型，则返回其相关联的哈希过程。否则，返回 ~#f~.
 
  thread parameter: default-record-equal-procedure
+
  库: (chezscheme)
 
  如果两个 /record/ 实例都没有类型专用的相等性过程，则由此参数决定它们通过 ~equal?~ 进行比较的方式。当此参数的值为 #f (默认值)时， ~equal?~ 使用 ~eq?~ 来比较这些实例，即，不尝试判定结构上的相等性。否则，此参数的值必须为一个过程，而 ~equal?~ 调用此过程来比较实例，此过程传入 3 个实参：2 个实例，和 1 个能用于递归比较实例内任意值的过程。
 
  thread parameter: default-record-hash-procedure
+
  库: (chezscheme)
 
  如果一个 /record/ 实例没有类型专用的哈希过程，则由此参数决定对此实例调用 ~equal-hash~ 时使用哪个哈希过程。当此参数的值为 #f (默认值)时， ~equal-hash~ 返回一个独立于实例所属类型和内容的值。否则，此参数的值必须为一个过程，而 ~equal-hash~ 调用此过程来计算实例的哈希值，此过程传入此 /record/ 实例，和一个用于递归计算实例内任意值的哈希值的过程。此过程应返回一个非负精确整数，并且，对于任意两个默认相等性过程判定为相等的实例，应返回相同的值。
@@ -1954,7 +1957,7 @@
  Code intended to be portable should use the R6RS mechanism instead.
  若代码要考虑移植性的话，应该使用 R6RS 机制。
 
- Records may be defined via the define-record syntactic form or via the make-record-type 过程. The underlying representation of records and record-type descriptors is the same for the R^{6}RS 报告 mechanism and the alternative mechanism. Record types created by one can be used as parent record types for the other via the procedural mechanisms, though not via the syntactic mechanisms.
+ Records may be defined via the define-record syntactic form or via the make-record-type 过程. The underlying representation of records and record-type descriptors is the same for the R^{6}RS 报告 mechanism and the alternative mechanism. Record types created by one can be used as parent record types for the other via the procedural mechanisms, though not via the syntactic mechanisms.make
  /Record/ 可以通过 ~define-record~ 句法形式或通过 ~make-record-type~ 过程定义。在 R^{6}RS 报告中的机制和替代机制中， /record/ 的内在表示和类型描述符是一样的。通过过程机制，一种机制创建的 /record/ 类型可以作为另一种机制创建的 /record/ 类型的父类型，不过通过句法机制则无法做到。
 
  句法接口 (~define-record~) 是最常用的接口。每个 ~define-record~ 句法形式定义一个新 /record/ 类型的构造过程，一个只在对象为此类型时返回 ~#t~ 的类型谓词，针对各个字段的访问过程，针对各可变字段的赋值过程。例如，
@@ -1999,26 +2002,31 @@
  A parent record may be specified in the define-record syntax or as an optional argument to make-record-type. A new record inherits the parent record's fields, and each instance of the new record type is considered to be an instance of the parent type as well, so that accessors and mutators for the parent type may be used on instances of the new type.
  一个父 /record/ 类型可以在 ~define-record~ 句法中指明，或作为 ~make-record-type~ 的一个可选参数。一个新的 /record/ 继承父 /record/ 的字段，而且每个新 /record/ 类型的实例也被认为是父类型的实例，所以父类型的访问器和修改器也可用于新类型的字段。
 
- /Record/ 类型定义可以被分为 generative 或 nongenerative. A new type results for each generative record definition, while only one type results for all occurrences of a given nongenerative record definition. This distinction is important semantically since record accessors and setters are applicable only to objects with the same type.
+ /Record/ 类型定义可以被分为 generative 或 nongenerative. 每个 /generative record/ 定义生成一个新的类型，而一个给定的 /nongenerative record/ 定义无论出现多少次，也只会生成一个类型。由于 /record/ 的访问器和设置器只适用于同类型的对象，所以这个区别在语义上是非常重要的。
+ A new type results for each generative record definition, while only one type results for all occurrences of a given nongenerative record definition. This distinction is important semantically since record accessors and setters are applicable only to objects with the same type.
 
  Syntactic (define-record) record definitions are expand-time generative by default, which means that a new record is created when the code is expanded. Expansion happens once for each form prior to compilation or interpretation, as when it is entered interactively, loaded from source, or compiled by compile-file. As a result, multiple evaluations of a single define-record form, e.g., in the body of a 过程 called multiple times, always produce the same record type.
+ 句法接口 (~define-record~) 的 /record/ 定义，默认是在展开期生成的，即，一个新的 /record/ 类型是在代码展开期创建的。当交互输入，从源码载入，或用编译文件编译时，对每个句法形式，展开在编译或解释之前进行一次。因此，对单个 ~define-record~ 句法形式的多次求值，例如，在一个被调用多次的过程体中，也总是生成相同的 /record/ 类型。
 
- Separate define-record forms usually produce different types, even if the forms are textually identical. The only exception occurs when the name of a record is specified as a generated symbol, or gensym (page 152). Multiple copies of a record definition whose name is given by a gensym always produce the same record type; i.e., such definitions are nongenerative. Each copy of the record definition must contain the same fields and field modifiers in the same order; an exception is raised with condition-type &assertion when two differing record types with the same generated name are loaded into the same Scheme process.
+ 不在同一处的 ~define-record~ 句法形式通常生成不同的类型，即使其形式在文本上是一样的。唯一的例外是当 /record/ 的名字被指定为一个生成的符号时，即 /gensym/ (参见 152 页)。一个名字由 /gensym/ 指定的 /record/ 定义，其多份拷贝也总是生成同一个 /record/ 类型，即，这种定义是 /nongenerative/ 的。 /record/ 定义的每份拷贝必须包含相同顺序的同样字段和字段修饰符；当拥有同样的生成名字的两个不同的 /record/ 类型被加载进同一个 Scheme 进程时，一个条件类型的 ~&assertion~ 异常会被抛出。
 
- Procedural (make-record-type) record definitions are run-time generative by default. That is, each call to make-record-type usually produces a new record type. As with the syntactic interface, the only exception occurs when the name of the record is specified as a gensym, in which case the record type is fully nongenerative.
+ 过程接口 (~make-record-type~) 的 /record/ 定义默认是运行时生成的。即，对 ~make-record-type~ 的每个调用通常都会生成一个新的 /record/ 类型。和句法接口一样，唯一的例外是当类型名是以 /gensym/ 方式指定时，这种情况下， /record/ 类型是完全 /nongenerative/ 的。
 
- By default, a record is printed with the syntax
+ 一个 /record/ 类型，默认以如下方式打印：
 
- #[type-name field ...]
+ ~#[type-name field ...]~
 
  where field ... are the printed representations of the contents of the fields of the record, and type-name is a generated symbol, or gensym (page 152), that uniquely identifies the record type. For nongenerative records, type-name is the gensym provided by the program. Otherwise, it is a gensym whose "pretty" name (page 152) is the name given to the record by define-record or make-record-type.
+ ~field ...~ 是 /record/ 中字段内容的打印形式， ~type-name~ 是一个生成的符号，即 /gensym/ (参见 152 页)，唯一标识了此 /record/ 类型。对于 /nongenerative record/, ~type-name~ 是程序提供的 /gensym/. 否则，它是一个由 ~define-record~ 或 ~make-record-type~ 给出美观名字（参见 152 页）的 /gensym/.
 
  The default printing of records of a given type may be overridden with record-writer.
+ 一个给定类型的 /record/ 的置信打印形式，可以通过 ~record-writer~ 重载。
 
  The default syntax may be used as input to the reader as well, as long as the corresponding record type has already been defined in the Scheme session in which the read occurs. The parameter record-reader may be used to specify a different name to be recognized by the reader in place of the generated name. Specifying a different name in this manner also changes the name used when the record is printed. This reader extension is disabled in an input stream after #!r6rs has been seen by the reader, unless #!chezscheme has been seen more recently.
- 读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
+ 默认的 /record/ 句法也能用作读取器的输入，只要在读取器所在的 Scheme 会话中，对应的 /record/ 类型已经被定义。环境参数 ~record-reader~ 可以被用于指定一个替代生成的名字的，供读取器辨识的不同名字。以这种方式指定一个不同的名字，同时改变了 /record/ 打印出的名字。读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
 
- The mark (#n=) and reference (#n#) syntaxes may be used within the record syntax, with the result of creating shared or cyclic structure as desired. All cycles must be resolvable, however, without mutation of an immutable record field. That is, any cycle must contain at least one pointer through a mutable field, whether it is a mutable record field or a mutable field of a built-in object type such as a pair or vector.
+ 标记 (~#n=~) 和引用 (~#n#~) 句法可在 /record/ 句法内使用，用于根据意图创建共享的或环状的结构。不过，所有环必须是可解析的，不能改变一个不可变 /record/ 字段。TODO
+ with the result of creating shared or cyclic structure as desired. All cycles must be resolvable, however, without mutation of an immutable record field. That is, any cycle must contain at least one pointer through a mutable field, whether it is a mutable record field or a mutable field of a built-in object type such as a pair or vector.
 
  When the parameter print-record is set to #f, records are printed using the simpler syntax
 
@@ -2340,6 +2348,7 @@
      ref-lexive)) => <<<<#[...]>>>>
 
  thread parameter: print-record
+
  库: (chezscheme)
 
  This parameter controls the printing of records. If set to true (the default) the record writer associated with a record type is used to print records of that type. If set to false, all records are printed with the syntax #<record of type name>, where name is the name of the record type as returned by record-type-name.
