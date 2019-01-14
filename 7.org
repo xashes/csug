@@ -2354,144 +2354,174 @@
 
  返回: ~rtd~ 关联的 /record writer/
 
- 过程: (record-writer rtd 过程)
+ 过程: (record-writer rtd procedure)
 
  返回: 未定义
 
  库: (chezscheme)
 
-  ~rtd~ 必须是一个 record 类型描述符，且过程应该接受 3 个参数，如下所述。
+  ~rtd~ 必须是一个 record 类型描述符，且 ~procedure~ 应该接受 3 个参数，如下所述。
 
  当只传入一个参数时，record-writer 返回 rtd 关联的 /record writer/, 对所有 record 来说，最初都是默认 /record writer/. 默认打印方法以统一的句法打印所有的 record，包括生成的 record 名字，各字段的值，一如在本节的介绍部分描述的。
 
- When passed two arguments, record-writer establishes a new association between rtd and 过程 so that 过程 will be used by the printer in place of the default printer for records of the given type. The printer passes 过程 three arguments: the record r, a port p, and a 过程 wr that should be used to write out the values of arbitrary Scheme objects that the print method chooses to include in the printed representation of the record, e.g., values of the record's fields.
+ 当传入两个参数时， ~record-writer~ 在 ~rtd~ 和 ~procedure~ 之间建立一个新的关联，从而使过程被用于打印器，以代替给定类型的 record 的默认打印器。打印器传给 ~procedure~ 三个参数：record /r/, 端口 /p/, 和一个应该被用于输出任意 Scheme 对象的打印方法选择包含在 record 打印形式中的值的过程 /wr/, 即，record 字段的值。
+ that should be used to write out the values of arbitrary Scheme objects that the print method chooses to include in the printed representation of the record, e.g., values of the record's fields.
 
- (define-record marble (color quality))
- (define m (make-marble 'blue 'medium))
+ #+BEGIN_SRC scheme
+   (define-record marble (color quality))
+   (define m (make-marble 'blue 'medium))
 
- m => #[#{marble bdhavk1bwafxyss1-d} blue medium]
+   m => #[#{marble bdhavk1bwafxyss1-d} blue medium]
 
- (record-writer (type-descriptor marble)
-   (lambda (r p wr)
-     (display "#<" p)
-     (wr (marble-quality r) p)
-     (display " quality " p)
-     (wr (marble-color r) p)
-     (display " marble>" p)))
+   (record-writer (type-descriptor marble)
+                  (lambda (r p wr)
+                    (display "#<" p)
+                    (wr (marble-quality r) p)
+                    (display " quality " p)
+                    (wr (marble-color r) p)
+                    (display " marble>" p)))
 
- m => #<medium quality blue marble>
+   m => #<medium quality blue marble>
+ #+END_SRC
 
- The record writer is used only when print-record is true (the default). When the parameter print-record is set to #f, records are printed using a compressed syntax that identifies only the type of record.
+ 只有当 ~print-record~ 为 ~#t~ 时（默认为真）， /record writer/ 才被使用。当参数 ~print-record~ 被设为 ~#f~ 时，record 使用一种只指明 record 类型的精简句法打印。
 
- (parameterize ([print-record #f])
-   (format "~s" m)) => "#<record of type marble>"
+ #+BEGIN_SRC scheme
+   (parameterize ([print-record #f])
+     (format "~s" m)) => "#<record of type marble>"
+ #+END_SRC
 
  A print method may be called more than once during the printing of a single record to support cycle detection and graph printing (see print-graph), so print methods that perform side effects other than printing to the given port are discouraged. Whenever a print method is called more than once during the printing of a single record, in all but one call, a generic "bit sink" port is used to suppress output automatically so that only one copy of the object appears on the actual port. In order to avoid confusing the cycle detection and graph printing algorithms, a print method should always produce the same printed representation for each object. Furthermore, a print method should normally use the supplied 过程 wr to print subobjects, though atomic values, such as strings or numbers, may be printed by direct calls to display or write or by other means.
 
- (let ()
-   (define-record ref () ((contents 'nothing)))
-   (record-writer (type-descriptor ref)
-     (lambda (r p wr)
-       (display "<" p)
-       (wr (ref-contents r) p)
-       (display ">" p)))
-   (let ([ref-lexive (make-ref)])
-     (set-ref-contents! ref-lexive ref-lexive)
-     ref-lexive)) => #0=<#0#>
+ #+BEGIN_SRC scheme
+   (let ()
+     (define-record ref () ((contents 'nothing)))
+     (record-writer (type-descriptor ref)
+                    (lambda (r p wr)
+                      (display "<" p)
+                      (wr (ref-contents r) p)
+                      (display ">" p)))
+     (let ([ref-lexive (make-ref)])
+       (set-ref-contents! ref-lexive ref-lexive)
+       ref-lexive)) => #0=<#0#>
+ #+END_SRC
 
  Print methods need not be concerned with handling nonfalse values of the parameters print-level. The printer handles print-level automatically even when user-defined print procedures are used. Since records typically contain a small, fixed number of fields, it is usually possible to ignore nonfalse values of print-length as well.
+ 打印方法不需要关注如何处理参数  ~print-level~  值为非假的情况。打印器会自动处理  ~print-level~ ，即使使用的是用户自定义的打印过程。由于 /record/ 一般只包含少量，固定数目的字段，所以通常也可以忽略  ~print-length~  的非假值。
 
- (print-level 3)
- (let ()
-   (define-record ref () ((contents 'nothing)))
-   (record-writer (type-descriptor ref)
-     (lambda (r p wr)
-       (display "<" p)
-       (wr (ref-contents r) p)
-       (display ">" p)))
-   (let ([ref-lexive (make-ref)])
-     (set-ref-contents! ref-lexive ref-lexive)
-     ref-lexive)) => <<<<#[...]>>>>
+ #+BEGIN_SRC scheme
+   (print-level 3)
+   (let ()
+     (define-record ref () ((contents 'nothing)))
+     (record-writer (type-descriptor ref)
+                    (lambda (r p wr)
+                      (display "<" p)
+                      (wr (ref-contents r) p)
+                      (display ">" p)))
+     (let ([ref-lexive (make-ref)])
+       (set-ref-contents! ref-lexive ref-lexive)
+       ref-lexive)) => <<<<#[...]>>>>
+ #+END_SRC
+
 
  thread parameter: print-record
 
  库: (chezscheme)
 
  This parameter controls the printing of records. If set to true (the default) the record writer associated with a record type is used to print records of that type. If set to false, all records are printed with the syntax #<record of type name>, where name is the name of the record type as returned by record-type-name.
+ 这个参数控制 record 的打印形式。如果设为真（为默认值），则使用与 record 类型相关联的 /record writer/ 打印此类型 record。如果设为假，所有 record 都以句法 ~#<record of type name>~ 打印，其中 ~name~ 是 record 类型的名称，即 ~record-type-name~ 的返回值。
+
 
  过程: (make-record-type type-name fields)
+
  过程: (make-record-type parent-rtd type-name fields)
- 返回: a record-type descriptor for a new record type
+
+ 返回: 一个新 record 类型的类型描述符
+
  库: (chezscheme)
 
- make-record-type creates a new data type and 返回 a record-type descriptor, a value representing the new data type. The new type is disjoint from all others.
+  ~make-record-type~ 创建一个新的数据类型，并返回一个 record 类型描述符，一个表示这个新类型的值。这个新类型和其它所有类型都是互斥的。
 
- If present, parent-rtd must be a record-type descriptor.
+ 如果被传入， ~parent-rtd~ 必须是一个 record 类型描述符。
 
- type-name must be a string or gensym. If type-name is a string, a new record type is generated. If type-name is a gensym, a new record type is generated only if one with the same gensym has not already been defined. If one has already been defined, the parent and fields must be identical to those of the existing record type, and the existing record type is used. If the parent and fields are not identical, an exception is raised with condition-type &assertion.
+  ~type-name~ 必须是一个字符串或 gensym. 如果 ~type-name~ 是一个字符串，则生成一个新的 record 类型。如果 ~type-name~ 是一个 gensym, 只有在没有具有相同 gensym 的类型被定义过时，才会生成一个新的 record 类型。如果已经定义过一个，则父类型和字段必须与现存类型中的一致，同时，现存的 record 类型会被使用。如果父类型和字段与现存的不一致，则一个条件类型的 ~&assertion~ 异常会被抛出。
 
- fields must be a list of field descriptors, each of which describes one field of instances of the new record type. A field descriptor is either a symbol or a list in the following form:
+  ~fields~ 必须是一个字段描述符的列表，其中每一个描述了一个新类型的实例的字段。一个字段描述符是一个符号或一个以下形式的列表：
 
- (class type field-name)
+ ~(class type field-name)~
 
- where class and type are optional. field-name must be a symbol. class, if present, must be the symbol immutable or the symbol mutable. If the immutable class-specifier is present, the field is immutable; otherwise, the field is mutable. type, if present, specifies how the field is represented. The types are the same as those given in the description of define-record on page 174.
+ 其中 ~class~ 和 ~type~ 是可选的。 ~field-name~ 必须是一个符号。如果指定 ~class~ ，则必须是符号 ~immutable~ 或符号 ~mutable~ 。如果提供 ~immutable~ 类别指示符，则字段是不可变的；否则，字段是可变的。 ~type~ ，如果提供的话，指定了字段如何表示。类型种类和 174 页上对 ~define-record~ 的描述中给出的一样。
+ if present, must be the symbol immutable or the symbol mutable. If the immutable class-specifier is present, the field is immutable; otherwise, the field is mutable. type, if present, specifies how the field is represented. The types are the same as those given in the description of define-record on page 174.
 
- If a type is specified, the field can contain objects only of the specified type. If no type is specified, the field is of type ptr, meaning that it can contain any Scheme object.
+ 如果指定了类型，则字段只能包含指定类型的对象。如果没有指定类型，字段则是 ptr 类型，意思是它可以包含任意 Scheme 对象。
 
  The behavior of a program that modifies the string type-name or the list fields or any of its sublists is 未定义.
+ 修改字符串 type-name 或 fields 列表或它的任何子列表的程序行为是未定义的。
 
  The record-type descriptor may be passed as an argument to any of the R^{6}RS 报告 procedures
+ record 类型描述符可以作为参数传递给 R^{6}RS 报告中的下列任何过程
 
-     record-constructor,
-     record-predicate,
-     record-accessor, and
-     record-mutator,
+ #+BEGIN_SRC scheme
+   record-constructor,
+   record-predicate,
+   record-accessor, and
+   record-mutator,
+ #+END_SRC
 
- or to the /Chez Scheme/ variants
+ 或 /Chez Scheme/ 中的变体
 
-     record-constructor,
-     record-field-accessor, and
-     record-field-mutator
+ #+BEGIN_SRC scheme
+   record-constructor,
+   record-field-accessor, and
+   record-field-mutator
+ #+END_SRC
 
  to obtain procedures for creating and manipulating records of the new type.
+ 以获取创建和操控新类型 record 的过程。
 
- (define marble
-   (make-record-type "marble"
-     '(color quality)
-     (lambda (r p wr)
-       (display "#<" p)
-       (wr (marble-quality r) p)
-       (display " quality " p)
-       (wr (marble-color r) p)
-       (display " marble>" p))))
- (define make-marble
-   (record-constructor marble))
- (define marble?
-   (record-predicate marble))
- (define marble-color
-   (record-field-accessor marble 'color))
- (define marble-quality
-   (record-field-accessor marble 'quality))
- (define set-marble-quality!
-   (record-field-mutator marble 'quality))
- (define x (make-marble 'blue 'high))
- (marble? x) => #t
- (marble-quality x) => high
- (set-marble-quality! x 'low)
- (marble-quality x) => low
- x => #<low quality blue marble>
+ #+BEGIN_SRC scheme
+   (define marble
+     (make-record-type "marble"
+                       '(color quality)
+                       (lambda (r p wr)
+                         (display "#<" p)
+                         (wr (marble-quality r) p)
+                         (display " quality " p)
+                         (wr (marble-color r) p)
+                         (display " marble>" p))))
+   (define make-marble
+     (record-constructor marble))
+   (define marble?
+     (record-predicate marble))
+   (define marble-color
+     (record-field-accessor marble 'color))
+   (define marble-quality
+     (record-field-accessor marble 'quality))
+   (define set-marble-quality!
+     (record-field-mutator marble 'quality))
+   (define x (make-marble 'blue 'high))
+   (marble? x) => #t
+   (marble-quality x) => high
+   (set-marble-quality! x 'low)
+   (marble-quality x) => low
+   x => #<low quality blue marble>
+ #+END_SRC
 
  The order in which the fields appear in fields is important. While field names are generally distinct, it is permissible for one field name to be the same as another in the list of fields or the same as an inherited name. In this case, field ordinals must be used to select fields in calls to record-field-accessor and record-field-mutator. Ordinals range from zero through one less than the number of fields. Parent fields come first, if any, followed by the fields in fields, in the order given.
+ 字段在  ~fields~  中出现的顺序是十分重要的。虽然通常字段名是互不相同的，但也有可能一个字段名与字段列表中的另一个字段名相同，或与继承来的字段名相同。在这种情况下，调用  ~record-field-accessor~  和  ~record-field-mutator~  时必须使用字段序数选择字段。序数的范围是从零到字段数量减一。如果有父字段的话，则父字段排在前面，后面按给定的次序跟着  ~fields~  中的字段。
 
- (define r1 (make-record-type "r1" '(t t)))
- (define r2 (make-record-type r1 "r2" '(t)))
- (define r3 (make-record-type r2 "r3" '(t t t)))
+ #+BEGIN_SRC scheme
+   (define r1 (make-record-type "r1" '(t t)))
+   (define r2 (make-record-type r1 "r2" '(t)))
+   (define r3 (make-record-type r2 "r3" '(t t t)))
 
- (define x ((record-constructor r3) 'a 'b 'c 'd 'e 'f))
- ((record-field-accessor r3 0) x) => a
- ((record-field-accessor r3 2) x) => c
- ((record-field-accessor r3 4) x) => e
- ((record-field-accessor r3 't) x) => 未定义
+   (define x ((record-constructor r3) 'a 'b 'c 'd 'e 'f))
+   ((record-field-accessor r3 0) x) => a
+   ((record-field-accessor r3 2) x) => c
+   ((record-field-accessor r3 4) x) => e
+   ((record-field-accessor r3 't) x) => 未定义
+ #+END_SRC
+
 
  过程: (record-constructor rcd)
  过程: (record-constructor rtd)
