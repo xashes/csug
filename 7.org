@@ -2009,11 +2009,10 @@
 
  ~#[type-name field ...]~
 
- where field ... are the printed representations of the contents of the fields of the record, and type-name is a generated symbol, or gensym (page 152), that uniquely identifies the record type. For nongenerative records, type-name is the gensym provided by the program. Otherwise, it is a gensym whose "pretty" name (page 152) is the name given to the record by define-record or make-record-type.
  ~field ...~ 是 /record/ 中字段内容的打印形式， ~type-name~ 是一个生成的符号，即 /gensym/ (参见 152 页)，唯一标识了此 /record/ 类型。对于 /nongenerative record/, ~type-name~ 是程序提供的 /gensym/. 否则，它是一个由 ~define-record~ 或 ~make-record-type~ 给出美观名字（参见 152 页）的 /gensym/.
 
  The default printing of records of a given type may be overridden with record-writer.
- 一个给定类型的 /record/ 的置信打印形式，可以通过 ~record-writer~ 重载。
+ 一个给定类型的 /record/ 的默认打印形式，可以通过 ~record-writer~ 重载。
 
  默认的 /record/ 句法也能用作读取器的输入，只要在读取器所在的 Scheme 会话中，对应的 /record/ 类型已经被定义。环境参数 ~record-reader~ 可以被用于指定一个替代生成的名字的，供读取器辨识的不同名字。以这种方式指定一个不同的名字，同时会改变 /record/ 打印出的名字。读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
 
@@ -2407,7 +2406,6 @@
 
  库: (chezscheme)
 
- This parameter controls the printing of records. If set to true (the default) the record writer associated with a record type is used to print records of that type. If set to false, all records are printed with the syntax #<record of type name>, where name is the name of the record type as returned by record-type-name.
  这个参数控制 record 的打印形式。如果设为真（默认值），则使用与 record 类型相关联的 /record writer/ 打印此类型 record。如果设为假，所有 record 都以句法 ~#<record of type name>~ 打印，其中 ~name~ 是 record 的类型名，即 ~record-type-name~ 的返回值。
 
 
@@ -2478,7 +2476,6 @@
    x => #<low quality blue marble>
  #+END_SRC
 
- The order in which the fields appear in fields is important. While field names are generally distinct, it is permissible for one field name to be the same as another in the list of fields or the same as an inherited name. In this case, field ordinals must be used to select fields in calls to record-field-accessor and record-field-mutator. Ordinals range from zero through one less than the number of fields. Parent fields come first, if any, followed by the fields in fields, in the order given.
  字段在 ~fields~ 中出现的顺序是十分重要的。虽然通常字段名是互不相同的，但也有可能一个字段名与字段列表中的另一个字段名相同，或与继承来的字段名相同。在这种情况下，调用 ~record-field-accessor~ 和 ~record-field-mutator~ 时必须使用字段序数选择字段。序数的范围是从零到字段数量减一。如果有父字段的话，则父字段排在前面，后面按给定的次序跟着 ~fields~ 中的字段。
 
  #+BEGIN_SRC scheme
