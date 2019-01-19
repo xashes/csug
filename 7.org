@@ -1950,15 +1950,13 @@
  如果一个 /record/ 实例没有类型专用的哈希过程，则由此参数决定对此实例调用 ~equal-hash~ 时使用哪个哈希过程。当此参数的值为 #f (默认值)时， ~equal-hash~ 返回一个独立于实例所属类型和内容的值。否则，此参数的值必须为一个过程，而 ~equal-hash~ 调用此过程来计算实例的哈希值，此过程传入此 /record/ 实例，和一个用于递归计算实例内任意值的哈希值的过程。此过程应返回一个非负精确整数，并且，对于任意两个默认相等性过程判定为相等的实例，应返回相同的值。
 
 
-*** 7.15. Legacy Record Types
+*** 7.15. 传统的 record 类型 (Legacy Record Types)
 
- 除了 R^{6}RS 报告中的 record 类型的创建和定义机制——参见“The Scheme Programming Language, 第 4 版”，第 9 章中的讲解， /Chez Scheme/ 仍然支持之前版本中创建新数据类型，或称 /record/ 类型（带有固定数量的命名字段）的机制。本节中介绍的很多过程，只在从 ~(chezscheme csv7)~ 库中导入 (import) 之后才可用。
+ 除了 R^{6}RS 报告中 record 类型的创建和定义机制——参见“The Scheme Programming Language, 第 4 版”，第 9 章中的讲解， /Chez Scheme/ 仍然支持之前版本中创建新数据类型，或称 /record/ 类型（带有固定数量的命名字段）的机制。本节中介绍的很多过程，只在从 ~(chezscheme csv7)~ 库中导入 (import) 之后才可用。
 
- Code intended to be portable should use the R6RS mechanism instead.
  若代码要考虑移植性的话，应该使用 R6RS 机制。
 
- Records may be defined via the define-record syntactic form or via the make-record-type 过程. The underlying representation of records and record-type descriptors is the same for the R^{6}RS 报告 mechanism and the alternative mechanism. Record types created by one can be used as parent record types for the other via the procedural mechanisms, though not via the syntactic mechanisms.make
- /Record/ 可以通过 ~define-record~ 句法形式或通过 ~make-record-type~ 过程定义。在 R^{6}RS 报告中的机制和替代机制中， /record/ 的内在表示和类型描述符是一样的。通过过程机制，一种机制创建的 /record/ 类型可以作为另一种机制创建的 /record/ 类型的父类型，不过通过句法机制则无法做到。
+ /Record/ 可以通过 ~define-record~ 句法形式或通过 ~make-record-type~ 过程定义。在 R^{6}RS 报告中的机制和替代机制中， /record/ 的底层表示和类型描述符是一样的。通过过程机制，一种机制创建的 /record/ 类型可以作为另一种机制创建的 /record/ 类型的父类型，不过通过句法机制则无法做到。
 
  句法接口 (~define-record~) 是最常用的接口。每个 ~define-record~ 句法形式定义一个新 /record/ 类型的构造过程，一个只在对象为此类型时返回 ~#t~ 的类型谓词，针对各个字段的访问过程，针对各可变字段的赋值过程。例如，
 
@@ -1966,7 +1964,7 @@
    (define-record point (x y))
  #+END_SRC
 
- 创建一个有两个字段，x 和 y 的 ~point~ /record/ 类型，同时定义了下列过程：
+ 创建一个有两个字段，x 和 y 的 ~point~ /record/ 类型，同时会定义下列过程：
 
  #+BEGIN_SRC scheme
    (make-point x y) 	constructor
@@ -1993,22 +1991,17 @@
  #+END_SRC
 
 
- The procedural interface is more flexible than the syntactic interface, but this flexibility can lead to less readable programs and compromises the compiler's ability to generate efficient code. Programmers should use the syntactic interface whenever it suffices.
  过程接口比句法接口更灵活，但这种灵活性会导致程序的可读性较差，也会降低编译器生成高效代码的能力。只要句法接口能完成任务，程序员应该尽可能使用它。
 
- A record-type descriptor may also be extracted from an instance of a record type, whether the record type was produced by define-record or make-record-type, and the extracted descriptor may also be used to produce constructors, predicates, accessors, and mutators, with a few limitations noted in the description of record-type-descriptor below. This is a powerful feature that permits the coding of portable printers and object inspectors. For example, the printer employs this feature in its default record printer, and the inspector uses it to allow inspection and mutation of system- and user-defined records during debugging.
- /record/ 类型描述符也可以从 /record/ 类型的实例中提取，无论这个类型是通过 ~define-record~ 还是通过 ~make-record-type~ 生成的，而且提取出的描述符也可用于生成构造过程，谓词，访问器，和修改器，不过有如下关于 ~record-type-descriptor~ 的描述中所注明的一些局限。这是个强大的特性，使得编写可移植的打印器和对象检查器成为可能。例如，在默认 /record/ 打印器中使用此特性的打印器，以及通过它在 /debug/ 期间支持检查和修改系统或用户定义的 /record/ 的检查器。
+ /record/ 类型描述符也可以从 /record/ 类型的实例中提取，无论这个类型是通过 ~define-record~ 还是通过 ~make-record-type~ 生成的，而且提取出的描述符也可用于生成构造过程，谓词，访问器，和修改器，不过有如下关于 ~record-type-descriptor~ 的描述中所注明的一些局限。这是个强大的特性，使得编写可移植的打印器和对象检查器成为可能。例如，在默认 /record/ 打印器中使用此特性的打印器，以及使用它的检查器，以支持在调试期间检查和修改系统或用户定义的 record.
 
- A parent record may be specified in the define-record syntax or as an optional argument to make-record-type. A new record inherits the parent record's fields, and each instance of the new record type is considered to be an instance of the parent type as well, so that accessors and mutators for the parent type may be used on instances of the new type.
  一个父 /record/ 类型可以在 ~define-record~ 句法中指明，或作为 ~make-record-type~ 的一个可选参数。一个新的 /record/ 继承父 /record/ 的字段，而且每个新 /record/ 类型的实例也被认为是父类型的实例，所以父类型的访问器和修改器也可用于新类型的字段。
 
  /Record/ 类型定义可以被分为 generative 或 nongenerative. 每个 /generative record/ 定义生成一个新的类型，而一个给定的 /nongenerative record/ 定义无论出现多少次，也只会生成一个类型。由于 /record/ 的访问器和设置器只适用于同类型的对象，所以这个区别在语义上是非常重要的。
- A new type results for each generative record definition, while only one type results for all occurrences of a given nongenerative record definition. This distinction is important semantically since record accessors and setters are applicable only to objects with the same type.
 
- Syntactic (define-record) record definitions are expand-time generative by default, which means that a new record is created when the code is expanded. Expansion happens once for each form prior to compilation or interpretation, as when it is entered interactively, loaded from source, or compiled by compile-file. As a result, multiple evaluations of a single define-record form, e.g., in the body of a 过程 called multiple times, always produce the same record type.
  句法接口 (~define-record~) 的 /record/ 定义，默认是在展开期生成的，即，一个新的 /record/ 类型是在代码展开期创建的。当交互输入，从源码载入，或用编译文件编译时，对每个句法形式，展开在编译或解释之前进行一次。因此，对单个 ~define-record~ 句法形式的多次求值，例如，在一个被调用多次的过程体中，也总是生成相同的 /record/ 类型。
 
- 不在同一处的 ~define-record~ 句法形式通常生成不同的类型，即使其形式在文本上是一样的。唯一的例外是当 /record/ 的名字被指定为一个生成的符号时，即 /gensym/ (参见 152 页)。一个名字由 /gensym/ 指定的 /record/ 定义，其多份拷贝也总是生成同一个 /record/ 类型，即，这种定义是 /nongenerative/ 的。 /record/ 定义的每份拷贝必须包含相同顺序的同样字段和字段修饰符；当拥有同样的生成名字的两个不同的 /record/ 类型被加载进同一个 Scheme 进程时，一个条件类型的 ~&assertion~ 异常会被抛出。
+ 不在同一处的 ~define-record~ 句法形式通常生成不同的类型，即使其形式在文本上是一样的。唯一的例外是当 /record/ 的名字被指定为一个生成的符号时，即 /gensym/ (参见 152 页)。一个名字由 /gensym/ 指定的 /record/ 定义，其多份拷贝也总是生成同一个 /record/ 类型，即，这种定义是 /nongenerative/ 的。 /record/ 定义的每份拷贝必须包含相同顺序的同样字段和字段修饰符；当拥有同样生成名字的两个不同的 /record/ 类型被加载进同一个 Scheme 进程时，一个条件类型的 ~&assertion~ 异常会被抛出。
 
  过程接口 (~make-record-type~) 的 /record/ 定义默认是运行时生成的。即，对 ~make-record-type~ 的每个调用通常都会生成一个新的 /record/ 类型。和句法接口一样，唯一的例外是当类型名是以 /gensym/ 方式指定时，这种情况下， /record/ 类型是完全 /nongenerative/ 的。
 
@@ -2022,18 +2015,14 @@
  The default printing of records of a given type may be overridden with record-writer.
  一个给定类型的 /record/ 的置信打印形式，可以通过 ~record-writer~ 重载。
 
- The default syntax may be used as input to the reader as well, as long as the corresponding record type has already been defined in the Scheme session in which the read occurs. The parameter record-reader may be used to specify a different name to be recognized by the reader in place of the generated name. Specifying a different name in this manner also changes the name used when the record is printed. This reader extension is disabled in an input stream after #!r6rs has been seen by the reader, unless #!chezscheme has been seen more recently.
- 默认的 /record/ 句法也能用作读取器的输入，只要在读取器所在的 Scheme 会话中，对应的 /record/ 类型已经被定义。环境参数 ~record-reader~ 可以被用于指定一个替代生成的名字的，供读取器辨识的不同名字。以这种方式指定一个不同的名字，同时改变了 /record/ 打印出的名字。读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
+ 默认的 /record/ 句法也能用作读取器的输入，只要在读取器所在的 Scheme 会话中，对应的 /record/ 类型已经被定义。环境参数 ~record-reader~ 可以被用于指定一个替代生成的名字的，供读取器辨识的不同名字。以这种方式指定一个不同的名字，同时会改变 /record/ 打印出的名字。读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
 
- 标记 (~#n=~) 和引用 (~#n#~) 句法可在 /record/ 句法内使用，用于根据意图创建共享的或环状的结构。不过，所有环必须是可解析的，不能改变一个不可变 /record/ 字段。即，任何环必须包含至少一个指向一个可变字段的指针，不论它是个可变的 /record/ 字段，还是一个内置对象类型（如点对或向量）的可变字段。
- with the result of creating shared or cyclic structure as desired. All cycles must be resolvable, however, without mutation of an immutable record field. That is, any cycle must contain at least one pointer through a mutable field, whether it is a mutable record field or a mutable field of a built-in object type such as a pair or vector.
+ 标记 (~#n=~) 和引用 (~#n#~) 句法可在 /record/ 句法内使用，用于根据意图创建共享或环状结构。不过，所有环必须是可解析的，不能改变一个不可变 /record/ 字段。即，任何环必须包含至少一个指向可变字段的指针，不论它是个可变的 /record/ 字段，还是一个内置对象类型（如点对或向量）的可变字段。
 
- When the parameter print-record is set to #f, records are printed using the simpler syntax
- 当环境参数 ~print-record~ 被设置为 ~#f~ 时， /record/ 使用更简单的句法打印
+ 当参数过程 ~print-record~ 被设置为 ~#f~ 时， /record/ 使用更简单的句法打印
  
  ~#<record of type name>~
 
- where name is the "pretty" name of the record (not the full gensym) or the reader name first assigned to the record type.
  其中 ~name~ 是 /record/ 的美观名字（不是完整的 /gensym/ ），或是首次分配给这个 /record/ 类型的读取器名字。
 
 
@@ -2055,7 +2044,7 @@
 
  ~(class type field-name)~
 
- ~class~ 和 ~type~ 是可选的，而 ~field-name~ 是一个标识符。如果提供 ~class~, 则必须指定不可变关键字或可变关键字。如果指定不可变 class 批示符，则字段是不可变的；否则，字段是可变的。 ~type~, 如果存在的话，则指定字段如何表示，如下所示。
+ ~class~ 和 ~type~ 是可选的，而 ~field-name~ 是一个标识符。如果提供 ~class~, 则必须指定不可变关键字或可变关键字。如果指定不可变 class 指示符，则字段是不可变的；否则，字段是可变的。 ~type~, 如果存在的话，则指定字段如何表示，如下所示。
 
  #+BEGIN_SRC scheme
    ptr 	any Scheme object
@@ -2083,13 +2072,11 @@
  #+END_SRC
 
 
- 如果指定一个类型，则字段只能包含指定类型的对象。如果没有指定类型，则字段为 ~ptr~ 类型，意思是它可以包含任意 Scheme 对象。
+ 如果指定一个类型，则字段只能包含指定类型的对象。如果没有指定类型，则字段为 ~ptr~ 类型，即，它可以包含任意 Scheme 对象。
 
- The field identifiers name the fields of the record. The values of the n fields described by fld1 ... are specified by the n arguments to the generated constructor 过程. The values of the remaining fields, fld2 ..., are given by the corresponding expressions, init .... Each init is evaluated within the scope of the set of field names given by fld1 ... and each field in fld2 ... that precedes it, as if within a let* expression. Each of these field names is bound to the value of the corresponding field during initialization.
  字段标识符命名 /record/ 的字段名。通过 ~fld1 ...~ 描述的 /n/ 个字段的值，由传递给生成的构造过程的 /n/ 个参数指定。剩余字段的值── ~fld2 ...~, 由对应的表达式── ~init ...~ 给出。每个 ~init~ 被求值时所处的作用域，为 ~fld1 ...~ 给出的字段名和 ~fld2 ...~ 中的字段名组成的集合中位于 ~init~ 之前的部分，就像在一个 ~let*~ 表达式中一样。这些字段名在初始化期间绑定到对应字段的值上。
 
- If parent is present, the record type named by parent is the parent of the record. The new record type inherits each of the parent record's fields, and records of the new type are considered records of the parent type. If parent is not present, the parent record type is a base record type with no fields.
- 如果指定了 ~parent~ ，则 ~parent~ 命名的类型为 /record/ 的父类型。新的类型继承父类型的所有字段，并且新类型的实例同时也被判定为父类型。如果未指定 ~parent~ ，则父类型为一个没有字段的基础 /record/ 类型。
+ 如果指定了 ~parent~ ，则 ~parent~ 名字所指代的类型为 /record/ 的父类型。新的类型继承父类型的所有字段，并且新类型的实例同时也被判定为父类型。如果未指定 ~parent~, 则父类型为一个没有字段的 /record/ 基类。
 
  ~define-record~ 定义了下列过程：
 
@@ -2113,11 +2100,9 @@
 
  其中 ~id1 ...~ 是由 ~fld1 ..~.定义的字段名， ~id2 ...~ 是由 ~fld2 ..~.定义的字段名，而 ~body~ 通过标识符 ~id1 ...~ 和 ~id2 ...~ 的值构造 /record/.
 
- If a parent record type is specified, the parent arguments appear first, and the parent fields are inserted into the record before the child fields.
- 如果指定的父类型，则父类型的参数排在前面，同时，在 /record/ 中，父类型的字段也插入到子类型的字段前面。
+ 如果指定了父类型，则父类型的参数排在前面，同时，在 /record/ 中，父类型的字段也插入到子类型的字段前面。
 
- The options opt ... control the selection of names of the generated constructor, predicate, accessors, and mutators.
- 选项 opt ...控制生成的构造过程，谓词，访问器和修改器的命名选择。
+ 选项 ~opt ...~ 控制生成的构造过程，谓词，访问器和修改器的命名选择。
 
  #+BEGIN_SRC scheme
    (constructor id)
@@ -2126,9 +2111,9 @@
  #+END_SRC
 
 
- 选项 (~constructor id~) 使得生成的构造过程的名字是 ~id~ 而非 ~make-name~. 选项 (~predicate id~) 同样使得生成的谓词名是 ~id~ 而非 ~name?~. 选项 (~prefix string~) 决定在生成的访问器和修改器名字中，用什么前缀取代 ~name-~.
+ 选项 (~constructor id~) 使得生成的构造过程的名字是 ~id~ 而非 ~make-name~. 类似，选项 (~predicate id~) 使得生成的谓词名是 ~id~ 而非 ~name?~. 选项 (~prefix string~) 决定在生成的访问器和修改器名字中，用什么前缀取代 ~name-~.
 
- 如果不需要选项，则第三个子表达式， (~opt ...~), 可以省略。如果除了通过构造过程的参数初始化的字段外，其它字段和选项都不需要的话，第二个和第三个子表达式都能省略。如果指定选项，则第二个子表达式必须存在，即使其不包含任何字段声明。may be omitted. If no options and no fields other than those initialized by the arguments to the constructor 过程 are needed, both the second and third subexpressions may be omitted. If options are specified, the second subexpression must be present, even if it contains no field specifiers.
+ 如果不需要选项，则第三个子表达式， (~opt ...~), 可以省略。如果除了通过构造过程的参数初始化的字段外，其它字段和选项都不需要的话，第二个和第三个子表达式都能省略。如果指定选项，则第二个子表达式必须存在，即使其不包含任何字段声明。
 
  这里是一个不包含继承和选项的简单例子。
 
@@ -2204,8 +2189,7 @@
  #+END_SRC
 
 
- This example illustrates the use a specified reader name, immutable fields, and the graph mark and reference syntax.
- 这个例子说明了指定读取器命名，不可变字段，以及图形标记和引用句法的用法。
+ 这个例子说明了指定读取器命名，不可变字段，以及图标记和引用句法的用法。
 
  #+BEGIN_SRC scheme
    (define-record triple ((immutable x1) (mutable x2) (immutable x3)))
@@ -2225,11 +2209,10 @@
  #+END_SRC
 
 
- Cycles established with the mark and reference syntax can be resolved only if a mutable record field or mutable location of some other object is involved the cycle, as in the last two examples above. An exception is raised with condition type &lexical if only immutable fields are involved.
+ 只有当一个可变 record 字段或某个其它对象的可变位置包含在环中时，通过标记和引用句法建立的环才能被解析，如同前两个例子中所表现的。如果只包含不可变字段，则一个条件类型的 ~&lexical~ 异常会被抛出。
 
  ~'#1=#[triple #1# (3 4) #1#] => exception~
 
- The following example demonstrates the use of nongenerative record definitions.
  以下例子说明了 /nongenerative record/ 定义的用法。
 
  #+BEGIN_SRC scheme
@@ -2254,8 +2237,7 @@
      (base-disp (make-point 3 4))) => 5
  #+END_SRC
 
- This works even if the different program components are loaded from different source files or are compiled separately and loaded from different object files.
- 即使程序的不同组件是从不同的源文件加载的，或从不同目标文件加载且是分别编译的，这也可以有效运行。
+ 即使程序的不同组件是从不同的源文件加载的，或从不同目标文件加载且是分别编译的，这个用法也成立。
 
 
  句法: predicate
@@ -2266,7 +2248,7 @@
 
  库: (chezscheme)
 
- 这些标识符是 ~define-record~ 的辅助关键字。除了在被识别为辅助关键字的上下文中，在其它任何地主引用这些标识符都是违反句法的。 ~mutable~ 和 ~immutable~ 也是 ~define-record~ 的辅助关键字，和 R^{6}RS 报告中的 ~define-record-type~ 一样。
+ 这些标识符是 ~define-record~ 的辅助关键字。除了在被识别为辅助关键字的上下文中，在其它任何地方引用这些标识符都是违反句法的。 ~mutable~ 和 ~immutable~ 也是 ~define-record~ 的辅助关键字，和 R^{6}RS 报告中的 ~define-record-type~ 一样。
 
 
  句法: (type-descriptor name)
@@ -2341,7 +2323,6 @@
    (record-reader 'marble) => #f
  #+END_SRC
 
-
  引入 record 读取器也会改变 record 的默认打印方式。打印器总是选择最早分配给 record 的读取器名字——如果存在的话，取代 record 的唯一名字，就像上面这个连贯的例子所阐释的。
 
  #+BEGIN_SRC scheme
@@ -2364,8 +2345,7 @@
 
  当只传入一个参数时，record-writer 返回 rtd 关联的 /record writer/, 对所有 record 来说，最初都是默认 /record writer/. 默认打印方法以统一的句法打印所有的 record，包括生成的 record 名字，各字段的值，一如在本节的介绍部分描述的。
 
- 当传入两个参数时， ~record-writer~ 在 ~rtd~ 和 ~procedure~ 之间建立一个新的关联，从而使过程被用于打印器，以代替给定类型的 record 的默认打印器。打印器传给 ~procedure~ 三个参数：record /r/, 端口 /p/, 和一个应该被用于输出任意 Scheme 对象的打印方法选择包含在 record 打印形式中的值的过程 /wr/, 即，record 字段的值。
- that should be used to write out the values of arbitrary Scheme objects that the print method chooses to include in the printed representation of the record, e.g., values of the record's fields.
+ 当传入两个参数时， ~record-writer~ 在 ~rtd~ 和 ~procedure~ 之间建立一个新的关联，从而使过程被用于打印器，以代替给定类型的 record 的默认打印器。打印器传给 ~procedure~ 三个参数：record /r/, 端口 /p/, 和一个应该被用于输出 record 打印方法选择包含在其打印形式中的任意 Scheme 对象的值的过程 /wr/, 例如，record 字段的值。
 
  #+BEGIN_SRC scheme
    (define-record marble (color quality))
@@ -2384,14 +2364,14 @@
    m => #<medium quality blue marble>
  #+END_SRC
 
- 只有当 ~print-record~ 为 ~#t~ 时（默认为真）， /record writer/ 才被使用。当参数 ~print-record~ 被设为 ~#f~ 时，record 使用一种只指明 record 类型的精简句法打印。
+ 只有当 ~print-record~ 为 ~#t~ （默认值）时， /record writer/ 才被使用。当参数 ~print-record~ 被设为 ~#f~ 时，record 使用一种只指明 record 类型的精简句法打印。
 
  #+BEGIN_SRC scheme
    (parameterize ([print-record #f])
      (format "~s" m)) => "#<record of type marble>"
  #+END_SRC
 
- A print method may be called more than once during the printing of a single record to support cycle detection and graph printing (see print-graph), so print methods that perform side effects other than printing to the given port are discouraged. Whenever a print method is called more than once during the printing of a single record, in all but one call, a generic "bit sink" port is used to suppress output automatically so that only one copy of the object appears on the actual port. In order to avoid confusing the cycle detection and graph printing algorithms, a print method should always produce the same printed representation for each object. Furthermore, a print method should normally use the supplied 过程 wr to print subobjects, though atomic values, such as strings or numbers, may be printed by direct calls to display or write or by other means.
+ 在打印一个单独的 record 期间，一个打印方法可能被调用不只一次，以支持环检测和图打印（参见 print-graph），所以，不建议使用除了打印到指定端口外，还产生副作用的打印方法。在打印一个单独的 record 期间，只要一个打印方法被调用不只一次，则在除一次调用以外的所有调用中，会使用一个通用的 "bit sink" 端口来自动阻止输出，从而，只有对象的一份拷贝会出现在实际的端口中。为避免混乱环检测和图打印算法，对于每个对象，打印方法应该总是产生相同的打印形式。此外，打印方法通常应该使用传入的过程 wr 打印子对象，尽管对于原子型的值，如字符串或数字，可能通过直接调用 display 或 write 或其它方法来打印。
 
  #+BEGIN_SRC scheme
    (let ()
@@ -2406,7 +2386,6 @@
        ref-lexive)) => #0=<#0#>
  #+END_SRC
 
- Print methods need not be concerned with handling nonfalse values of the parameters print-level. The printer handles print-level automatically even when user-defined print procedures are used. Since records typically contain a small, fixed number of fields, it is usually possible to ignore nonfalse values of print-length as well.
  打印方法不需要关注如何处理参数  ~print-level~  值为非假的情况。打印器会自动处理  ~print-level~ ，即使使用的是用户自定义的打印过程。由于 /record/ 一般只包含少量，固定数目的字段，所以通常也可以忽略  ~print-length~  的非假值。
 
  #+BEGIN_SRC scheme
@@ -2429,7 +2408,7 @@
  库: (chezscheme)
 
  This parameter controls the printing of records. If set to true (the default) the record writer associated with a record type is used to print records of that type. If set to false, all records are printed with the syntax #<record of type name>, where name is the name of the record type as returned by record-type-name.
- 这个参数控制 record 的打印形式。如果设为真（为默认值），则使用与 record 类型相关联的 /record writer/ 打印此类型 record。如果设为假，所有 record 都以句法 ~#<record of type name>~ 打印，其中 ~name~ 是 record 类型的名称，即 ~record-type-name~ 的返回值。
+ 这个参数控制 record 的打印形式。如果设为真（默认值），则使用与 record 类型相关联的 /record writer/ 打印此类型 record。如果设为假，所有 record 都以句法 ~#<record of type name>~ 打印，其中 ~name~ 是 record 的类型名，即 ~record-type-name~ 的返回值。
 
 
  过程: (make-record-type type-name fields)
@@ -2450,33 +2429,25 @@
 
  ~(class type field-name)~
 
- 其中 ~class~ 和 ~type~ 是可选的。 ~field-name~ 必须是一个符号。如果指定 ~class~ ，则必须是符号 ~immutable~ 或符号 ~mutable~ 。如果提供 ~immutable~ 类别指示符，则字段是不可变的；否则，字段是可变的。 ~type~ ，如果提供的话，指定了字段如何表示。类型种类和 174 页上对 ~define-record~ 的描述中给出的一样。
- if present, must be the symbol immutable or the symbol mutable. If the immutable class-specifier is present, the field is immutable; otherwise, the field is mutable. type, if present, specifies how the field is represented. The types are the same as those given in the description of define-record on page 174.
+ 其中 ~class~ 和 ~type~ 是可选的。 ~field-name~ 必须是一个符号。如果指定 ~class~ ，则必须是符号 ~immutable~ 或符号 ~mutable~ 。如果提供 ~immutable~ 类别指示符，则字段是不可变的；否则，字段是可变的。 ~type~, 如果提供的话，指定了字段如何表示。类型类型和 174 页上对 ~define-record~ 的描述中给出的一样。
 
- 如果指定了类型，则字段只能包含指定类型的对象。如果没有指定类型，字段则是 ptr 类型，意思是它可以包含任意 Scheme 对象。
+ 如果指定了类型，则字段只能包含指定类型的对象。如果没有指定类型，字段则是 ~ptr~ 类型，意思是它可以包含任意 Scheme 对象。
 
- The behavior of a program that modifies the string type-name or the list fields or any of its sublists is 未定义.
- 修改字符串 type-name 或 fields 列表或它的任何子列表的程序行为是未定义的。
+ 修改字符串 ~type-name~ 或 ~fields~ 列表或它的任何子列表的程序行为是未定义的。
 
- The record-type descriptor may be passed as an argument to any of the R^{6}RS 报告 procedures
  record 类型描述符可以作为参数传递给 R^{6}RS 报告中的下列任何过程
 
- #+BEGIN_SRC scheme
-   record-constructor,
-   record-predicate,
-   record-accessor, and
-   record-mutator,
- #+END_SRC
+   - ~record-constructor~,
+   - ~record-predicate~,
+   - ~record-accessor~, and
+   - ~record-mutator~,
 
  或 /Chez Scheme/ 中的变体
 
- #+BEGIN_SRC scheme
-   record-constructor,
-   record-field-accessor, and
-   record-field-mutator
- #+END_SRC
+   - ~record-constructor~,
+   - ~record-field-accessor~, and
+   - ~record-field-mutator~
 
- to obtain procedures for creating and manipulating records of the new type.
  以获取创建和操控新类型 record 的过程。
 
  #+BEGIN_SRC scheme
@@ -2508,7 +2479,7 @@
  #+END_SRC
 
  The order in which the fields appear in fields is important. While field names are generally distinct, it is permissible for one field name to be the same as another in the list of fields or the same as an inherited name. In this case, field ordinals must be used to select fields in calls to record-field-accessor and record-field-mutator. Ordinals range from zero through one less than the number of fields. Parent fields come first, if any, followed by the fields in fields, in the order given.
- 字段在  ~fields~  中出现的顺序是十分重要的。虽然通常字段名是互不相同的，但也有可能一个字段名与字段列表中的另一个字段名相同，或与继承来的字段名相同。在这种情况下，调用  ~record-field-accessor~  和  ~record-field-mutator~  时必须使用字段序数选择字段。序数的范围是从零到字段数量减一。如果有父字段的话，则父字段排在前面，后面按给定的次序跟着  ~fields~  中的字段。
+ 字段在 ~fields~ 中出现的顺序是十分重要的。虽然通常字段名是互不相同的，但也有可能一个字段名与字段列表中的另一个字段名相同，或与继承来的字段名相同。在这种情况下，调用 ~record-field-accessor~ 和 ~record-field-mutator~ 时必须使用字段序数选择字段。序数的范围是从零到字段数量减一。如果有父字段的话，则父字段排在前面，后面按给定的次序跟着 ~fields~ 中的字段。
 
  #+BEGIN_SRC scheme
    (define r1 (make-record-type "r1" '(t t)))
@@ -2524,143 +2495,194 @@
 
 
  过程: (record-constructor rcd)
+
  过程: (record-constructor rtd)
- 返回: a constructor for records of the type represented by rtd
+
+ 返回: ~rtd~ 所表示的 record 类型的构造过程
+
  库: (chezscheme)
 
- Like the R^{6}RS 报告 version of this 过程, this 过程 may be passed a record-constructor descriptor, rcd, which determines the behavior of the constructor. It may also be passed a record-type descriptor, rtd, in which case the constructor accepts as many arguments as there are fields in the record; these arguments are the initial values of the fields in the order given when the record-type descriptor was created.
+ 和这个过程的 R^{6}RS 报告中的版本一样，这个过程可以传入一个 record 构造描述符—— ~rcd~, 其决定构造过程的行为。它也可以传入一个 record 类型描述符， ~rtd~ ，这种情况下，构造过程接受的参数数量和 record 的字段数量一样；这些参数是字段的初始值，以 record 类型描述符创建时给定的顺序排序。
+
 
  过程: (record-field-accessor rtd field-id)
- 返回: an accessor for the identified field
+
+ 返回: 指定字段的访问器
+
  库: (chezscheme csv7)
 
- rtd must be a record-type descriptor, field-id must be a symbol or field ordinal, i.e., a nonnegative exact integer less than the number of fields of the given record type. The specified field must be accessible.
+  ~rtd~ 必须是 record 类型描述符， ~field-id~ 必须是符号或是字段序数，即，一个非负的精确整数，小于给定 record 类型的字段数。指定的字段必须是可访问的。
 
- The generated accessor expects one argument, which must be a record of the type represented by rtd. It 返回 the contents of the specified field of the record.
+ 生成的访问器接受一个参数，其必须是一个 ~rtd~ 所表示类型的 record. 它返回此 record 指定字段的内容。
+
 
  过程: (record-field-accessible? rtd field-id)
- 返回: #t if the specified field is accessible, otherwise #f
+
+ 返回: 如果指定的字段可访问，则为 ~#t~, 否则为 ~#f~.
+
  库: (chezscheme csv7)
 
- rtd must be a record-type descriptor, field-id must be a symbol or field ordinal, i.e., a nonnegative exact integer less than the number of fields of the given record type.
+  ~rtd~ 必须是 record 类型描述符， ~field-id~ 必须是符号或是字段序数，即，一个非负的精确整数，小于给定 record 类型的字段数。
 
- The compiler is free to eliminate a record field if it can prove that the field is not accessed. In making this determination, the compiler is free to ignore the possibility that an accessor might be created from a record-type descriptor obtained by calling record-type-descriptor on an instance of the record type.
+ 如果编译器可以确认 record 的一个字段没有被访问，则它可以自由地排除这个字段。在做出这个决定时，编辑器可以自由地忽略以下可能性，即访问器可能是通过一个 record 类型描述符创建的，而这个描述符是通过在此 record 类型的一个实例上调用 ~record-type-descripter~ 而获得的。
+
 
  过程: (record-field-mutator rtd field-id)
- 返回: a mutator for the identified field
+
+ 返回: 指定字段的修改器
+
  库: (chezscheme csv7)
 
- rtd must be a record-type descriptor, field-id must be a symbol or field ordinal, i.e., a nonnegative exact integer less than the number of fields of the given record type. The specified field must be mutable.
+  ~rtd~ 必须是 record 类型描述符， ~field-id~ 必须是符号或是字段序数，即，一个非负的精确整数，小于给定 record 类型的字段数。指定字段必须是可变的。
 
- The mutator expects two arguments, r and obj. r must be a record of the type represented by rtd. obj must be a value that is compatible with the type declared for the specified field when the record-type descriptor was created. obj is stored in the specified field of the record.
+ 修改器接受两个参数， /r/ 和 /obj/. /r/ 必须是 ~rtd~ 表示的类型的 record. /obj/ 必须是与 record 类型描述符创建时所声明的指定字段的类型相兼容的值。 /obj/ 存储在 record 的指定字段中。
 
  过程: (record-field-mutable? rtd field-id)
- 返回: #t if the specified field is mutable, otherwise #f
+
+ 返回: 如果指定的字段是可变的，则为 ~#t~, 否则为 ~#f~.
+
  库: (chezscheme csv7)
 
- rtd must be a record-type descriptor, field-id must be a symbol or field ordinal, i.e., a nonnegative exact integer less than the number of fields of the given record type.
+ ~rtd~ 必须是 record 类型描述符， ~field-id~ 必须是符号或者字段序数，即，一个非负的精确整数，小于给定 record 类型的字段数量。
 
- Any field declared immutable is immutable. In addition, the compiler is free to treat a field as immutable if it can prove that the field is never assigned. In making this determination, the compiler is free to ignore the possibility that a mutator might be created from a record-type descriptor obtained by calling record-type-descriptor on an instance of the record type.
+ 任何声明为不可变的字段为不可变的。此外，编译器可以自由地把一个字段看作不可变的，只要它可以确证这个字段从来没有被赋值。在做出这个决定时，编辑器可以自由地忽略以下可能性，即修改器可能是通过一个 record 类型描述符创建的，而这个描述符是通过在此 record 类型的一个实例上调用 ~record-type-descripter~ 而获得的。
 
  过程: (record-type-name rtd)
- 返回: the name of the record-type represented by rtd
+
+ 返回: 由 rtd 表示的 record 类型的名字
+
  库: (chezscheme csv7)
 
- rtd must be a record-type descriptor.
+ ~rtd~ 必须是一个 record 类型描述符。
 
- The name is a always a string. If a gensym is provided as the record-type name in a define-record form or make-record-type call, the result is the "pretty" name of the gensym (see 7.9).
+ 名字总是一个字符串。如果在 ~define-record~ 句法形式或 ~make-record-type~ 调用中，一个 /gensym/ 被作为 record 类型名提供，则结果为 gensym 的美观名字（参见 7.9 节）。
 
- (record-type-name (make-record-type "empty" '())) => "empty"
+ #+BEGIN_SRC scheme
+   (record-type-name (make-record-type "empty" '())) => "empty"
 
- (define-record #{point bdhavk1bwafxyss1-b} (x y))
- (define p (type-descriptor #{point bdhavk1bwafxyss1-b}))
- (record-type-name p) => "point"
+   (define-record #{point bdhavk1bwafxyss1-b} (x y))
+   (define p (type-descriptor #{point bdhavk1bwafxyss1-b}))
+   (record-type-name p) => "point"
+ #+END_SRC
+
 
  过程: (record-type-symbol rtd)
- 返回: the generated symbol associated with rtd
+
+ 返回: 与 ~rtd~ 关联的生成的符号
+
  库: (chezscheme csv7)
 
- rtd must be a record-type descriptor.
+ ~rtd~ 必须是一个 record 类型描述符。
 
- (define e (make-record-type "empty" '()))
- (record-type-symbol e) => #{empty bdhavk1bwafxyss1-e}
+ #+BEGIN_SRC scheme
+   (define e (make-record-type "empty" '()))
+   (record-type-symbol e) => #{empty bdhavk1bwafxyss1-e}
 
- (define-record #{point bdhavk1bwafxyss1-b} (x y))
- (define p (type-descriptor #{point bdhavk1bwafxyss1-b}))
- (record-type-symbol p) => #{point bdhavk1bwafxyss1-b}
+   (define-record #{point bdhavk1bwafxyss1-b} (x y))
+   (define p (type-descriptor #{point bdhavk1bwafxyss1-b}))
+   (record-type-symbol p) => #{point bdhavk1bwafxyss1-b}
+ #+END_SRC
+
 
  过程: (record-type-field-names rtd)
- 返回: a list of field names of the type represented by rtd
+
+ 返回: ~rtd~ 所表示的类型的字段名列表
+
  库: (chezscheme csv7)
 
- rtd must be a record-type descriptor. The field names are symbols.
+ ~rtd~ 必须是一个 record 类型描述符。字段名是符号。
 
- (define-record triple ((immutable x1) (mutable x2) (immutable x3)))
- (record-type-field-names (type-descriptor triple)) => (x1 x2 x3)
+ #+BEGIN_SRC scheme
+   (define-record triple ((immutable x1) (mutable x2) (immutable x3)))
+   (record-type-field-names (type-descriptor triple)) => (x1 x2 x3)
+ #+END_SRC
+
 
  过程: (record-type-field-decls rtd)
- 返回: a list of field declarations of the type represented by rtd
+
+ 返回: ~rtd~ 所表示的类型的字段声明列表
+
  库: (chezscheme csv7)
 
- rtd must be a record-type descriptor. Each field declaration has the following form:
+ ~rtd~ 必须是一个 record 类型描述符。每个字段声明有以下句法形式：
 
- (class type field-name)
+ ~(class type field-name)~
 
- where class, type, and field-name are as described under make-record-type.
+ 其中 ~class~, ~type~, 和 ~field-name~ 一如 ~make-record-type~ 后面的描述。
 
- (define-record shape (x y))
- (define-record circle shape (radius))
+ #+BEGIN_SRC scheme
+   (define-record shape (x y))
+   (define-record circle shape (radius))
 
- (record-type-field-decls
-   (type-descriptor circle)) => ((mutable ptr x)
-                               (mutable ptr y)
-                               (mutable ptr radius))
+   (record-type-field-decls
+    (type-descriptor circle)) => ((mutable ptr x)
+                                  (mutable ptr y)
+                                  (mutable ptr radius))
+ #+END_SRC
+
 
  过程: (record? obj)
- 返回: #t if obj is a record, otherwise #f
+
+ 返回: 如果 ~obj~ 是 record，则为 ~#t~, 否则为 ~#f~.
+
  过程: (record? obj rtd)
- 返回: #t if obj is a record of the given type, otherwise #f
+
+ 返回: 如果 ~obj~ 是指定类型的 record，则为 ~#t~, 否则为 ~#f~.
+
  库: (chezscheme)
 
- If present, rtd must be a record-type descriptor.
+ ~rtd~ (如果存在) 必须是一个 record 类型描述符。
 
- A record is "of the given type" if it is an instance of the record type or one of its ancestors. The predicate generated by record-predicate for a record-type descriptor rtd is equivalent to the following.
+ 一个 record 是“指定的类型”，意指它是指定 record 类型或其某个父类型的实例。通过 ~record-predicate~ 为一个 record 类型描述符 ~rtd~ 生成的谓词等价于如下定义。
 
- (lambda (x) (record? x rtd))
+ #+BEGIN_SRC scheme
+   (lambda (x) (record? x rtd))
+ #+END_SRC
+
 
  过程: (record-type-descriptor rec)
- 返回: the record-type descriptor of rec
+
+ 返回: ~rec~ 的 record 类型描述符
+
  库: (chezscheme csv7)
 
- rec must be a record. This 过程 is intended for use in the definition of portable printers and debuggers. For records created with make-record-type, it may not be the same as the descriptor returned by make-record-type. See the comments about field accessibility and mutability under record-field-accessible? and record-field-mutable? above.
+ ~rec~ 必须是一个 record. 这个过程是用在可移植的打印器和调试器的定义中。对于用 ~make-record-type~ 创建的 record, 它可能和 ~make-record-type~ 返回的描述符不一样。可参见 ~record-field-accessible?~ 后面和 ~record-field-mutable?~ 前面，关于字段可访问性和可变性的注解。
 
- This 过程 is equivalent to the R^{6}RS 报告 record-rtd 过程.
+ 这个过程等价于 R^{6}RS 报告中的 ~record-rtd~ 过程。
 
- (define rtd (make-record-type "frob" '(blit blat)))
- rtd => #<record type frob>
- (define x ((record-constructor rtd) 1 2))
- (record-type-descriptor x) => #<record type frob>
- (eq? (record-type-descriptor x) rtd) => 未定义
+ #+BEGIN_SRC scheme
+   (define rtd (make-record-type "frob" '(blit blat)))
+   rtd => #<record type frob>
+   (define x ((record-constructor rtd) 1 2))
+   (record-type-descriptor x) => #<record type frob>
+   (eq? (record-type-descriptor x) rtd) => 未定义
+ #+END_SRC
 
-*** 7.16. Procedures
+
+*** 7.16. 过程 (Procedures)
 
  过程: (procedure-arity-mask proc)
- 返回: an exact integer bitmask identifying the accepted argument counts of proc
+
+ 返回: 一个精确的整数位掩码，指明了 proc 可接受的参数数量
+
  库: (chezscheme)
 
- The bitmask is represented as two's complement number with the bit at each index n set if and only if proc accepts n arguments.
+ 位掩码以补码的形式表示，当且仅当 proc 接受 n 个参数时，每个索引 n 处的位被设定。
 
- The two's complement encoding implies that if proc accepts n or more arguments, the encoding is a negative number, since all the bits from n and up are set. For example, if proc accepts any number of arguments, the two's complement encoding of all bits set is -1.
+ 补码编码意味着，如果 proc 接受 n 个或更多的参数，则编码是一个负数，由于所有 n 及更高的位均被设定。例如，如果 proc 接受任意数量的参数，则所有位设置的补码编码为-1.
 
- (procedure-arity-mask (lambda () 'none)) => 1
- (procedure-arity-mask car) => 2
- (procedure-arity-mask (case-lambda [() 'none] [(x) x])) => 3
- (procedure-arity-mask (lambda x x)) => -1
- (procedure-arity-mask (case-lambda [() 'none] [(x y . z) x])) => -3
- (procedure-arity-mask (case-lambda)) => 0
- (logbit? 1 (procedure-arity-mask pair?)) => #t
- (logbit? 2 (procedure-arity-mask pair?)) => #f
- (logbit? 2 (procedure-arity-mask cons)) => #t
+ #+BEGIN_SRC scheme
+   (procedure-arity-mask (lambda () 'none)) => 1
+   (procedure-arity-mask car) => 2
+   (procedure-arity-mask (case-lambda [() 'none] [(x) x])) => 3
+   (procedure-arity-mask (lambda x x)) => -1
+   (procedure-arity-mask (case-lambda [() 'none] [(x y . z) x])) => -3
+   (procedure-arity-mask (case-lambda)) => 0
+   (logbit? 1 (procedure-arity-mask pair?)) => #t
+   (logbit? 2 (procedure-arity-mask pair?)) => #f
+   (logbit? 2 (procedure-arity-mask cons)) => #t
+ #+END_SRC
+
 
  /Chez Scheme/ Version 9 User's Guide
  Copyright © 2018 Cisco Systems, Inc.
