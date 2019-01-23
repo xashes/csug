@@ -330,97 +330,131 @@ libraries: (chezscheme)
 ** Section 8.3. Flonum 操作
 
 Inexact real numbers are normally represented by flonums. A flonum is a single 64-bit double-precision floating point number. This section describes operations on flonums, most of which accept flonum arguments and return flonum values. In most cases, the operations are inline-coded or coded as machine language subroutines at optimize-level 3 with no argument type checking; full type checking is performed at lower optimize levels. Flonum-specific procedure names begin with the prefix "fl" to set them apart from their generic counterparts.
+不精确的实数通常以 flonum 表示。flonum 是一个 64 位双精度浮点数。本节介绍针对 flonum 的操作，其中大多数接受 flonum 类型的实参，并返回 flonum 类型的值。大多数情况下，
 
 Inexact real numbers may also be represented by inexact complexnums with imaginary parts equal to zero, which cannot be used as input to the flonum-specific operators. Such numbers are produced, however, only from operations involving complex numbers with nonzero imaginary parts, by explicit calls to fl-make-rectangular, make-rectangular, or make-polar, or by numeric input in either polar or rectangular format.
 
 procedure: (flonum->fixnum flonum)
-returns: the fixnum representation of flonum, truncated
+
+returns: flonum 的 fixnum 表示形式（被截短的）
+
 libraries: (chezscheme)
 
 The truncated value of flonum must fall within the fixnum range. flonum->fixnum is a restricted version of exact, which converts any numeric representation to its exact equivalent.
+flonum 被截短后的值必须落在 fixnum 范围内。flonum->fixnum 是一个精确值的限定版本，会把任何数字表示转化为它的精确等价版本。
 
-(flonum->fixnum 0.0) => 0
-(flonum->fixnum 3.9) => 3
-(flonum->fixnum -2.2) => -2
+#+BEGIN_SRC scheme
+  (flonum->fixnum 0.0) => 0
+  (flonum->fixnum 3.9) => 3
+  (flonum->fixnum -2.2) => -2
+#+END_SRC
+
 
 procedure: (fl= flonum1 flonum2 ...)
+
 procedure: (fl< flonum1 flonum2 ...)
+
 procedure: (fl> flonum1 flonum2 ...)
+
 procedure: (fl<= flonum1 flonum2 ...)
+
 procedure: (fl>= flonum1 flonum2 ...)
-returns: #t if the relation holds, #f otherwise
+
+返回: 如果关系成立，则为 ~#t~, 否则为 ~#f~.
+
 libraries: (chezscheme)
 
 The predicate fl= returns #t if its arguments are equal. The predicate fl< returns #t if its arguments are monotonically increasing, i.e., each argument is greater than the preceding ones, while fl> returns #t if its arguments are monotonically decreasing. The predicate fl<= returns #t if its arguments are monotonically nondecreasing, i.e., each argument is not less than the preceding ones, while fl>= returns #t if its arguments are monotonically nonincreasing. When passed only one argument, each of these predicates returns #t.
+谓词 fl=在其实参相等时返回#t。谓词 fl<在其实参单调递增时返回#t，即，每个实参都大于它前一个实参，而 fl>在其实参单调递减时返回#t。谓词 fl<=在其实参单调非递减时返回#t，即，每个实参不小于它前一个实参，而 fl>=在其实参单调非递增时返回#t。只传入一个实参时，这些谓词均返回#t。
 
-IEEE NANs are not comparable, i.e., comparisons involving NANs always return #f.
+IEEE NANs 不具有可比较性，即，涉及 NANs 的比较总是返回#f.
 
 These procedures are similar to the Revised6 Report procedures fl=?, fl<?, fl>?, fl<=?, and fl>=? except that the Revised6 Report procedures require two or more arguments, and their names have the "?" suffix.
+这些过程与 R^{6}RS 中的过程 fl=?, fl<?, fl>?, fl<=?, 和 fl>=?类似，除了 R^{6}RS 中的过程需要 2 个或更多参数，以及它们的名称中都有 "?" 后缀以外。
 
-(fl= 0.0) => #t
-(fl= 0.0 0.0) => #t
-(fl< -1.0 0.0 1.0) => #t
-(fl> -1.0 0.0 1.0) => #f
-(fl<= 0.0 3.0 3.0) => #t
-(fl>= 4.0 3.0 3.0) => #t
-(fl< 7.0 +inf.0) => #t
-(fl= +nan.0 0.0) => #f
-(fl= +nan.0 +nan.0) => #f
-(fl< +nan.0 +nan.0) => #f
-(fl> +nan.0 +nan.0) => #f
+#+BEGIN_SRC scheme
+  (fl= 0.0) => #t
+  (fl= 0.0 0.0) => #t
+  (fl< -1.0 0.0 1.0) => #t
+  (fl> -1.0 0.0 1.0) => #f
+  (fl<= 0.0 3.0 3.0) => #t
+  (fl>= 4.0 3.0 3.0) => #t
+  (fl< 7.0 +inf.0) => #t
+  (fl= +nan.0 0.0) => #f
+  (fl= +nan.0 +nan.0) => #f
+  (fl< +nan.0 +nan.0) => #f
+  (fl> +nan.0 +nan.0) => #f
+#+END_SRC
+
 
 procedure: (flnonpositive? fl)
-returns: #t if fl is not greater than zero, #f otherwise
+
+返回: 如果 fl 不大于 0，则为 ~#t~, 否则为 ~#f~.
+
 procedure: (flnonnegative? fl)
-returns: #t if fl is not less than zero, #f otherwise
+
+返回: 如果 fl 不小于 0，则为 ~#t~, 否则为 ~#f~.
+
 libraries: (chezscheme)
 
-flnonpositive? is equivalent to (lambda (x) (fl<= x 0.0)), and flnonnegative? is equivalent to (lambda (x) (fl>= x 0.0)).
+flnonpositive?等价于(lambda (x) (fl<= x 0.0)), 而 flnonnegative?等价于(lambda (x) (fl>= x 0.0)).
 
 Even if the flonum representation distinguishes -0.0 from +0.0, both are considered nonpositive and nonnegative.
+虽然 flonum 的表示形式区分-0.0 和+0.0，但都判定为非负且非正。
 
-(flnonpositive? 128.0) => #f
-(flnonpositive? 0.0) => #t
-(flnonpositive? -0.0) => #t
-(flnonpositive? -1.0) => #t
+#+BEGIN_SRC scheme
+  (flnonpositive? 128.0) => #f
+  (flnonpositive? 0.0) => #t
+  (flnonpositive? -0.0) => #t
+  (flnonpositive? -1.0) => #t
 
-(flnonnegative? -65.0) => #f
-(flnonnegative? 0.0) => #t
-(flnonnegative? -0.0) => #t
-(flnonnegative? 1.0) => #t
+  (flnonnegative? -65.0) => #f
+  (flnonnegative? 0.0) => #t
+  (flnonnegative? -0.0) => #t
+  (flnonnegative? 1.0) => #t
 
-(flnonnegative? +nan.0) => #f
-(flnonpositive? +nan.0) => #f
+  (flnonnegative? +nan.0) => #f
+  (flnonpositive? +nan.0) => #f
 
-(flnonnegative? +inf.0) => #t
-(flnonnegative? -inf.0) => #f
+  (flnonnegative? +inf.0) => #t
+  (flnonnegative? -inf.0) => #f
+#+END_SRC
+
 
 procedure: (decode-float x)
-returns: see below
+
+returns: 参见下文
+
 libraries: (chezscheme)
 
-x must be a flonum. decode-float returns a vector with three integer elements, m, e, and s, such that x = sm2e. It is useful primarily in the printing of floating-point numbers.
+x 必须是 flonum. decode-float 返回一个包含 3 个整数元素的向量，m, e, 和 s, 满足 x = sm2e. 它主要是用于打印浮点数。
 
-(decode-float 1.0) => #(4503599627370496 -52 1)
-(decode-float -1.0) => #(4503599627370496 -52 -1)
+#+BEGIN_SRC scheme
+  (decode-float 1.0) => #(4503599627370496 -52 1)
+  (decode-float -1.0) => #(4503599627370496 -52 -1)
 
-(define slow-identity
-  (lambda (x)
-    (inexact
-      (let ([v (decode-float x)])
-        (let ([m (vector-ref v 0)]
-              [e (vector-ref v 1)]
-              [s (vector-ref v 2)])
-          (* s m (expt 2 e)))))))
+  (define slow-identity
+    (lambda (x)
+      (inexact
+       (let ([v (decode-float x)])
+         (let ([m (vector-ref v 0)]
+               [e (vector-ref v 1)]
+               [s (vector-ref v 2)])
+           (* s m (expt 2 e)))))))
 
-(slow-identity 1.0) => 1.0
-(slow-identity -1e20) => -1e20
+  (slow-identity 1.0) => 1.0
+  (slow-identity -1e20) => -1e20
+#+END_SRC
+
 
 procedure: (fllp flonum)
-returns: see below
+
+returns: 参见下文
+
 libraries: (chezscheme)
 
 fllp returns the 12-bit integer consisting of the exponent plus highest order represented bit of a flonum (ieee 64-bit floating-point number). It can be used to compute a fast approximation of the logarithm of the number.
+
 
 (fllp 0.0) => 0
 (fllp 1.0) => 2046
@@ -434,51 +468,75 @@ fllp returns the 12-bit integer consisting of the exponent plus highest order re
 (fllp #b1.0e-1111111111) => 1
 (fllp #b1.0e-10000000000) => 0
 
-** Section 8.4. Inexact Complex Operations
+** Section 8.4. 不精确复数的操作
 
-The procedures described in this section provide mechanisms for creating and operating on inexact complex numbers. Inexact complex numbers with nonzero imaginary parts are represented as inexact complexnums. An inexact complexnum contains two 64-bit double-precision floating point numbers. Inexact complex numbers with imaginary parts equal to zero (in other words, inexact real numbers) may be represented as either inexact complexnums or flonums. The operations described in this section accept any mix of inexact complexnum and flonum arguments (collectively, "cflonums").
+本节介绍的过程提供了创建和操作不精确复数的机制。虚部非 0 的不精确复数表示为不精确的 complexnums. 不精确的 complexnum 包含 2 个 64 位双精度浮点数。虚部为 0 的不精确复数（即， 不精确实数）可以表示为不精确 complexnums 或 flonums. 本节介绍的操作接受任何不精确 complexnum 和 flonum（合称为"cflonums"）实参的组合。
 
-In most cases, the operations are performed with minimal type checking at optimize-level 3; full type checking is performed at lower optimize levels. Inexact complex procedure names begin with the prefix "cfl" to set them apart from their generic counterparts.
+大多数情况下，这些操作在优化级别 3 执行最少化的类型检查；在更低的优化级别才会执行全面的类型检查。不精确复数过程的名称以前缀 "cfl" 开始，以区分于它们对应的通用版本。
 
 procedure: (fl-make-rectangular flonum1 flonum2)
-returns: an inexact complexnum
+
+returns: 一个不精确 complexnum
+
 libraries: (chezscheme)
 
-The inexact complexnum produced by fl-make-rectangular has real part equal to flonum1 and imaginary part equal to flonum2.
+通过 fl-make-rectangular 生成的不精确 complexnum，实部等于 flonum1, 而虚部等于 flonum2.
 
-(fl-make-rectangular 2.0 -3.0) => 2.0-3.0i
-(fl-make-rectangular 2.0 0.0) => 2.0+0.0i
-(fl-make-rectangular 2.0 -0.0) => 2.0-0.0i
+#+BEGIN_SRC scheme
+  (fl-make-rectangular 2.0 -3.0) => 2.0-3.0i
+  (fl-make-rectangular 2.0 0.0) => 2.0+0.0i
+  (fl-make-rectangular 2.0 -0.0) => 2.0-0.0i
+#+END_SRC
+
 
 procedure: (cfl-real-part cflonum)
-returns: the real part of cflonum
+
+returns: cflonum 的实部
+
 procedure: (cfl-imag-part cflonum)
-returns: the imaginary part of cflonum
+
+returns: cflonum 的虚部
+
 libraries: (chezscheme)
 
-(cfl-real-part 2.0-3.0i) => 2.0
-(cfl-imag-part 2.0-3.0i) => -3.0
-(cfl-imag-part 2.0-0.0i) => -0.0
-(cfl-imag-part 2.0-inf.0i) => -inf.0
+#+BEGIN_SRC scheme
+  (cfl-real-part 2.0-3.0i) => 2.0
+  (cfl-imag-part 2.0-3.0i) => -3.0
+  (cfl-imag-part 2.0-0.0i) => -0.0
+  (cfl-imag-part 2.0-inf.0i) => -inf.0
+#+END_SRC
+
 
 procedure: (cfl= cflonum ...)
-returns: #t if its arguments are equal, #f otherwise
+
+返回: 如果实参相等，则为 ~#t~, 否则为 ~#f~.
+
 libraries: (chezscheme)
 
-(cfl= 7.0+0.0i 7.0) => #t
-(cfl= 1.0+2.0i 1.0+2.0i) => #t
-(cfl= 1.0+2.0i 1.0-2.0i) => #f
+#+BEGIN_SRC scheme
+  (cfl= 7.0+0.0i 7.0) => #t
+  (cfl= 1.0+2.0i 1.0+2.0i) => #t
+  (cfl= 1.0+2.0i 1.0-2.0i) => #f
+#+END_SRC
+
 
 procedure: (cfl+ cflonum ...)
+
 procedure: (cfl* cflonum ...)
+
 procedure: (cfl- cflonum1 cflonum2 ...)
+
 procedure: (cfl/ cflonum1 cflonum2 ...)
-returns: a cflonum
+
+returns: 一个 cflonum
+
 libraries: (chezscheme)
 
 These procedures compute the sum, difference, product, or quotient of inexact complex quantities, whether these quantities are represented by flonums or inexact complexnums. For example, if cfl+ receives two flonum arguments a and b, it returns the sum a + b; in this case, it behaves the same as fl+. With two inexact complexnum arguments a + bi and c + di, it returns the sum (a + c) + (b + d)i. If one argument is a flonum a and the other an inexact complexnum c + di, cfl+ returns (a + c) + di.
+这些过程计算不精确复数数值的和，差，积或商，不论这些数值是以 flonums 表示，或以不精确 complexnums 表示。例如，如果 cfl+收到 2 个 flonum 实参 a 和 b，它返回它们的和 a + b; 在这种情况下，它和 fl+ 的行为一样。若 2 个实参为不精确 complexnum a + bi 和 c + di, 它返回和 (a + c) + (b + d)i. 若 1 个实参为 flonum a，而另一个为不精确 complexnum c + di, cfl+ 返回 (a + c) + di.
 
 When passed zero arguments, cfl+ returns 0.0 and cfl* returns 1.0. When passed one argument, cfl- returns the additive inverse of the argument, and cfl/ returns the multiplicative inverse of the argument. When passed three or more arguments, cfl- returns the difference between its first and the sum of its remaining arguments, and cfl/ returns the quotient of its first and the product of its remaining arguments.
+当传入 0 个实参，cfl+ 返回 0.0，而 cfl* 返回 1.0. 当传入 1 个实参，
 
 (cfl+) => 0.0
 (cfl*) => 1.0
