@@ -1100,7 +1100,7 @@
    (gensym) => #{g0 bcsfg5eq4e9b3h9o-a}
  #+END_SRC
 
- 当环境参数 ~print-gensym~ 被设为 ~pretty~, 则打印器只输出美观名字，使用 ~#:~ 句法，所以
+ 当参数对象 ~print-gensym~ 被设为 ~pretty~, 则打印器只输出美观名字，使用 ~#:~ 句法，所以
 
  #+BEGIN_SRC scheme
    (parameterize ([print-gensym 'pretty])
@@ -1111,7 +1111,7 @@
 
  当读取器遇到 ~#:~ 句法，便以其提供的美观名字产生一个 /gensym/ ，但是最初的唯一名字就遗失了。
 
- 当环境参数被设为 ~#f~, 则打印器只输出美观名字，所以
+ 当参数对象被设为 ~#f~, 则打印器只输出美观名字，所以
 
  #+BEGIN_SRC scheme
    (parameterize ([print-gensym #f])
@@ -1137,9 +1137,9 @@
 
  库: (chezscheme)
 
- 当 ~gensym~ 没有传入显式的字符串参数时，环境参数 ~gensym-prefix~ 和 ~gensym-count~ 被用来访问和设置生成美观名字的内部前缀和计数器。 ~gensym-prefix~ 默认为字符串 ~"g"~ , 并且可以被设置为任何对象。 ~gensym-count~ 起始于 0, 并且可以被设置为任何非负整数。
+ 当 ~gensym~ 没有传入显式的字符串参数时，参数对象 ~gensym-prefix~ 和 ~gensym-count~ 被用来访问和设置生成美观名字的内部前缀和计数器。 ~gensym-prefix~ 默认为字符串 ~"g"~ , 并且可以被设置为任何对象。 ~gensym-count~ 起始于 0, 并且可以被设置为任何非负整数。
 
- 如上所述， /Chez Scheme/ 把美观名字的创建延迟到其第一次被请求时──被打印器或通过显式调用 ~symbol->string~ 。在那之前，这些环境参数并不会起作用；因此，在调用 ~gensym~ 时设置它们，对生成的名字并没有影响。
+ 如上所述， /Chez Scheme/ 把美观名字的创建延迟到其第一次被请求时──被打印器或通过显式调用 ~symbol->string~ 。在那之前，这些参数对象并不会起作用；因此，在调用 ~gensym~ 时设置它们，对生成的名字并没有影响。
 
  #+BEGIN_SRC scheme
    (let ([x (parameterize ([gensym-prefix "genny"]
@@ -1788,13 +1788,13 @@
 
  ~(nongenerative #f)~
 
- 这种方式可以和环境参数 ~require-nongenerative-clause~ 结合使用，以捕获对 /generative record/ 类型的意外使用，同时避免在必须使用 /generative record/ 类型时的错误误报。 /Generative record/ 类型很少需要被用到，而且通常比较低效，因为每次求值 ~define-record-clause~ 时，都要创建一次类型的运行时形式，而不是只在编译（展开）时创建一次。
+ 这种方式可以和参数对象 ~require-nongenerative-clause~ 结合使用，以捕获对 /generative record/ 类型的意外使用，同时避免在必须使用 /generative record/ 类型时的错误误报。 /Generative record/ 类型很少需要被用到，而且通常比较低效，因为每次求值 ~define-record-clause~ 时，都要创建一次类型的运行时形式，而不是只在编译（展开）时创建一次。
 
  thread parameter: require-nongenerative-clause
  
  库: (chezscheme)
 
- 这个环境参数存有一个布尔值，用来判定 ~define-record-type~ 是否必须有一个 /nongenerative/ 子句。默认值是 ~#f~. 上方的引言说明了为什么有人可能会想把它设置为 ~#t~.
+ 这个参数对象存有一个布尔值，用来判定 ~define-record-type~ 是否必须有一个 /nongenerative/ 子句。默认值是 ~#f~. 上方的引言说明了为什么有人可能会想把它设置为 ~#t~.
 
 
 *** 7.14. Record 相等性和哈希化 (Record Equality and Hashing)
@@ -1803,11 +1803,11 @@
 
  当比较两个 /eq?/ 的实例时， ~equal?~ 总是返回 ~#t~. 当比较两个共享相等性过程 /equal-proc/ 的 /non-eq?/ 的实例时， ~equal?~ 使用 /equal-proc/ 比较两个实例。如果两个实例 /x/ 和 /y/ 在继承链的相同位置上继承了一个相等性过程，则它们共享这个相等性过程，即， ~(record-equal-procedure x y)~ 返回一个过程 ~(equal-proc)~ 而不是 ~#f~. /equal?/ 传递给 /equal-proc/ 3 个参数：2 个实例，及一个能用来递归地比较 2 个实例内的值的 /eql?/ 过程。使用 /eql?/ 进行递归地比较是必要的，这样才能比较潜在的循环结构。当比较两个不共享相等性过程的 /non-eq?/ 实例时， ~equal?~ 返回 ~#f~.
 
- 通过环境参数 ~default-record-equal-procedure~ 可以指定一个用于所有 /record/ 类型（包括不透明类型）的默认相等性过程。只有在实例所属类型没有实现或继承一个类型专用的相等性过程时，这个默认过程才会被使用。
+ 通过参数对象 ~default-record-equal-procedure~ 可以指定一个用于所有 /record/ 类型（包括不透明类型）的默认相等性过程。只有在实例所属类型没有实现或继承一个类型专用的相等性过程时，这个默认过程才会被使用。
 
  类似的，当 ~equal-hash~ 直接哈希化一个 /record/ 实例时，它默认生成一个独立于实例所属类型和内容的值。对于一个 /record/ 类型的实例，通过使用 ~record-type-hash-procedure~ 把哈希过程和描述这个 /record/ 类型的 /record/ 类型描述符（rtd）关联起来，程序可以重载这种行为。 ~record-hash-procedure~ 过程可以沿着继承链，找到一个特定 /record/ 实例的哈希过程。 /equal-hash/ 传递给哈希过程 2 个参数：实例，和一个可用于递归地哈希化实例中的值的哈希过程。递归地进行哈希化是必要的，这样才能哈希化潜在的循环结构，并使得对共享结构的哈希化更为高效。
 
- 通过环境参数 ~default-record-hash-procedure~ 可以指定一个用于所有 /record/ 类型（包括不透明类型）的默认哈希过程。只有当实例所属类型没有实现或继承一个类型专用的哈希过程时，这个默认的哈希过程才会被使用。
+ 通过参数对象 ~default-record-hash-procedure~ 可以指定一个用于所有 /record/ 类型（包括不透明类型）的默认哈希过程。只有当实例所属类型没有实现或继承一个类型专用的哈希过程时，这个默认的哈希过程才会被使用。
 
  以下的例子说明了相等性过程和哈希过程的设置。
 
@@ -2014,7 +2014,7 @@
  The default printing of records of a given type may be overridden with record-writer.
  一个给定类型的 /record/ 的默认打印形式，可以通过 ~record-writer~ 重载。
 
- 默认的 /record/ 句法也能用作读取器的输入，只要在读取器所在的 Scheme 会话中，对应的 /record/ 类型已经被定义。环境参数 ~record-reader~ 可以被用于指定一个替代生成的名字的，供读取器辨识的不同名字。以这种方式指定一个不同的名字，同时会改变 /record/ 打印出的名字。读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
+ 默认的 /record/ 句法也能用作读取器的输入，只要在读取器所在的 Scheme 会话中，对应的 /record/ 类型已经被定义。参数对象 ~record-reader~ 可以被用于指定一个替代生成的名字的，供读取器辨识的不同名字。以这种方式指定一个不同的名字，同时会改变 /record/ 打印出的名字。读取器若遇到 ~#!r6rs~ ，则会在其后的输入流中禁用这些扩展，除非在更近的位置遇到 ~#!chezscheme~.
 
  标记 (~#n=~) 和引用 (~#n#~) 句法可在 /record/ 句法内使用，用于根据意图创建共享或环状结构。不过，所有环必须是可解析的，不能改变一个不可变 /record/ 字段。即，任何环必须包含至少一个指向可变字段的指针，不论它是个可变的 /record/ 字段，还是一个内置对象类型（如点对或向量）的可变字段。
 
