@@ -1,30 +1,39 @@
-Chapter 8. Numeric Operations
+* Chapter 8. Numeric Operations
 
 This chapter describes Chez Scheme extensions to the standard set of operations on numbers. See Chapter 6 of The Scheme Programming Language, 4th Edition or the Revised6 Report on Scheme for a description of standard operations on numbers.
+本章介绍了 Chez Scheme 对数字对象上的标准操作集的扩展。参见"The Scheme Programming Language, 第 4 版", 第 6 章，或 R^{6}RS 中对数字对象上标准操作的介绍。
 
-Chez Scheme supports the full set of Scheme numeric datatypes, including exact and inexact integer, rational, real, and complex numbers. A variety of representations are used to support these datatypes:
+Chez Scheme 支持全部 Scheme 数字类型，包括精确和不精确整数，有理数，实数，及复数。并使用了一系列表示形式支持这些数据类型：
 
 Fixnums
     represent exact integers in the fixnum range (see most-negative-fixnum and most-positive-fixnum). The length of a string, vector, or fxvector is constrained to be a fixnum.
+    在 fixnum 范围内表示精确整数（参见 most-negative-fixnum 和 most-positive-fixnum）。字符串，向量或 fxvector 的长度均被限定为 fixnum.
 
 Bignums
     represent arbitrary-precision exact integers outside of the fixnum range.
+    表示 fixnum 范围外的任意精度的精确整数。
 
 Ratnums
     represent arbitrary-precision exact rational numbers. Each ratnum contains an exact integer (fixnum or bignum) numerator and an exact integer denominator. Ratios are always reduced to lowest terms and never have a denominator of one or a numerator of zero.
+    表示任意精度的精确有理数。每个有理数包含一个精确整数分子（fixnum 或 bignum）和一个精确整数分母。分数总是被约分为最简形式，分母从不为 1，而分子永不会为 0.
 
 Flonums
     represent inexact real numbers. Flonums are IEEE 64-bit floating-point numbers. (Since flonums cannot represent irrational numbers, all inexact real numbers are actually rational, although they may approximate irrational quantities.)
+    表示不精确的实数。Flonums 是 IEEE 64 位浮点数。（由于 flonums 不能表示无理数，所有不精确的实数实际只是指有理数，虽然它们可能近似于无理数的数值）。
 
 Exact complexnums
     represent exact complex numbers. Each exact complexnum contains an exact rational (fixnum, bignum, or ratnum) real part and an exact rational imaginary part.
+    表示精确的复数。每个复数包含一个精确有理数（fixnum, bignum, 或 ratnum）的实部，和一个精确有理数的虚部。
 
 Inexact complexnums
     represent inexact complex numbers. Each inexact complexnum contains a flonum real part and a flonum imaginary part. 
+    表示不精确的复数。每个不精确的复数包含一个浮点数实部和一个浮点数虚部。
 
 Most numbers can be represented in only one way; however, real numbers are sometimes represented as inexact complex numbers with imaginary component equal to zero.
+大多数数字只能以一种方式表示；不过，实数有时会表示为虚部为 0 的不精确复数。
 
-Chez Scheme extends the syntax of numbers with arbitrary radixes from two through 36, nondecimal floating-point and scientific notation, and printed representations for IEEE infinities and NANs. (NAN stands for "not-a-number.")
+Chez Scheme
+extends the syntax of numbers with arbitrary radixes from two through 36, non decimal floating-point and scientific notation, and printed representations for IEEE infinities and NANs. (NAN stands for "not-a-number.")
 
 Arbitrary radixes are specified with the prefix #nr, where n ranges from 2 through 36. Digits beyond 9 are specified with the letters (in either upper or lower case) a through z. For example, #2r101 is 510, and #36rZ is 3510.
 
@@ -37,9 +46,9 @@ IEEE infinities are printed as +inf.0 and -inf.0, while IEEE NANs are printed as
 (/ 0.0 0.0) <graphic> +nan.0
 (/ +inf.0 -inf.0) <graphic> +nan.0
 
-The first section of this chapter describes type-specific numeric type predicates. Sections 8.2 through 8.4 describe fast, type-specific numeric operations on fixnums, flonums, and inexact complex numbers (flonums and/or inexact complexnums). The fixnum-specific versions should be used only when the programmer is certain that the operands and results (where appropriate) will be fixnums, i.e., integers in the range (most-negative-fixnum) to (most-positive-fixnum), inclusive. The flonum-specific versions should be used only when the inputs and outputs (where appropriate) are certain to be flonums. The mixed flonum/complexnum versions should be used only when the inputs are certain to be either flonums or inexact complexnums. Section 8.5 describes operations, both arbitrary precision and fixnum-specific, that allow exact integers to be treated as sets or sequences of bits. Random number generation is covered Section 8.6, and miscellaneous numeric operations are covered in the Section 8.7.
+The first section of this chapter describes type-specific numeric type predicates. Sections 8.2 through 8.4 describe fast, type-specific numeric operations on fixnums, flonums, and inexact complex numbers (flonums and/or inexact complexnums). The fixnum-specific versions should be used only when the programmer is certain that the operands and results (where appropriate) will be fixnums, i.e., integers in the range (most-negative-fixnum) to (most-positive-fixnum), inclusive. The flonum-specific versions should be used only when the inputs and outputs (where appropriate) are certain to be flonums. The mixed flonum/complexnum versions should be used only when the inputs are certain to be either flonums or inexact complexnums. ** Section 8.5 describes operations, both arbitrary precision and fixnum-specific, that allow exact integers to be treated as sets or sequences of bits. Random number generation is covered ** Section 8.6, and miscellaneous numeric operations are covered in the ** Section 8.7.
 
-Section 8.1. Numeric Type Predicates
+** Section 8.1. Numeric Type Predicates
 
 The Revised6 Report distinguishes two types of special numeric objects: fixnums and flonums. Chez Scheme additionally distinguishes bignums (exact integers outside of the fixnum range) and ratnums (ratios of exact integers). It also provides a predicate for recognizing cflonums, which are flonums or inexact complex numbers.
 
@@ -76,7 +85,7 @@ libraries: (chezscheme)
 (cflonum? +i) <graphic> #f
 (cflonum? +1.0i) <graphic> #t
 
-Section 8.2. Fixnum Operations
+** Section 8.2. Fixnum Operations
 
 Fixnum-specific procedures normally check their inputs and outputs (where appropriate), but at optimization level 3 the compiler generates, in most cases, code that does not perform these checks.
 
@@ -227,7 +236,7 @@ libraries: (chezscheme)
 (fxabs -1) <graphic> 1
 (fxabs 0) <graphic> 0
 
-Section 8.3. Flonum Operations
+** Section 8.3. Flonum Operations
 
 Inexact real numbers are normally represented by flonums. A flonum is a single 64-bit double-precision floating point number. This section describes operations on flonums, most of which accept flonum arguments and return flonum values. In most cases, the operations are inline-coded or coded as machine language subroutines at optimize-level 3 with no argument type checking; full type checking is performed at lower optimize levels. Flonum-specific procedure names begin with the prefix "fl" to set them apart from their generic counterparts.
 
@@ -334,7 +343,7 @@ fllp returns the 12-bit integer consisting of the exponent plus highest order re
 (fllp #b1.0e-1111111111) <graphic> 1
 (fllp #b1.0e-10000000000) <graphic> 0
 
-Section 8.4. Inexact Complex Operations
+** Section 8.4. Inexact Complex Operations
 
 The procedures described in this section provide mechanisms for creating and operating on inexact complex numbers. Inexact complex numbers with nonzero imaginary parts are represented as inexact complexnums. An inexact complexnum contains two 64-bit double-precision floating point numbers. Inexact complex numbers with imaginary parts equal to zero (in other words, inexact real numbers) may be represented as either inexact complexnums or flonums. The operations described in this section accept any mix of inexact complexnum and flonum arguments (collectively, "cflonums").
 
@@ -415,7 +424,7 @@ See also magnitude-squared, which is a generic version of this operator that ret
 (cfl-magnitude-squared 3.0) <graphic> 9.0
 (cfl-magnitude-squared 3.0-4.0i) <graphic> 25.0
 
-Section 8.5. Bitwise and Logical Operators
+** Section 8.5. Bitwise and Logical Operators
 
 Chez Scheme provides a set of logical operators that allow exact integers (fixnums and bignums) to be treated as sets or sequences of bits. These operators include logand (bitwise logical and), logior (bitwise logical or), logxor (bitwise logical exclusive or), lognot (bitwise logical not), logtest (test multiple bits), logbit? (test single bit), logbit0 (reset single bit), logbit1 (set single bit), and ash (arithmetic shift). Each of these operators treats its arguments as two's complement integers, regardless of the underlying representation. This treatment can be exploited to represent infinite sets: a negative number represents an infinite number of one bits beyond the leftmost zero, and a nonnegative number represents an infinite number of zero bits beyond the leftmost one bit.
 
@@ -745,7 +754,7 @@ fixnum is treated as a two's complement integer, regardless of the underlying re
 (fxsra -1 1) <graphic> -1
 (fxsra -64 3) <graphic> -8
 
-Section 8.6. Random Number Generation
+** Section 8.6. Random Number Generation
 
 procedure: (random real)
 returns: a nonnegative pseudo-random number less than real
@@ -769,7 +778,7 @@ When called without arguments, random-seed returns the current random seed. When
     (random-seed s)
     (eqv? (random 1.0) r1))) <graphic> #t
 
-Section 8.7. Miscellaneous Numeric Operations
+** Section 8.7. Miscellaneous Numeric Operations
 
 procedure: (= num1 num2 num3 ...)
 procedure: (< real1 real2 real3 ...)
