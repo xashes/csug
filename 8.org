@@ -32,211 +32,302 @@ Inexact complexnums
 Most numbers can be represented in only one way; however, real numbers are sometimes represented as inexact complex numbers with imaginary component equal to zero.
 大多数数字只能以一种方式表示；不过，实数有时会表示为虚部为 0 的不精确复数。
 
-Chez Scheme
+Chez Scheme 对数字对象的语法进行了扩展，包括 2 至 36 的任意基数，非十进制的浮点数，科学表示法，以及 IEEE 无穷数和 NAN（NAN 是 "not-a-number" 的缩写）的打印形式。
 extends the syntax of numbers with arbitrary radixes from two through 36, non decimal floating-point and scientific notation, and printed representations for IEEE infinities and NANs. (NAN stands for "not-a-number.")
 
 Arbitrary radixes are specified with the prefix #nr, where n ranges from 2 through 36. Digits beyond 9 are specified with the letters (in either upper or lower case) a through z. For example, #2r101 is 510, and #36rZ is 3510.
+任意基数由前缀#nr 指定，n 的范围是 2 至 36. 大于 9 的数字用字母 a 至 z 指定（大写小写均可）。例如，#2r101 是 510, 而#36rZ 是 3510.
 
 For higher radixes, an ambiguity arises between the interpretation of certain letters, e.g., e, as digits or exponent specifiers; in such cases, the letter is assumed to be a digit. For example, the e in #x3.2e5 is interpreted as a digit, not as an exponent marker, whereas in 3.2e5 it is treated as an exponent marker.
+对于较大的基数，对于特定字母的解读会出现歧义，例如，e， 作为数字还是作为指数指示符；在这类情况下，字母被当作一个数字。例如，在#x3.2e5 中，e 被解读为一个数字，而不作为指数标记。而在 3.2e5 中，e 则被当作指数标记。
 
-IEEE infinities are printed as +inf.0 and -inf.0, while IEEE NANs are printed as +nan.0 or -nan.0. (+nan.0 is used on output for all NANs.)
+IEEE 无穷数被打印为+inf.0 和-inf.0, 而 IEEE NANs 被打印为 +nan.0 或-nan.0. (+nan.0 被用作所有 NANs 的输出）
 
-(/ 1.0 0.0) <graphic> +inf.0
-(/ 1.0 -0.0) <graphic> -inf.0
-(/ 0.0 0.0) <graphic> +nan.0
-(/ +inf.0 -inf.0) <graphic> +nan.0
+#+BEGIN_SRC scheme
+  (/ 1.0 0.0) => +inf.0
+  (/ 1.0 -0.0) => -inf.0
+  (/ 0.0 0.0) => +nan.0
+  (/ +inf.0 -inf.0) => +nan.0
+#+END_SRC
 
-The first section of this chapter describes type-specific numeric type predicates. Sections 8.2 through 8.4 describe fast, type-specific numeric operations on fixnums, flonums, and inexact complex numbers (flonums and/or inexact complexnums). The fixnum-specific versions should be used only when the programmer is certain that the operands and results (where appropriate) will be fixnums, i.e., integers in the range (most-negative-fixnum) to (most-positive-fixnum), inclusive. The flonum-specific versions should be used only when the inputs and outputs (where appropriate) are certain to be flonums. The mixed flonum/complexnum versions should be used only when the inputs are certain to be either flonums or inexact complexnums. ** Section 8.5 describes operations, both arbitrary precision and fixnum-specific, that allow exact integers to be treated as sets or sequences of bits. Random number generation is covered ** Section 8.6, and miscellaneous numeric operations are covered in the ** Section 8.7.
+本章第 1 节介绍了特定类型的数字类型谓词。8.2 至 8.4 节介绍了应用于 fixnums, flonums, 和不精确的复数（flonums 和/或不精确的 complexnums）上的快速的，类型专用的数字操作。专用于 fixnum 的版本，应只用于程序员确定操作数和结果都会是 fixnum 时，即，整数在范围(most-negative-fixnum)至(most-positive-fixnum)之间时（两端均包含）。专用于 flonum 的版本，应只用于输入和输出确定为 flonum 时。flonum/complexnum 混合版本，应只用于输入确定为 flonum 或不精确的 complexnum 时。8.5 节介绍了支持把精确整数作为比特集合或序列的，任意精度和专用于 fixnum 的操作。8.6 节介绍了随机数生成，8.7 节介绍了其余各种数字操作。
 
-** Section 8.1. Numeric Type Predicates
+** Section 8.1. 数字类型谓词
 
 The Revised6 Report distinguishes two types of special numeric objects: fixnums and flonums. Chez Scheme additionally distinguishes bignums (exact integers outside of the fixnum range) and ratnums (ratios of exact integers). It also provides a predicate for recognizing cflonums, which are flonums or inexact complex numbers.
+R^{6}RS 区分了两种特殊的数字对象：fixnum 和 flonum. Chez Scheme 进一步区分了 bignum（fixnum 范围之外的精确整数）和 ratnum（精确整数的比值）。它同时也提供了一个识别 cflonum 的谓词，其为 flonum 或不精确的复数。
+
 
 procedure: (bignum? obj)
-returns: #t if obj is a bignum, otherwise #f
+
+返回: 如果 ~obj~ 是 bignum，则为 ~#t~, 否则为 ~#f~.
+
 libraries: (chezscheme)
 
-(bignum? 0) <graphic> #f
-(bignum? (most-positive-fixnum)) <graphic> #f
-(bignum? (most-negative-fixnum)) <graphic> #f
-(bignum? (* (most-positive-fixnum) 2)) <graphic> #t
-(bignum? 3/4) <graphic> #f
-(bignum? 'a) <graphic> #f
+#+BEGIN_SRC scheme
+  (bignum? 0) => #f
+  (bignum? (most-positive-fixnum)) => #f
+  (bignum? (most-negative-fixnum)) => #f
+  (bignum? (* (most-positive-fixnum) 2)) => #t
+  (bignum? 3/4) => #f
+  (bignum? 'a) => #f
+#+END_SRC
+
 
 procedure: (ratnum? obj)
-returns: #t if obj is a ratnum, otherwise #f
+
+返回: 如果 ~obj~ 是 ratnum，则为 ~#t~, 否则为 ~#f~.
+
 libraries: (chezscheme)
 
-(ratnum? 0) <graphic> #f
-(ratnum? (* (most-positive-fixnum) 2)) <graphic> #f
-(ratnum? 3/4) <graphic> #t
-(ratnum? -10/2) <graphic> #f
-(ratnum? -11/2) <graphic> #t
-(ratnum? 'a) <graphic> #f
+#+BEGIN_SRC scheme
+  (ratnum? 0) => #f
+  (ratnum? (* (most-positive-fixnum) 2)) => #f
+  (ratnum? 3/4) => #t
+  (ratnum? -10/2) => #f
+  (ratnum? -11/2) => #t
+  (ratnum? 'a) => #f
+#+END_SRC
+
 
 procedure: (cflonum? obj)
-returns: #t if obj is an inexact complexnum or flonum, otherwise #f
+
+返回: 如果 ~obj~ 是不精确的 complexnum 或 flonum，则为 ~#t~, 否则为 ~#f~.
+
 libraries: (chezscheme)
 
-(cflonum? 0) <graphic> #f
-(cflonum? 0.0) <graphic> #t
-(cflonum? 3+4i) <graphic> #f
-(cflonum? 3.0+4i) <graphic> #t
-(cflonum? +i) <graphic> #f
-(cflonum? +1.0i) <graphic> #t
+#+BEGIN_SRC scheme
+  (cflonum? 0) => #f
+  (cflonum? 0.0) => #t
+  (cflonum? 3+4i) => #f
+  (cflonum? 3.0+4i) => #t
+  (cflonum? +i) => #f
+  (cflonum? +1.0i) => #t
+#+END_SRC
 
-** Section 8.2. Fixnum Operations
+
+** Section 8.2. Fixnum 操作
 
 Fixnum-specific procedures normally check their inputs and outputs (where appropriate), but at optimization level 3 the compiler generates, in most cases, code that does not perform these checks.
+专用于 fixnum 的过程，通过会检查它们的输入和输出（需要时），但编译器在优化级别 3 下生成的代码，大多数情况下不执行这些检查。
 
 procedure: (most-positive-fixnum)
-returns: the most positive fixnum supported by the system
+
+returns: 系统支持的最大正 fixnum
+
 procedure: (most-negative-fixnum)
-returns: the most negative fixnum supported by the system
+
+returns: 系统支持的最大负 fixnum
+
 libraries: (chezscheme)
 
-These procedures are identical to the Revised6 Report greatest-fixnum and least-fixnum procedures.
+这些过程和 R^{6}RS 中的 greatest-fixnum 和 least-fixnum 过程一样。
+
 
 procedure: (fx= fixnum1 fixnum2 ...)
+
 procedure: (fx< fixnum1 fixnum2 ...)
+
 procedure: (fx> fixnum1 fixnum2 ...)
+
 procedure: (fx<= fixnum1 fixnum2 ...)
+
 procedure: (fx>= fixnum1 fixnum2 ...)
-returns: #t if the relation holds, #f otherwise
+
+返回: 如果关系成立，则为 ~#t~, 否则为 ~#f~.
+
 libraries: (chezscheme)
 
-The predicate fx= returns #t if its arguments are equal. The predicate fx< returns #t if its arguments are monotonically increasing, i.e., each argument is greater than the preceding ones, while fx> returns #t if its arguments are monotonically decreasing. The predicate fx<= returns #t if its arguments are monotonically nondecreasing, i.e., each argument is not less than the preceding ones, while fx>= returns #t if its arguments are monotonically nonincreasing. When passed only one argument, each of these predicates returns #t.
+谓词 fx=在其实参相等时返回#t。谓词 fx<在其实参单调递增时返回#t，即，每个实参都大于它前一个实参，而 fx>在其实参单调递减时返回#t。谓词 fx<=在其实参单调非递减时返回#t，即，每个实参不小于它前一个实参，而 fx>=在其实参单调非递增时返回#t。只传入一个实参时，这些谓词均返回#t。
 
-These procedures are similar to the Revised6 Report procedures fx=?, fx<?, fx>?, fx<=?, and fx>=? except that the Revised6 Report procedures require two or more arguments, and their names have the "?" suffix.
+这些过程与 R^{6}RS 中的过程 fx=?, fx<?, fx>?, fx<=?, 和 fx>=?类似，除了 R^{6}RS 中的过程需要 2 个或更多参数，以及它们的名称中都有 "?" 后缀以外。
 
-(fx= 0) <graphic> #t
-(fx= 0 0) <graphic> #t
-(fx< (most-negative-fixnum) 0 (most-positive-fixnum)) <graphic> #t
-(let ([x 3]) (fx<= 0 x 9)) <graphic> #t
-(fx<= 0 3 3) <graphic> #t
-(fx>= 0 0 (most-negative-fixnum)) <graphic> #t
+#+BEGIN_SRC scheme
+  (fx= 0) => #t
+  (fx= 0 0) => #t
+  (fx< (most-negative-fixnum) 0 (most-positive-fixnum)) => #t
+  (let ([x 3]) (fx<= 0 x 9)) => #t
+  (fx<= 0 3 3) => #t
+  (fx>= 0 0 (most-negative-fixnum)) => #t
+#+END_SRC
+
 
 procedure: (fxnonpositive? fixnum)
-returns: #t if fixnum is not greater than zero, #f otherwise
+
+返回: 如果 fixnum 不大于 0，则为 ~#t~, 否则为 ~#f~.
+
 procedure: (fxnonnegative? fixnum)
-returns: #t if fixnum is not less than zero, #f otherwise
+
+返回: 如果 fixnum 不小于 0，则为 ~#t~, 否则为 ~#f~.
+
 libraries: (chezscheme)
 
-fxnonpositive? is equivalent to (lambda (x) (fx<= x 0)), and fxnonnegative? is equivalent to (lambda (x) (fx>= x 0)).
+fxnonpositive?等价于(lambda (x) (fx<= x 0)), 而 fxnonnegative?等价于(lambda (x) (fx>= x 0)).
 
-(fxnonpositive? 128) <graphic> #f
-(fxnonpositive? 0) <graphic> #t
-(fxnonpositive? -1) <graphic> #t
+#+BEGIN_SRC scheme
+  (fxnonpositive? 128) => #f
+  (fxnonpositive? 0) => #t
+  (fxnonpositive? -1) => #t
 
-(fxnonnegative? -65) <graphic> #f
-(fxnonnegative? 0) <graphic> #t
-(fxnonnegative? 1) <graphic> #t
+  (fxnonnegative? -65) => #f
+  (fxnonnegative? 0) => #t
+  (fxnonnegative? 1) => #t
+#+END_SRC
+
 
 procedure: (fx+ fixnum ...)
-returns: the sum of the arguments fixnum ...
+
+returns: 实参 fixnum ...之和
+
 libraries: (chezscheme)
 
 When called with no arguments, fx+ returns 0.
+不带参数调用时，fx+返回 0.
 
-(fx+) <graphic> 0
-(fx+ 1 2) <graphic> 3
-(fx+ 3 4 5) <graphic> 12
-(apply fx+ '(1 2 3 4 5)) <graphic> 15
+#+BEGIN_SRC scheme
+  (fx+) => 0
+  (fx+ 1 2) => 3
+  (fx+ 3 4 5) => 12
+  (apply fx+ '(1 2 3 4 5)) => 15
+#+END_SRC
+
 
 procedure: (fx- fixnum1 fixnum2 ...)
-returns: a fixnum
+
+returns: 一个 fixnum
+
 libraries: (chezscheme)
 
-When called with one argument, fx- returns the negative of fixnum1. Thus, (fx- fixnum1) is an idiom for (fx- 0 fixnum1).
+调用时若只传入一个实参，fx-返回 fixnum1 的负值。即，(fx- fixnum1)相当于(fx- 0 fixnum1).
 
-When called with two or more arguments, fx- returns the result of subtracting the sum of the numbers fixnum2 ... from fixnum1.
+调用时若传入 2 个以上的实参，fx-返回从 fixnum1 中减去数字 fixnum2 ...之和的结果。
 
-(fx- 3) <graphic> -3
-(fx- 4 3) <graphic> 1
-(fx- 4 3 2 1) <graphic> -2
+#+BEGIN_SRC scheme
+  (fx- 3) => -3
+  (fx- 4 3) => 1
+  (fx- 4 3 2 1) => -2
+#+END_SRC
+
 
 procedure: (fx* fixnum ...)
-returns: the product of the arguments fixnum ...
+
+returns: 参数 fixnum ...的乘积
+
 libraries: (chezscheme)
 
 When called with no arguments, fx* returns 1.
+不带参数调用时，fx*返回 1.
 
-(fx*) <graphic> 1
-(fx* 1 2) <graphic> 2
-(fx* 3 -4 5) <graphic> -60
-(apply fx* '(1 -2 3 -4 5)) <graphic> 120
+#+BEGIN_SRC scheme
+  (fx*) => 1
+  (fx* 1 2) => 2
+  (fx* 3 -4 5) => -60
+  (apply fx* '(1 -2 3 -4 5)) => 120
+#+END_SRC
+
 
 procedure: (fx/ fixnum1 fixnum2 ...)
-returns: see explanation
+
+returns: 参见后面的解释
+
 libraries: (chezscheme)
 
-When called with one argument, fx/ returns the reciprocal of fixnum1. That is, (fx/ fixnum1) is an idiom for (fx/ 1 fixnum1).
+调用时若只传入一个实参，fx/返回 fixnum1 的倒数。即，(fx/ fixnum1)相当于(fx/ 1 fixnum1）.
 
-When called with two or more arguments, fx/ returns the result of dividing fixnum1 by the product of the remaining arguments fixnum2 ....
+调用时若传入 2 个以上的实参，fx/ 返回 fixnum1 除以其余实参 fixnum2 ...的乘积的结果。
 
-(fx/ 1) <graphic> 1
-(fx/ -17) <graphic> 0
-(fx/ 8 -2) <graphic> -4
-(fx/ -9 2) <graphic> -4
-(fx/ 60 5 3 2) <graphic> 2
+#+BEGIN_SRC scheme
+  (fx/ 1) => 1
+  (fx/ -17) => 0
+  (fx/ 8 -2) => -4
+  (fx/ -9 2) => -4
+  (fx/ 60 5 3 2) => 2
+#+END_SRC
+
 
 procedure: (fx1+ fixnum)
+
 procedure: (fx1- fixnum)
-returns: fixnum plus 1 or fixnum minus 1
+
+returns: fixnum 加 1 或 fixnum 减 1
+
 libraries: (chezscheme)
 
-(define fxplus
-  (lambda (x y)
-    (if (fxzero? x)
-        y
-        (fxplus (fx1- x) (fx1+ y)))))
+#+BEGIN_SRC scheme
+  (define fxplus
+    (lambda (x y)
+      (if (fxzero? x)
+          y
+          (fxplus (fx1- x) (fx1+ y)))))
 
-(fxplus 7 8) <graphic> 15
+  (fxplus 7 8) => 15
+#+END_SRC
 
-fx1+ and fx1- can be defined as follows:
+fx1+ 和 fx1- 可依如下定义：
 
-(define fx1+ (lambda (x) (fx+ x 1)))
-(define fx1- (lambda (x) (fx- x 1)))
+#+BEGIN_SRC scheme
+  (define fx1+ (lambda (x) (fx+ x 1)))
+  (define fx1- (lambda (x) (fx- x 1)))
+#+END_SRC
+
 
 procedure: (fxquotient fixnum1 fixnum2 ...)
-returns: see explanation
+
+returns: 参见后面的解释
+
 libraries: (chezscheme)
 
-fxquotient is identical to fx/. See the description of fx/ above.
+fxquotient 和 fx/一样。参见上面关于 fx/的介绍。
+
 
 procedure: (fxremainder fixnum1 fixnum2)
-returns: the fixnum remainder of fixnum1 divided by fixnum2
+
+returns: fixnum1 除以 fixnum2 的 fixnum 余数
+
 libraries: (chezscheme)
 
-The result of fxremainder has the same sign as fixnum1.
+fxremainder 结果的符号与 fixnum1 相同。
 
-(fxremainder 16 4) <graphic> 0
-(fxremainder 5 2) <graphic> 1
-(fxremainder -45 7) <graphic> -3
-(fxremainder 10 -3) <graphic> 1
-(fxremainder -17 -9) <graphic> -8
+#+BEGIN_SRC scheme
+  (fxremainder 16 4) => 0
+  (fxremainder 5 2) => 1
+  (fxremainder -45 7) => -3
+  (fxremainder 10 -3) => 1
+  (fxremainder -17 -9) => -8
+#+END_SRC
+
 
 procedure: (fxmodulo fixnum1 fixnum2)
-returns: the fixnum modulus of fixnum1 and fixnum2
+
+returns: fixnum1 和 fixnum2 的 fixnum 模数
+
 libraries: (chezscheme)
 
-The result of fxmodulo has the same sign as fixnum2.
+fxmodulo 结果的符号与 fixnum2 相同。
 
-(fxmodulo 16 4) <graphic> 0
-(fxmodulo 5 2) <graphic> 1
-(fxmodulo -45 7) <graphic> 4
-(fxmodulo 10 -3) <graphic> -2
-(fxmodulo -17 -9) <graphic> -8
+#+BEGIN_SRC scheme
+  (fxmodulo 16 4) => 0
+  (fxmodulo 5 2) => 1
+  (fxmodulo -45 7) => 4
+  (fxmodulo 10 -3) => -2
+  (fxmodulo -17 -9) => -8
+#+END_SRC
+
 
 procedure: (fxabs fixnum)
-returns: the absolute value of fixnum
+
+returns: fixnum 的绝对值
+
 libraries: (chezscheme)
 
-(fxabs 1) <graphic> 1
-(fxabs -1) <graphic> 1
-(fxabs 0) <graphic> 0
+#+BEGIN_SRC scheme
+  (fxabs 1) => 1
+  (fxabs -1) => 1
+  (fxabs 0) => 0
+#+END_SRC
 
-** Section 8.3. Flonum Operations
+
+** Section 8.3. Flonum 操作
 
 Inexact real numbers are normally represented by flonums. A flonum is a single 64-bit double-precision floating point number. This section describes operations on flonums, most of which accept flonum arguments and return flonum values. In most cases, the operations are inline-coded or coded as machine language subroutines at optimize-level 3 with no argument type checking; full type checking is performed at lower optimize levels. Flonum-specific procedure names begin with the prefix "fl" to set them apart from their generic counterparts.
 
@@ -248,9 +339,9 @@ libraries: (chezscheme)
 
 The truncated value of flonum must fall within the fixnum range. flonum->fixnum is a restricted version of exact, which converts any numeric representation to its exact equivalent.
 
-(flonum->fixnum 0.0) <graphic> 0
-(flonum->fixnum 3.9) <graphic> 3
-(flonum->fixnum -2.2) <graphic> -2
+(flonum->fixnum 0.0) => 0
+(flonum->fixnum 3.9) => 3
+(flonum->fixnum -2.2) => -2
 
 procedure: (fl= flonum1 flonum2 ...)
 procedure: (fl< flonum1 flonum2 ...)
@@ -266,17 +357,17 @@ IEEE NANs are not comparable, i.e., comparisons involving NANs always return #f.
 
 These procedures are similar to the Revised6 Report procedures fl=?, fl<?, fl>?, fl<=?, and fl>=? except that the Revised6 Report procedures require two or more arguments, and their names have the "?" suffix.
 
-(fl= 0.0) <graphic> #t
-(fl= 0.0 0.0) <graphic> #t
-(fl< -1.0 0.0 1.0) <graphic> #t
-(fl> -1.0 0.0 1.0) <graphic> #f
-(fl<= 0.0 3.0 3.0) <graphic> #t
-(fl>= 4.0 3.0 3.0) <graphic> #t
-(fl< 7.0 +inf.0) <graphic> #t
-(fl= +nan.0 0.0) <graphic> #f
-(fl= +nan.0 +nan.0) <graphic> #f
-(fl< +nan.0 +nan.0) <graphic> #f
-(fl> +nan.0 +nan.0) <graphic> #f
+(fl= 0.0) => #t
+(fl= 0.0 0.0) => #t
+(fl< -1.0 0.0 1.0) => #t
+(fl> -1.0 0.0 1.0) => #f
+(fl<= 0.0 3.0 3.0) => #t
+(fl>= 4.0 3.0 3.0) => #t
+(fl< 7.0 +inf.0) => #t
+(fl= +nan.0 0.0) => #f
+(fl= +nan.0 +nan.0) => #f
+(fl< +nan.0 +nan.0) => #f
+(fl> +nan.0 +nan.0) => #f
 
 procedure: (flnonpositive? fl)
 returns: #t if fl is not greater than zero, #f otherwise
@@ -288,21 +379,21 @@ flnonpositive? is equivalent to (lambda (x) (fl<= x 0.0)), and flnonnegative? is
 
 Even if the flonum representation distinguishes -0.0 from +0.0, both are considered nonpositive and nonnegative.
 
-(flnonpositive? 128.0) <graphic> #f
-(flnonpositive? 0.0) <graphic> #t
-(flnonpositive? -0.0) <graphic> #t
-(flnonpositive? -1.0) <graphic> #t
+(flnonpositive? 128.0) => #f
+(flnonpositive? 0.0) => #t
+(flnonpositive? -0.0) => #t
+(flnonpositive? -1.0) => #t
 
-(flnonnegative? -65.0) <graphic> #f
-(flnonnegative? 0.0) <graphic> #t
-(flnonnegative? -0.0) <graphic> #t
-(flnonnegative? 1.0) <graphic> #t
+(flnonnegative? -65.0) => #f
+(flnonnegative? 0.0) => #t
+(flnonnegative? -0.0) => #t
+(flnonnegative? 1.0) => #t
 
-(flnonnegative? +nan.0) <graphic> #f
-(flnonpositive? +nan.0) <graphic> #f
+(flnonnegative? +nan.0) => #f
+(flnonpositive? +nan.0) => #f
 
-(flnonnegative? +inf.0) <graphic> #t
-(flnonnegative? -inf.0) <graphic> #f
+(flnonnegative? +inf.0) => #t
+(flnonnegative? -inf.0) => #f
 
 procedure: (decode-float x)
 returns: see below
@@ -310,8 +401,8 @@ libraries: (chezscheme)
 
 x must be a flonum. decode-float returns a vector with three integer elements, m, e, and s, such that x = sm2e. It is useful primarily in the printing of floating-point numbers.
 
-(decode-float 1.0) <graphic> #(4503599627370496 -52 1)
-(decode-float -1.0) <graphic> #(4503599627370496 -52 -1)
+(decode-float 1.0) => #(4503599627370496 -52 1)
+(decode-float -1.0) => #(4503599627370496 -52 -1)
 
 (define slow-identity
   (lambda (x)
@@ -322,8 +413,8 @@ x must be a flonum. decode-float returns a vector with three integer elements, m
               [s (vector-ref v 2)])
           (* s m (expt 2 e)))))))
 
-(slow-identity 1.0) <graphic> 1.0
-(slow-identity -1e20) <graphic> -1e20
+(slow-identity 1.0) => 1.0
+(slow-identity -1e20) => -1e20
 
 procedure: (fllp flonum)
 returns: see below
@@ -331,17 +422,17 @@ libraries: (chezscheme)
 
 fllp returns the 12-bit integer consisting of the exponent plus highest order represented bit of a flonum (ieee 64-bit floating-point number). It can be used to compute a fast approximation of the logarithm of the number.
 
-(fllp 0.0) <graphic> 0
-(fllp 1.0) <graphic> 2046
-(fllp -1.0) <graphic> 2046
+(fllp 0.0) => 0
+(fllp 1.0) => 2046
+(fllp -1.0) => 2046
 
-(fllp 1.5) <graphic> 2047
+(fllp 1.5) => 2047
 
-(fllp +inf.0) <graphic> 4094
-(fllp -inf.0) <graphic> 4094
+(fllp +inf.0) => 4094
+(fllp -inf.0) => 4094
 
-(fllp #b1.0e-1111111111) <graphic> 1
-(fllp #b1.0e-10000000000) <graphic> 0
+(fllp #b1.0e-1111111111) => 1
+(fllp #b1.0e-10000000000) => 0
 
 ** Section 8.4. Inexact Complex Operations
 
@@ -355,9 +446,9 @@ libraries: (chezscheme)
 
 The inexact complexnum produced by fl-make-rectangular has real part equal to flonum1 and imaginary part equal to flonum2.
 
-(fl-make-rectangular 2.0 -3.0) <graphic> 2.0-3.0i
-(fl-make-rectangular 2.0 0.0) <graphic> 2.0+0.0i
-(fl-make-rectangular 2.0 -0.0) <graphic> 2.0-0.0i
+(fl-make-rectangular 2.0 -3.0) => 2.0-3.0i
+(fl-make-rectangular 2.0 0.0) => 2.0+0.0i
+(fl-make-rectangular 2.0 -0.0) => 2.0-0.0i
 
 procedure: (cfl-real-part cflonum)
 returns: the real part of cflonum
@@ -365,18 +456,18 @@ procedure: (cfl-imag-part cflonum)
 returns: the imaginary part of cflonum
 libraries: (chezscheme)
 
-(cfl-real-part 2.0-3.0i) <graphic> 2.0
-(cfl-imag-part 2.0-3.0i) <graphic> -3.0
-(cfl-imag-part 2.0-0.0i) <graphic> -0.0
-(cfl-imag-part 2.0-inf.0i) <graphic> -inf.0
+(cfl-real-part 2.0-3.0i) => 2.0
+(cfl-imag-part 2.0-3.0i) => -3.0
+(cfl-imag-part 2.0-0.0i) => -0.0
+(cfl-imag-part 2.0-inf.0i) => -inf.0
 
 procedure: (cfl= cflonum ...)
 returns: #t if its arguments are equal, #f otherwise
 libraries: (chezscheme)
 
-(cfl= 7.0+0.0i 7.0) <graphic> #t
-(cfl= 1.0+2.0i 1.0+2.0i) <graphic> #t
-(cfl= 1.0+2.0i 1.0-2.0i) <graphic> #f
+(cfl= 7.0+0.0i 7.0) => #t
+(cfl= 1.0+2.0i 1.0+2.0i) => #t
+(cfl= 1.0+2.0i 1.0-2.0i) => #f
 
 procedure: (cfl+ cflonum ...)
 procedure: (cfl* cflonum ...)
@@ -389,17 +480,17 @@ These procedures compute the sum, difference, product, or quotient of inexact co
 
 When passed zero arguments, cfl+ returns 0.0 and cfl* returns 1.0. When passed one argument, cfl- returns the additive inverse of the argument, and cfl/ returns the multiplicative inverse of the argument. When passed three or more arguments, cfl- returns the difference between its first and the sum of its remaining arguments, and cfl/ returns the quotient of its first and the product of its remaining arguments.
 
-(cfl+) <graphic> 0.0
-(cfl*) <graphic> 1.0
-(cfl- 5.0+1.0i) <graphic> -5.0-1.0i
-(cfl/ 2.0+2.0i) <graphic> 0.25-0.25i
+(cfl+) => 0.0
+(cfl*) => 1.0
+(cfl- 5.0+1.0i) => -5.0-1.0i
+(cfl/ 2.0+2.0i) => 0.25-0.25i
 
-(cfl+ 1.0+2.2i -3.7+5.3i) <graphic> -2.7+7.5i
-(cfl+ 1.0 -5.3) <graphic> -4.3
-(cfl+ 1.0 2.0 -5.3i) <graphic> 3.0-5.3i
-(cfl- 1.0+2.5i -3.7) <graphic> 4.7+2.5i
-(cfl* 1.0+2.0i 3.0+4.0i) <graphic> -5.0+10.0i
-(cfl/ -5.0+10.0i 1.0+2.0i 2.0) <graphic> 1.5+2.0i
+(cfl+ 1.0+2.2i -3.7+5.3i) => -2.7+7.5i
+(cfl+ 1.0 -5.3) => -4.3
+(cfl+ 1.0 2.0 -5.3i) => 3.0-5.3i
+(cfl- 1.0+2.5i -3.7) => 4.7+2.5i
+(cfl* 1.0+2.0i 3.0+4.0i) => -5.0+10.0i
+(cfl/ -5.0+10.0i 1.0+2.0i 2.0) => 1.5+2.0i
 
 procedure: (cfl-conjugate cflonum)
 returns: complex conjugate of cflonum
@@ -409,9 +500,9 @@ The procedure cfl-conjugate, when passed an inexact complex argument a + bi, ret
 
 See also conjugate, which is a generic version of this operator that returns the complex conjugate of any valid representation for a complex number.
 
-(cfl-conjugate 3.0) <graphic> 3.0
-(cfl-conjugate 3.0+4.0i) <graphic> 3.0-4.0i
-(cfl-conjugate 1e-20-2e-30i) <graphic> 1e-20+2e-30i
+(cfl-conjugate 3.0) => 3.0
+(cfl-conjugate 3.0+4.0i) => 3.0-4.0i
+(cfl-conjugate 1e-20-2e-30i) => 1e-20+2e-30i
 
 procedure: (cfl-magnitude-squared cflonum)
 returns: magnitude of cflonum squared
@@ -421,8 +512,8 @@ The procedure cfl-magnitude-squared, when passed an inexact complex argument a +
 
 See also magnitude-squared, which is a generic version of this operator that returns the magnitude squared of any valid representation for a complex number. Both operations are similar to the magnitude procedure, which returns the magnitude, sqrt(a2 + b2), of its generic complex argument.
 
-(cfl-magnitude-squared 3.0) <graphic> 9.0
-(cfl-magnitude-squared 3.0-4.0i) <graphic> 25.0
+(cfl-magnitude-squared 3.0) => 9.0
+(cfl-magnitude-squared 3.0-4.0i) => 25.0
 
 ** Section 8.5. Bitwise and Logical Operators
 
@@ -438,14 +529,14 @@ libraries: (chezscheme)
 
 The arguments must be exact integers (fixnums or bignums) and are treated as two's complement integers, regardless of the underlying representation. With no arguments, logand returns -1, i.e., all bits set.
 
-(logand) <graphic> -1
-(logand 15) <graphic> 15
-(logand -1 -1) <graphic> -1
-(logand -1 0) <graphic> 0
-(logand 5 3) <graphic> 1
-(logand #x173C8D95 7) <graphic> 5
-(logand #x173C8D95 -8) <graphic> #x173C8D90
-(logand #b1100 #b1111 #b1101) <graphic> #b1100
+(logand) => -1
+(logand 15) => 15
+(logand -1 -1) => -1
+(logand -1 0) => 0
+(logand 5 3) => 1
+(logand #x173C8D95 7) => 5
+(logand #x173C8D95 -8) => #x173C8D90
+(logand #b1100 #b1111 #b1101) => #b1100
 
 procedure: (logior int ...)
 procedure: (logor int ...)
@@ -454,14 +545,14 @@ libraries: (chezscheme)
 
 The arguments must be exact integers (fixnums or bignums) and are treated as two's complement integers, regardless of the underlying representation. With no arguments, logior returns 0, i.e., all bits reset.
 
-(logior) <graphic> 0
-(logior 15) <graphic> 15
-(logior -1 -1) <graphic> -1
-(logior -1 0) <graphic> -1
-(logior 5 3) <graphic> 7
-(logior #b111000 #b101010) <graphic> #b111010
-(logior #b1000 #b0100 #b0010) <graphic> #b1110
-(apply logior '(1 2 4 8 16)) <graphic> 31
+(logior) => 0
+(logior 15) => 15
+(logior -1 -1) => -1
+(logior -1 0) => -1
+(logior 5 3) => 7
+(logior #b111000 #b101010) => #b111010
+(logior #b1000 #b0100 #b0010) => #b1110
+(apply logior '(1 2 4 8 16)) => 31
 
 procedure: (logxor int ...)
 returns: the logical "exclusive or" of the arguments int ...
@@ -469,13 +560,13 @@ libraries: (chezscheme)
 
 The arguments must be exact integers (fixnums or bignums) and are treated as two's complement integers, regardless of the underlying representation. With no arguments, logxor returns 0, i.e., all bits reset.
 
-(logxor) <graphic> 0
-(logxor 15) <graphic> 15
-(logxor -1 -1) <graphic> 0
-(logxor -1 0) <graphic> -1
-(logxor 5 3) <graphic> 6
-(logxor #b111000 #b101010) <graphic> #b010010
-(logxor #b1100 #b0100 #b0110) <graphic> #b1110
+(logxor) => 0
+(logxor 15) => 15
+(logxor -1 -1) => 0
+(logxor -1 0) => -1
+(logxor 5 3) => 6
+(logxor #b111000 #b101010) => #b010010
+(logxor #b1100 #b0100 #b0110) => #b1110
 
 procedure: (lognot int)
 returns: the logical "not" of int
@@ -483,10 +574,10 @@ libraries: (chezscheme)
 
 The argument must be an exact integer (fixnum or bignum) and is treated as a two's complement integer, regardless of the underlying representation.
 
-(lognot -1) <graphic> 0
-(lognot 0) <graphic> -1
-(lognot 7) <graphic> -8
-(lognot -8) <graphic> 7
+(lognot -1) => 0
+(lognot 0) => -1
+(lognot 7) => -8
+(lognot -8) => 7
 
 procedure: (logbit? index int)
 returns: #t if the specified bit is set, otherwise #f
@@ -502,23 +593,23 @@ logbit? is equivalent to
 
 but more efficient.
 
-(logbit? 0 #b1110) <graphic> #f
-(logbit? 1 #b1110) <graphic> #t
-(logbit? 2 #b1110) <graphic> #t
-(logbit? 3 #b1110) <graphic> #t
-(logbit? 4 #b1110) <graphic> #f
-(logbit? 100 #b1110) <graphic> #f
+(logbit? 0 #b1110) => #f
+(logbit? 1 #b1110) => #t
+(logbit? 2 #b1110) => #t
+(logbit? 3 #b1110) => #t
+(logbit? 4 #b1110) => #f
+(logbit? 100 #b1110) => #f
 
-(logbit? 0 -6) <graphic> #f  ; the two's complement of -6 is 1...1010
-(logbit? 1 -6) <graphic> #t
-(logbit? 2 -6) <graphic> #f
-(logbit? 3 -6) <graphic> #t
-(logbit? 100 -6) <graphic> #t
+(logbit? 0 -6) => #f  ; the two's complement of -6 is 1...1010
+(logbit? 1 -6) => #t
+(logbit? 2 -6) => #f
+(logbit? 3 -6) => #t
+(logbit? 100 -6) => #t
 
-(logbit? (random 1000000) 0) <graphic> #f
-(logbit? (random 1000000) -1) <graphic> #t
+(logbit? (random 1000000) 0) => #f
+(logbit? (random 1000000) -1) => #t
 
-(logbit? 20000 (ash 1 20000)) <graphic> #t
+(logbit? 20000 (ash 1 20000)) => #t
 
 procedure: (logtest int1 int2)
 returns: #t if any common bits are set, otherwise #f
@@ -534,18 +625,18 @@ logtest is equivalent to
 
 but more efficient.
 
-(logtest #b10001 #b1110) <graphic> #f
-(logtest #b10101 #b1110) <graphic> #t
-(logtest #b111000 #b110111) <graphic> #t
+(logtest #b10001 #b1110) => #f
+(logtest #b10101 #b1110) => #t
+(logtest #b111000 #b110111) => #t
 
-(logtest #b101 -6) <graphic> #f  ; the two's complement of -6 is 1...1010
-(logtest #b1000 -6) <graphic> #t
-(logtest 100 -6) <graphic> #t
+(logtest #b101 -6) => #f  ; the two's complement of -6 is 1...1010
+(logtest #b1000 -6) => #t
+(logtest 100 -6) => #t
 
-(logtest (+ (random 1000000) 1) 0) <graphic> #f
-(logtest (+ (random 1000000) 1) -1) <graphic> #t
+(logtest (+ (random 1000000) 1) 0) => #f
+(logtest (+ (random 1000000) 1) -1) => #t
 
-(logtest (ash #b101 20000) (ash #b111 20000)) <graphic> #t
+(logtest (ash #b101 20000) (ash #b111 20000)) => #t
 
 procedure: (logbit0 index int)
 returns: the result of clearing bit index of int
@@ -561,9 +652,9 @@ logbit0 is equivalent to
 
 but more efficient.
 
-(logbit0 3 #b10101010) <graphic> #b10100010
-(logbit0 4 #b10101010) <graphic> #b10101010
-(logbit0 0 -1) <graphic> -2
+(logbit0 3 #b10101010) => #b10100010
+(logbit0 4 #b10101010) => #b10101010
+(logbit0 0 -1) => -2
 
 procedure: (logbit1 index int)
 returns: the result of setting bit index of int
@@ -579,10 +670,10 @@ logbit1 is equivalent to
 
 but more efficient.
 
-(logbit1 3 #b10101010) <graphic> #b10101010
-(logbit1 4 #b10101010) <graphic> #b10111010
-(logbit1 4 0) <graphic> #b10000
-(logbit1 0 -2) <graphic> -1
+(logbit1 3 #b10101010) => #b10101010
+(logbit1 4 #b10101010) => #b10111010
+(logbit1 4 0) => #b10000
+(logbit1 0 -2) => -1
 
 procedure: (ash int count)
 returns: int shifted left arithmetically by count.
@@ -590,11 +681,11 @@ libraries: (chezscheme)
 
 Both arguments must be exact integers. The first argument is treated as a two's complement integer, regardless of the underlying representation. If count is negative, int is shifted right by -count bits.
 
-(ash 8 0) <graphic> 8
-(ash 8 2) <graphic> 32
-(ash 8 -2) <graphic> 2
-(ash -1 2) <graphic> -4
-(ash -1 -2) <graphic> -1
+(ash 8 0) => 8
+(ash 8 2) => 32
+(ash 8 -2) => 2
+(ash -1 2) => -4
+(ash -1 -2) => -1
 
 procedure: (fxlogand fixnum ...)
 returns: the logical "and" of the arguments fixnum ...
@@ -602,13 +693,13 @@ libraries: (chezscheme)
 
 The arguments are treated as two's complement integers, regardless of the underlying representation. With no arguments, fxlogand returns -1, i.e., all bits set.
 
-(fxlogand) <graphic> -1
-(fxlogand 15) <graphic> 15
-(fxlogand -1 -1) <graphic> -1
-(fxlogand -1 0) <graphic> 0
-(fxlogand 5 3) <graphic> 1
-(fxlogand #b111000 #b101010) <graphic> #b101000
-(fxlogand #b1100 #b1111 #b1101) <graphic> #b1100
+(fxlogand) => -1
+(fxlogand 15) => 15
+(fxlogand -1 -1) => -1
+(fxlogand -1 0) => 0
+(fxlogand 5 3) => 1
+(fxlogand #b111000 #b101010) => #b101000
+(fxlogand #b1100 #b1111 #b1101) => #b1100
 
 procedure: (fxlogior fixnum ...)
 procedure: (fxlogor fixnum ...)
@@ -617,13 +708,13 @@ libraries: (chezscheme)
 
 The arguments are treated as two's complement integers, regardless of the underlying representation. With no arguments, fxlogior returns 0, i.e., all bits reset.
 
-(fxlogior) <graphic> 0
-(fxlogior 15) <graphic> 15
-(fxlogior -1 -1) <graphic> -1
-(fxlogior -1 0) <graphic> -1
-(fxlogior #b111000 #b101010) <graphic> #b111010
-(fxlogior #b1000 #b0100 #b0010) <graphic> #b1110
-(apply fxlogior '(1 2 4 8 16)) <graphic> 31
+(fxlogior) => 0
+(fxlogior 15) => 15
+(fxlogior -1 -1) => -1
+(fxlogior -1 0) => -1
+(fxlogior #b111000 #b101010) => #b111010
+(fxlogior #b1000 #b0100 #b0010) => #b1110
+(apply fxlogior '(1 2 4 8 16)) => 31
 
 procedure: (fxlogxor fixnum ...)
 returns: the logical "exclusive or" of the arguments fixnum ...
@@ -631,13 +722,13 @@ libraries: (chezscheme)
 
 The arguments are treated as two's complement integers, regardless of the underlying representation. With no arguments, fxlogxor returns 0, i.e., all bits reset.
 
-(fxlogxor) <graphic> 0
-(fxlogxor 15) <graphic> 15
-(fxlogxor -1 -1) <graphic> 0
-(fxlogxor -1 0) <graphic> -1
-(fxlogxor 5 3) <graphic> 6
-(fxlogxor #b111000 #b101010) <graphic> #b010010
-(fxlogxor #b1100 #b0100 #b0110) <graphic> #b1110
+(fxlogxor) => 0
+(fxlogxor 15) => 15
+(fxlogxor -1 -1) => 0
+(fxlogxor -1 0) => -1
+(fxlogxor 5 3) => 6
+(fxlogxor #b111000 #b101010) => #b010010
+(fxlogxor #b1100 #b0100 #b0110) => #b1110
 
 procedure: (fxlognot fixnum)
 returns: the logical "not" of fixnum
@@ -645,10 +736,10 @@ libraries: (chezscheme)
 
 The argument is treated as a two's complement integer, regardless of the underlying representation.
 
-(fxlognot -1) <graphic> 0
-(fxlognot 0) <graphic> -1
-(fxlognot 1) <graphic> -2
-(fxlognot -2) <graphic> 1
+(fxlognot -1) => 0
+(fxlognot 0) => -1
+(fxlognot 1) => -2
+(fxlognot -2) => 1
 
 procedure: (fxlogbit? index fixnum)
 returns: #t if the specified bit is set, otherwise #f
@@ -658,21 +749,21 @@ index must be a nonnegative fixnum. fixnum is treated as a two's complement inte
 
 fxlogbit? returns #t if the bit at index index of fixnum is set (one) and #f otherwise. The index is zero-based, counting from the lowest-order toward higher-order bits. The index is limited only by the fixnum range; for nonnegative values of fixnum, the bits above the highest order set bit are all considered to be zero, and for negative values, the bits above the highest order reset bit are all considered to be one.
 
-(fxlogbit? 0 #b1110) <graphic> #f
-(fxlogbit? 1 #b1110) <graphic> #t
-(fxlogbit? 2 #b1110) <graphic> #t
-(fxlogbit? 3 #b1110) <graphic> #t
-(fxlogbit? 4 #b1110) <graphic> #f
-(fxlogbit? 100 #b1110) <graphic> #f
+(fxlogbit? 0 #b1110) => #f
+(fxlogbit? 1 #b1110) => #t
+(fxlogbit? 2 #b1110) => #t
+(fxlogbit? 3 #b1110) => #t
+(fxlogbit? 4 #b1110) => #f
+(fxlogbit? 100 #b1110) => #f
 
-(fxlogbit? 0 -6) <graphic> #f  ; the two's complement of -6 is 1...1010
-(fxlogbit? 1 -6) <graphic> #t
-(fxlogbit? 2 -6) <graphic> #f
-(fxlogbit? 3 -6) <graphic> #t
-(fxlogbit? 100 -6) <graphic> #t
+(fxlogbit? 0 -6) => #f  ; the two's complement of -6 is 1...1010
+(fxlogbit? 1 -6) => #t
+(fxlogbit? 2 -6) => #f
+(fxlogbit? 3 -6) => #t
+(fxlogbit? 100 -6) => #t
 
-(fxlogbit? (random 1000000) 0) <graphic> #f
-(fxlogbit? (random 1000000) -1) <graphic> #t
+(fxlogbit? (random 1000000) 0) => #f
+(fxlogbit? (random 1000000) -1) => #t
 
 procedure: (fxlogtest fixnum1 fixnum2)
 returns: #t if any common bits are set, otherwise #f
@@ -682,16 +773,16 @@ The arguments are treated as two's complement integers, regardless of the underl
 
 fxlogtest returns #t if any bit set in one argument is also set in the other. It returns #f if the two arguments have no set bits in common.
 
-(fxlogtest #b10001 #b1110) <graphic> #f
-(fxlogtest #b10101 #b1110) <graphic> #t
-(fxlogtest #b111000 #b110111) <graphic> #t
+(fxlogtest #b10001 #b1110) => #f
+(fxlogtest #b10101 #b1110) => #t
+(fxlogtest #b111000 #b110111) => #t
 
-(fxlogtest #b101 -6) <graphic> #f  ; the two's complement of -6 is 1...1010
-(fxlogtest #b1000 -6) <graphic> #t
-(fxlogtest 100 -6) <graphic> #t
+(fxlogtest #b101 -6) => #f  ; the two's complement of -6 is 1...1010
+(fxlogtest #b1000 -6) => #t
+(fxlogtest 100 -6) => #t
 
-(fxlogtest (+ (random 1000000) 1) 0) <graphic> #f
-(fxlogtest (+ (random 1000000) 1) -1) <graphic> #t
+(fxlogtest (+ (random 1000000) 1) 0) => #f
+(fxlogtest (+ (random 1000000) 1) -1) => #t
 
 procedure: (fxlogbit0 index fixnum)
 returns: the result of clearing bit index of fixnum
@@ -705,9 +796,9 @@ fxlogbit0 is equivalent to
 
 but more efficient.
 
-(fxlogbit0 3 #b10101010) <graphic> #b10100010
-(fxlogbit0 4 #b10101010) <graphic> #b10101010
-(fxlogbit0 0 -1) <graphic> -2
+(fxlogbit0 3 #b10101010) => #b10100010
+(fxlogbit0 4 #b10101010) => #b10101010
+(fxlogbit0 0 -1) => -2
 
 procedure: (fxlogbit1 index fixnum)
 returns: the result of setting bit index of fixnum
@@ -721,10 +812,10 @@ fxlogbit1 is equivalent to
 
 but more efficient.
 
-(fxlogbit1 3 #b10101010) <graphic> #b10101010
-(fxlogbit1 4 #b10101010) <graphic> #b10111010
-(fxlogbit1 4 0) <graphic> #b10000
-(fxlogbit1 0 -2) <graphic> -1
+(fxlogbit1 3 #b10101010) => #b10101010
+(fxlogbit1 4 #b10101010) => #b10111010
+(fxlogbit1 4 0) => #b10000
+(fxlogbit1 0 -2) => -1
 
 procedure: (fxsll fixnum count)
 returns: fixnum shifted left by count
@@ -732,8 +823,8 @@ libraries: (chezscheme)
 
 fixnum is treated as a two's complement integer, regardless of the underlying representation. count must be nonnegative and not more than the number of bits in a fixnum, i.e., (+ (integer-length (most-positive-fixnum)) 1). An exception is raised with condition-type &implementation-restriction if the result cannot be represented as a fixnum.
 
-(fxsll 1 2) <graphic> 4
-(fxsll -1 2) <graphic> -4
+(fxsll 1 2) => 4
+(fxsll -1 2) => -4
 
 procedure: (fxsrl fixnum count)
 returns: fixnum logically shifted right by count
@@ -741,8 +832,8 @@ libraries: (chezscheme)
 
 fixnum is treated as a two's complement integer, regardless of the underlying representation. count must be nonnegative and not more than the number of bits in a fixnum, i.e., (+ (integer-length (most-positive-fixnum)) 1).
 
-(fxsrl 4 2) <graphic> 1
-(= (fxsrl -1 1) (most-positive-fixnum)) <graphic> #t
+(fxsrl 4 2) => 1
+(= (fxsrl -1 1) (most-positive-fixnum)) => #t
 
 procedure: (fxsra fixnum count)
 returns: fixnum arithmetically shifted right by count
@@ -750,9 +841,9 @@ libraries: (chezscheme)
 
 fixnum is treated as a two's complement integer, regardless of the underlying representation. count must be nonnegative and not more than the number of bits in a fixnum, i.e., (+ (integer-length (most-positive-fixnum)) 1).
 
-(fxsra 64 3) <graphic> 8
-(fxsra -1 1) <graphic> -1
-(fxsra -64 3) <graphic> -8
+(fxsra 64 3) => 8
+(fxsra -1 1) => -1
+(fxsra -64 3) => -8
 
 ** Section 8.6. Random Number Generation
 
@@ -762,9 +853,9 @@ libraries: (chezscheme)
 
 real must be a positive integer or positive inexact real number.
 
-(random 1) <graphic> 0
-(random 1029384535235) <graphic> 1029384535001, every now and then
-(random 1.0) <graphic> 0.5, every now and then
+(random 1) => 0
+(random 1029384535235) => 1029384535001, every now and then
+(random 1.0) => 0.5, every now and then
 
 thread parameter: random-seed
 libraries: (chezscheme)
@@ -776,7 +867,7 @@ When called without arguments, random-seed returns the current random seed. When
 (let ([s (random-seed)])
   (let ([r1 (random 1.0)])
     (random-seed s)
-    (eqv? (random 1.0) r1))) <graphic> #t
+    (eqv? (random 1.0) r1))) => #t
 
 ** Section 8.7. Miscellaneous Numeric Operations
 
@@ -790,9 +881,9 @@ libraries: (chezscheme)
 
 These predicates are identical to the Revised6 Report counterparts, except they are extended to accept one or more rather than two or more arguments. When passed one argument, each of these predicates returns #t.
 
-(> 3/4) <graphic> #t
-(< 3/4) <graphic> #t
-(= 3/4) <graphic> #t
+(> 3/4) => #t
+(< 3/4) => #t
+(= 3/4) => #t
 
 procedure: (1+ num)
 procedure: (add1 num)
@@ -811,7 +902,7 @@ libraries: (chezscheme)
         y
         (plus (1- x) (1+ y)))))
 
-(plus 7 8) <graphic> 15
+(plus 7 8) => 15
 
 (define double
  ; x should be a nonnegative integer
@@ -820,7 +911,7 @@ libraries: (chezscheme)
         0
         (add1 (add1 (double (sub1 x)))))))
 
-(double 7) <graphic> 14
+(double 7) => 14
 
 procedure: (expt-mod int1 int2 int3)
 returns: int1 raised to the int2 power, modulo int3
@@ -828,21 +919,21 @@ libraries: (chezscheme)
 
 int1, int2 and int3 must be nonnegative integers. expt-mod performs its computation in such a way that the intermediate results are never much larger than int3. This means that when int2 is large, expt-mod is more efficient than the equivalent procedure (lambda (x y z) (modulo (expt x y) z)).
 
-(expt-mod 2 4 3) <graphic> 1
-(expt-mod 2 76543 76543) <graphic> 2
+(expt-mod 2 4 3) => 1
+(expt-mod 2 76543 76543) => 2
 
 procedure: (isqrt n)
 returns: the integer square root of n
 libraries: (chezscheme)
 
-n must be a nonnegative integer. The integer square root of n is defined to be <graphic>.
+n must be a nonnegative integer. The integer square root of n is defined to be =>.
 
-(isqrt 0) <graphic> 0
-(isqrt 16) <graphic> 4
-(isqrt 16.0) <graphic> 4.0
-(isqrt 20) <graphic> 4
-(isqrt 20.0) <graphic> 4.0
-(isqrt (* 2 (expt 10 20))) <graphic> 14142135623
+(isqrt 0) => 0
+(isqrt 16) => 4
+(isqrt 16.0) => 4.0
+(isqrt 20) => 4
+(isqrt 20.0) => 4.0
+(isqrt (* 2 (expt 10 20))) => 14142135623
 
 procedure: (integer-length n)
 returns: see below
@@ -850,17 +941,17 @@ libraries: (chezscheme)
 
 The procedure integer-length returns the length in bits of the smallest two's complement representation for n, with an assumed leading 1 (sign) bit for negative numbers. For zero, integer-length returns 0.
 
-(integer-length 0) <graphic> 0
-(integer-length 1) <graphic> 1
-(integer-length 2) <graphic> 2
-(integer-length 3) <graphic> 2
-(integer-length 4) <graphic> 3
-(integer-length #b10000000) <graphic> 8
-(integer-length #b11111111) <graphic> 8
-(integer-length -1) <graphic> 0
-(integer-length -2) <graphic> 1
-(integer-length -3) <graphic> 2
-(integer-length -4) <graphic> 2
+(integer-length 0) => 0
+(integer-length 1) => 1
+(integer-length 2) => 2
+(integer-length 3) => 2
+(integer-length 4) => 3
+(integer-length #b10000000) => 8
+(integer-length #b11111111) => 8
+(integer-length -1) => 0
+(integer-length -2) => 1
+(integer-length -3) => 2
+(integer-length -4) => 2
 
 procedure: (nonpositive? real)
 returns: #t if real is not greater than zero, #f otherwise
@@ -868,10 +959,10 @@ libraries: (chezscheme)
 
 nonpositive? is equivalent to (lambda (x) (<= x 0)).
 
-(nonpositive? 128) <graphic> #f
-(nonpositive? 0.0) <graphic> #t
-(nonpositive? 1.8e-15) <graphic> #f
-(nonpositive? -2/3) <graphic> #t
+(nonpositive? 128) => #f
+(nonpositive? 0.0) => #t
+(nonpositive? 1.8e-15) => #f
+(nonpositive? -2/3) => #t
 
 procedure: (nonnegative? real)
 returns: #t if real is not less than zero, #f otherwise
@@ -879,10 +970,10 @@ libraries: (chezscheme)
 
 nonnegative? is equivalent to (lambda (x) (>= x 0)).
 
-(nonnegative? -65) <graphic> #f
-(nonnegative? 0) <graphic> #t
-(nonnegative? -0.0121) <graphic> #f
-(nonnegative? 15/16) <graphic> #t
+(nonnegative? -65) => #f
+(nonnegative? 0) => #t
+(nonnegative? -0.0121) => #f
+(nonnegative? 15/16) => #t
 
 procedure: (conjugate num)
 returns: complex conjugate of num
@@ -890,9 +981,9 @@ libraries: (chezscheme)
 
 The procedure conjugate, when passed a complex argument a + bi, returns its complex conjugate a + (-b)i.
 
-(conjugate 3.0+4.0i) <graphic> 3.0-4.0i
-(conjugate 1e-20-2e-30i) <graphic> 1e-20+2e-30i
-(conjugate 3) <graphic> 3
+(conjugate 3.0+4.0i) => 3.0-4.0i
+(conjugate 1e-20-2e-30i) => 1e-20+2e-30i
+(conjugate 3) => 3
 
 procedure: (magnitude-squared num)
 returns: magnitude of num squared
@@ -900,8 +991,8 @@ libraries: (chezscheme)
 
 The procedure magnitude-squared, when passed a complex argument a + bi returns its magnitude squared, i.e., a2 + b2.
 
-(magnitude-squared 3.0-4.0i) <graphic> 25.0
-(magnitude-squared 3.0) <graphic> 9.0
+(magnitude-squared 3.0-4.0i) => 25.0
+(magnitude-squared 3.0) => 9.0
 
 procedure: (sinh num)
 procedure: (cosh num)
@@ -909,9 +1000,9 @@ procedure: (tanh num)
 returns: the hyperbolic sine, cosine, or tangent of num
 libraries: (chezscheme)
 
-(sinh 0.0) <graphic> 0.0
-(cosh 0.0) <graphic> 1.0
-(tanh -0.0) <graphic> -0.0
+(sinh 0.0) => 0.0
+(cosh 0.0) => 1.0
+(tanh -0.0) => -0.0
 
 procedure: (asinh num)
 procedure: (acosh num)
@@ -919,9 +1010,9 @@ procedure: (atanh num)
 returns: the hyperbolic arc sine, arc cosine, or arc tangent of num
 libraries: (chezscheme)
 
-(acosh 0.0) <graphic> 0.0+1.5707963267948966i
-(acosh 1.0) <graphic> 0.0
-(atanh -1.0) <graphic> -inf.0
+(acosh 0.0) => 0.0+1.5707963267948966i
+(acosh 1.0) => 0.0
+(atanh -1.0) => -inf.0
 
 procedure: (string->number string)
 procedure: (string->number string radix)
@@ -930,8 +1021,8 @@ libraries: (chezscheme)
 
 This procedure is identical to the Revised6 Report version except that radix may be any exact integer between 2 and 36, inclusive. The Revised6 Report version requires radix to be in the set {2,8,10,16}.
 
-(string->number "211012" 3) <graphic> 559
-(string->number "tobeornottobe" 36) <graphic> 140613689159812836698
+(string->number "211012" 3) => 559
+(string->number "tobeornottobe" 36) => 140613689159812836698
 
 procedure: (number->string num)
 procedure: (number->string num radix)
@@ -941,8 +1032,8 @@ libraries: (chezscheme)
 
 This procedure is identical to the Revised6 Report version except that radix may be any exact integer between 2 and 36, inclusive. The Revised6 Report version requires radix to be in the set {2,8,10,16}.
 
-(number->string 10000 4) <graphic> "2130100"
-(number->string 10000 27) <graphic> "DJA"
+(number->string 10000 4) => "2130100"
+(number->string 10000 27) => "DJA"
 
 Chez Scheme Version 9 User's Guide
 Copyright © 2018 Cisco Systems, Inc.
