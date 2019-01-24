@@ -536,44 +536,58 @@ These procedures compute the sum, difference, product, or quotient of inexact co
 这些过程计算不精确复数数值的和，差，积或商，不论这些数值是以 flonums 表示，或以不精确 complexnums 表示。例如，如果 cfl+收到 2 个 flonum 实参 a 和 b，它返回它们的和 a + b; 在这种情况下，它和 fl+ 的行为一样。若 2 个实参为不精确 complexnum a + bi 和 c + di, 它返回和 (a + c) + (b + d)i. 若 1 个实参为 flonum a，而另一个为不精确 complexnum c + di, cfl+ 返回 (a + c) + di.
 
 When passed zero arguments, cfl+ returns 0.0 and cfl* returns 1.0. When passed one argument, cfl- returns the additive inverse of the argument, and cfl/ returns the multiplicative inverse of the argument. When passed three or more arguments, cfl- returns the difference between its first and the sum of its remaining arguments, and cfl/ returns the quotient of its first and the product of its remaining arguments.
-当传入 0 个实参，cfl+ 返回 0.0，而 cfl* 返回 1.0. 当传入 1 个实参，
+当传入 0 个实参，cfl+ 返回 0.0，而 cfl* 返回 1.0. 当传入 1 个实参，cfl- 返回实参的加法逆元，而 cfl/ 返回实参的乘法逆元。当传入 3 个或更多实参，cfl- 返回其第一个实参与其余实参之和的差，而 cfl/ 返回其第一个实参与其余实参之积的商。
 
-(cfl+) => 0.0
-(cfl*) => 1.0
-(cfl- 5.0+1.0i) => -5.0-1.0i
-(cfl/ 2.0+2.0i) => 0.25-0.25i
+#+BEGIN_SRC scheme
+  (cfl+) => 0.0
+  (cfl*) => 1.0
+  (cfl- 5.0+1.0i) => -5.0-1.0i
+  (cfl/ 2.0+2.0i) => 0.25-0.25i
 
-(cfl+ 1.0+2.2i -3.7+5.3i) => -2.7+7.5i
-(cfl+ 1.0 -5.3) => -4.3
-(cfl+ 1.0 2.0 -5.3i) => 3.0-5.3i
-(cfl- 1.0+2.5i -3.7) => 4.7+2.5i
-(cfl* 1.0+2.0i 3.0+4.0i) => -5.0+10.0i
-(cfl/ -5.0+10.0i 1.0+2.0i 2.0) => 1.5+2.0i
+  (cfl+ 1.0+2.2i -3.7+5.3i) => -2.7+7.5i
+  (cfl+ 1.0 -5.3) => -4.3
+  (cfl+ 1.0 2.0 -5.3i) => 3.0-5.3i
+  (cfl- 1.0+2.5i -3.7) => 4.7+2.5i
+  (cfl* 1.0+2.0i 3.0+4.0i) => -5.0+10.0i
+  (cfl/ -5.0+10.0i 1.0+2.0i 2.0) => 1.5+2.0i
+#+END_SRC
+
 
 procedure: (cfl-conjugate cflonum)
-returns: complex conjugate of cflonum
+
+returns: cflonum 的共轭复数
+
 libraries: (chezscheme)
 
-The procedure cfl-conjugate, when passed an inexact complex argument a + bi, returns its complex conjugate a + (-b)i.
+当传入一个不精确的复数实参 a + bi 时，过程 cfl-conjugate 返回它的共轭复数 a + (-b)i.
 
-See also conjugate, which is a generic version of this operator that returns the complex conjugate of any valid representation for a complex number.
+参见 conjugate, 其为这个操作符的通用版本，对于一个复数的任何有效表现形式，返回其共轭复数。
 
-(cfl-conjugate 3.0) => 3.0
-(cfl-conjugate 3.0+4.0i) => 3.0-4.0i
-(cfl-conjugate 1e-20-2e-30i) => 1e-20+2e-30i
+#+BEGIN_SRC scheme
+  (cfl-conjugate 3.0) => 3.0
+  (cfl-conjugate 3.0+4.0i) => 3.0-4.0i
+  (cfl-conjugate 1e-20-2e-30i) => 1e-20+2e-30i
+#+END_SRC
+
 
 procedure: (cfl-magnitude-squared cflonum)
-returns: magnitude of cflonum squared
+
+returns: cflonum 的模的平方
+
 libraries: (chezscheme)
 
-The procedure cfl-magnitude-squared, when passed an inexact complex argument a + bi returns a flonum representing the magnitude of the argument squared, i.e., a2 + b2.
+当传入 1 个不精确的复数实参 a + bi, 过程 cfl-magnitude-squared 返回一个表示此实参的模的平方的 flonum, 即，a^2 + b^2.
 
-See also magnitude-squared, which is a generic version of this operator that returns the magnitude squared of any valid representation for a complex number. Both operations are similar to the magnitude procedure, which returns the magnitude, sqrt(a2 + b2), of its generic complex argument.
+参见 magnitude-squared, 其为此操作符的通用版本，对于 1 个复数的任何有效表示形式，返回它的模的平方。这两个操作都类似于过程 magnitude, 其返回它的复数实参的模，sqrt(a2 + b2).
+, of its generic complex argument.
 
-(cfl-magnitude-squared 3.0) => 9.0
-(cfl-magnitude-squared 3.0-4.0i) => 25.0
+#+BEGIN_SRC scheme
+  (cfl-magnitude-squared 3.0) => 9.0
+  (cfl-magnitude-squared 3.0-4.0i) => 25.0
+#+END_SRC
 
-** Section 8.5. Bitwise and Logical Operators
+
+** Section 8.5. 位运算符和逻辑运算符
 
 Chez Scheme provides a set of logical operators that allow exact integers (fixnums and bignums) to be treated as sets or sequences of bits. These operators include logand (bitwise logical and), logior (bitwise logical or), logxor (bitwise logical exclusive or), lognot (bitwise logical not), logtest (test multiple bits), logbit? (test single bit), logbit0 (reset single bit), logbit1 (set single bit), and ash (arithmetic shift). Each of these operators treats its arguments as two's complement integers, regardless of the underlying representation. This treatment can be exploited to represent infinite sets: a negative number represents an infinite number of one bits beyond the leftmost zero, and a nonnegative number represents an infinite number of zero bits beyond the leftmost one bit.
 
