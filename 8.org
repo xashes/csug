@@ -587,359 +587,499 @@ libraries: (chezscheme)
 #+END_SRC
 
 
-** Section 8.5. 位运算符和逻辑运算符
+** Section 8.5. 位和逻辑运算符
 
-Chez Scheme provides a set of logical operators that allow exact integers (fixnums and bignums) to be treated as sets or sequences of bits. These operators include logand (bitwise logical and), logior (bitwise logical or), logxor (bitwise logical exclusive or), lognot (bitwise logical not), logtest (test multiple bits), logbit? (test single bit), logbit0 (reset single bit), logbit1 (set single bit), and ash (arithmetic shift). Each of these operators treats its arguments as two's complement integers, regardless of the underlying representation. This treatment can be exploited to represent infinite sets: a negative number represents an infinite number of one bits beyond the leftmost zero, and a nonnegative number represents an infinite number of zero bits beyond the leftmost one bit.
+Chez Scheme 提供了一系列的逻辑运算符，以支持把精确整数 (fixnums 和 bignums) 作为位集合或位序列来处理。这些运算符包括 logand（逐位的逻辑与），logior（逐位的逻辑或），logxor（逐位的逻辑异或），lognot（逐位的逻辑非），logtest（测试多位），logbit?（测试单个位），logbit0（重置单个位），logbit1（设置单个位），以及 ash（算术移位）。这些运算符均把它的实参作为补码整数处理，不论这些实参的底层表示形式是什么。这种处理方法可被利用于表示无穷集合：TODO
+This treatment can be exploited to represent infinite sets: a negative number represents an infinite number of one bits beyond the leftmost zero, and a nonnegative number represents an infinite number of zero bits beyond the leftmost one bit.
 
 Fixnum equivalents of the logical operators are provided, as fxlogand, fxlogior, fxlogxor, fxlognot, fxlogtest, fxlogbit?, fxlogbit0, and fxlogbit1. Three separate fixnum operators are provided for shifting: fxsll (shift-left logical), fxsrl (shift-right logical), fxsra (shift-right arithmetic). Logical and arithmetic shifts differ only for right shifts. Shift-right logical shifts in zero bits on the left end, and shift-right arithmetic replicates the sign bit.
+也提供了 fixnum 相应版本的逻辑运算符，比如 fxlogand, fxlogior, fxlogxor, fxlognot, fxlogtest, fxlogbit?, fxlogbit0, 以及 fxlogbit1. 还有三个用于移位的 fixnum 运算符: fxsll（逻辑左移位），fxsrl（逻辑右移位），fxsra（算术右移位）。逻辑和算术移位只在右移位上有差别。逻辑右移位在最左端填充 0，而算术右移位则复制符号位。
 
 Logical shifts do not make sense for arbitrary-precision integers, since these have no "left end" into which bits must be shifted.
+对任意精度的整数，逻辑移位没有意义，因为这些数没有必须移位的“最左端”。
+
 
 procedure: (logand int ...)
-returns: the logical "and" of the arguments int ...
+
+returns: 实参 int ...的逻辑与
+
 libraries: (chezscheme)
 
 The arguments must be exact integers (fixnums or bignums) and are treated as two's complement integers, regardless of the underlying representation. With no arguments, logand returns -1, i.e., all bits set.
+实参必须是精确的整数（fixnums 或 bignums），而且被作为补码整数处理，无论其底层的表示形式是什么。不传入实参时，logand 返回-1，即，所有位都设为 1.
 
-(logand) => -1
-(logand 15) => 15
-(logand -1 -1) => -1
-(logand -1 0) => 0
-(logand 5 3) => 1
-(logand #x173C8D95 7) => 5
-(logand #x173C8D95 -8) => #x173C8D90
-(logand #b1100 #b1111 #b1101) => #b1100
+#+BEGIN_SRC scheme
+  (logand) => -1
+  (logand 15) => 15
+  (logand -1 -1) => -1
+  (logand -1 0) => 0
+  (logand 5 3) => 1
+  (logand #x173C8D95 7) => 5
+  (logand #x173C8D95 -8) => #x173C8D90
+  (logand #b1100 #b1111 #b1101) => #b1100
+#+END_SRC
+
 
 procedure: (logior int ...)
+
 procedure: (logor int ...)
-returns: the logical "or" of the arguments int ...
+
+returns: 实参 int ...的逻辑或
+
 libraries: (chezscheme)
 
 The arguments must be exact integers (fixnums or bignums) and are treated as two's complement integers, regardless of the underlying representation. With no arguments, logior returns 0, i.e., all bits reset.
+实参必须是精确的整数（fixnums 或 bignums），而且被作为补码整数处理，无论其底层的表示形式是什么。不传入实参时，logior 返回 0，即，所有位都被重置。
 
-(logior) => 0
-(logior 15) => 15
-(logior -1 -1) => -1
-(logior -1 0) => -1
-(logior 5 3) => 7
-(logior #b111000 #b101010) => #b111010
-(logior #b1000 #b0100 #b0010) => #b1110
-(apply logior '(1 2 4 8 16)) => 31
+#+BEGIN_SRC scheme
+  (logior) => 0
+  (logior 15) => 15
+  (logior -1 -1) => -1
+  (logior -1 0) => -1
+  (logior 5 3) => 7
+  (logior #b111000 #b101010) => #b111010
+  (logior #b1000 #b0100 #b0010) => #b1110
+  (apply logior '(1 2 4 8 16)) => 31
+#+END_SRC
+
 
 procedure: (logxor int ...)
-returns: the logical "exclusive or" of the arguments int ...
+
+returns: 实参 int ...的逻辑异或
+
 libraries: (chezscheme)
 
 The arguments must be exact integers (fixnums or bignums) and are treated as two's complement integers, regardless of the underlying representation. With no arguments, logxor returns 0, i.e., all bits reset.
+实参必须是精确的整数（fixnums 或 bignums），而且被作为补码整数处理，无论其底层的表示形式是什么。不传入实参时，logxor 返回 0，即，所有位都被重置。
 
-(logxor) => 0
-(logxor 15) => 15
-(logxor -1 -1) => 0
-(logxor -1 0) => -1
-(logxor 5 3) => 6
-(logxor #b111000 #b101010) => #b010010
-(logxor #b1100 #b0100 #b0110) => #b1110
+#+BEGIN_SRC scheme
+  (logxor) => 0
+  (logxor 15) => 15
+  (logxor -1 -1) => 0
+  (logxor -1 0) => -1
+  (logxor 5 3) => 6
+  (logxor #b111000 #b101010) => #b010010
+  (logxor #b1100 #b0100 #b0110) => #b1110
+#+END_SRC
+
 
 procedure: (lognot int)
-returns: the logical "not" of int
+
+returns: int 的逻辑非
+
 libraries: (chezscheme)
 
-The argument must be an exact integer (fixnum or bignum) and is treated as a two's complement integer, regardless of the underlying representation.
+实参必须是精确的整数（fixnums 或 bignums），而且被作为补码整数处理，无论其底层的表示形式是什么。
 
-(lognot -1) => 0
-(lognot 0) => -1
-(lognot 7) => -8
-(lognot -8) => 7
+#+BEGIN_SRC scheme
+  (lognot -1) => 0
+  (lognot 0) => -1
+  (lognot 7) => -8
+  (lognot -8) => 7
+#+END_SRC
+
 
 procedure: (logbit? index int)
-returns: #t if the specified bit is set, otherwise #f
+
+返回: 如果指定位被设置为 1，则为 ~#t~, 否则为 ~#f~.
+
 libraries: (chezscheme)
 
-index must be a nonnegative exact integer. int must be an exact integer (fixnum or bignum) and is treated as a two's complement integer, regardless of the underlying representation.
+实参必须是精确的整数（fixnums 或 bignums），而且被作为补码整数处理，无论其底层的表示形式是什么。
 
-logbit? returns #t if the bit at index index of int is set (one) and #f otherwise. The index is zero-based, counting from the lowest-order toward higher-order bits. There is no upper limit on the index; for nonnegative values of int, the bits above the highest order set bit are all considered to be zero, and for negative values, the bits above the highest order reset bit are all considered to be one.
+如果在 int 的索引 index 处的位被设为 1，logbit? 返回#t, 否则返回#f. 索引基于 0，从最低位向最高位数。索引没有上限；对于非负的 int，在最高的设置位以上的位均被当作 0，而对负值，在最高的重置位以上的位都被当作 1.
+returns #t if the bit at index index of int is set (one) and #f otherwise. The index is zero-based, counting from the lowest-order toward higher-order bits. There is no upper limit on the index; for nonnegative values of int, the bits above the highest order set bit are all considered to be zero, and for negative values, the bits above the highest order reset bit are all considered to be one.
 
-logbit? is equivalent to
+logbit? 等价于
 
-(lambda (k n) (not (zero? (logand n (ash 1 k)))))
+#+BEGIN_SRC scheme
+  (lambda (k n) (not (zero? (logand n (ash 1 k)))))
+#+END_SRC
 
-but more efficient.
+但更加高效。
 
-(logbit? 0 #b1110) => #f
-(logbit? 1 #b1110) => #t
-(logbit? 2 #b1110) => #t
-(logbit? 3 #b1110) => #t
-(logbit? 4 #b1110) => #f
-(logbit? 100 #b1110) => #f
+#+BEGIN_SRC scheme
+  (logbit? 0 #b1110) => #f
+  (logbit? 1 #b1110) => #t
+  (logbit? 2 #b1110) => #t
+  (logbit? 3 #b1110) => #t
+  (logbit? 4 #b1110) => #f
+  (logbit? 100 #b1110) => #f
 
-(logbit? 0 -6) => #f  ; the two's complement of -6 is 1...1010
-(logbit? 1 -6) => #t
-(logbit? 2 -6) => #f
-(logbit? 3 -6) => #t
-(logbit? 100 -6) => #t
+  (logbit? 0 -6) => #f  ; the two's complement of -6 is 1...1010
+  (logbit? 1 -6) => #t
+  (logbit? 2 -6) => #f
+  (logbit? 3 -6) => #t
+  (logbit? 100 -6) => #t
 
-(logbit? (random 1000000) 0) => #f
-(logbit? (random 1000000) -1) => #t
+  (logbit? (random 1000000) 0) => #f
+  (logbit? (random 1000000) -1) => #t
 
-(logbit? 20000 (ash 1 20000)) => #t
+  (logbit? 20000 (ash 1 20000)) => #t
+#+END_SRC
+
 
 procedure: (logtest int1 int2)
-returns: #t if any common bits are set, otherwise #f
+
+返回: 如果任何共同位被设为 1，则为 ~#t~, 否则为 ~#f~.
+
 libraries: (chezscheme)
 
-The arguments must be exact integers (fixnums or bignums) and are treated as two's complement integers, regardless of the underlying representation.
+实参必须是精确的整数（fixnums 或 bignums），而且被作为补码整数处理，无论其底层的表示形式是什么。
 
-logtest returns #t if any bit set in one argument is also set in the other. It returns #f if the two arguments have no set bits in common.
+如果有任何位在两个实参中都被设为 1，则 logtest 返回#t. 如果两个实参中没有任何共同位被设为 1，则返回#f.
 
-logtest is equivalent to
+logtest 等价于
 
-(lambda (n1 n2) (not (zero? (logand n1 n2))))
+#+BEGIN_SRC scheme
+  (lambda (n1 n2) (not (zero? (logand n1 n2))))
+#+END_SRC
 
-but more efficient.
+但更加高效。
 
-(logtest #b10001 #b1110) => #f
-(logtest #b10101 #b1110) => #t
-(logtest #b111000 #b110111) => #t
+#+BEGIN_SRC scheme
+  (logtest #b10001 #b1110) => #f
+  (logtest #b10101 #b1110) => #t
+  (logtest #b111000 #b110111) => #t
 
-(logtest #b101 -6) => #f  ; the two's complement of -6 is 1...1010
-(logtest #b1000 -6) => #t
-(logtest 100 -6) => #t
+  (logtest #b101 -6) => #f  ; the two's complement of -6 is 1...1010
+  (logtest #b1000 -6) => #t
+  (logtest 100 -6) => #t
 
-(logtest (+ (random 1000000) 1) 0) => #f
-(logtest (+ (random 1000000) 1) -1) => #t
+  (logtest (+ (random 1000000) 1) 0) => #f
+  (logtest (+ (random 1000000) 1) -1) => #t
 
-(logtest (ash #b101 20000) (ash #b111 20000)) => #t
+  (logtest (ash #b101 20000) (ash #b111 20000)) => #t
+#+END_SRC
+
 
 procedure: (logbit0 index int)
-returns: the result of clearing bit index of int
+
+returns: 把 int 在索引 index 处的位清 0 后的结果
+
 libraries: (chezscheme)
 
-index must be a nonnegative exact integer. int must be an exact integer (fixnum or bignum) and is treated as a two's complement integer, regardless of the underlying representation.
+index 必须是一个非负的精确整数。int 必须是一个精确整数（fixnum 或 bignum），且被作为补码整数处理，无论它背后的表示形式是什么。
 
-The index is zero-based, counting from the lowest-order toward higher-order bits. As with logbit?, there is no upper limit on the index.
+索引基于 0，从低位到高位计数。和 logbit?一样，索引没有上限。
 
-logbit0 is equivalent to
+logbit0 等价于
 
-(lambda (i n) (logand (lognot (ash 1 i)) n))
+#+BEGIN_SRC scheme
+  (lambda (i n) (logand (lognot (ash 1 i)) n))
+#+END_SRC
 
-but more efficient.
+但更加高效。
 
-(logbit0 3 #b10101010) => #b10100010
-(logbit0 4 #b10101010) => #b10101010
-(logbit0 0 -1) => -2
+#+BEGIN_SRC scheme
+  (logbit0 3 #b10101010) => #b10100010
+  (logbit0 4 #b10101010) => #b10101010
+  (logbit0 0 -1) => -2
+#+END_SRC
+
 
 procedure: (logbit1 index int)
-returns: the result of setting bit index of int
+
+returns: 把 int 在索引 index 处的位设为 1 后的结果
+
 libraries: (chezscheme)
 
-index must be a nonnegative exact integer. int must be an exact integer (fixnum or bignum) and is treated as a two's complement integer, regardless of the underlying representation.
+index 必须是一个非负的精确整数。int 必须是一个精确整数（fixnum 或 bignum），且被作为补码整数处理，无论它背后的表示形式是什么。
 
-The index is zero-based, counting from the lowest-order toward higher-order bits. As with logbit?, there is no upper limit on the index.
+索引基于 0，从低位到高位计数。和 logbit?一样，索引没有上限。
 
-logbit1 is equivalent to
+logbit1 等价于
 
-(lambda (i n) (logor (ash 1 i) n))
+#+BEGIN_SRC scheme
+  (lambda (i n) (logor (ash 1 i) n))
+#+END_SRC
 
-but more efficient.
+但更加高效。
 
-(logbit1 3 #b10101010) => #b10101010
-(logbit1 4 #b10101010) => #b10111010
-(logbit1 4 0) => #b10000
-(logbit1 0 -2) => -1
+#+BEGIN_SRC scheme
+  (logbit1 3 #b10101010) => #b10101010
+  (logbit1 4 #b10101010) => #b10111010
+  (logbit1 4 0) => #b10000
+  (logbit1 0 -2) => -1
+#+END_SRC
+
 
 procedure: (ash int count)
-returns: int shifted left arithmetically by count.
+
+returns: int 算术左移 count 位的结果
+
 libraries: (chezscheme)
 
-Both arguments must be exact integers. The first argument is treated as a two's complement integer, regardless of the underlying representation. If count is negative, int is shifted right by -count bits.
+两个实参都必须是精确整数。第一个实参被作为补码整数处理，无论其底层的表示形式是什么。如果 count 是负数，则 int 右移 -count 位。
 
-(ash 8 0) => 8
-(ash 8 2) => 32
-(ash 8 -2) => 2
-(ash -1 2) => -4
-(ash -1 -2) => -1
+#+BEGIN_SRC scheme
+  (ash 8 0) => 8
+  (ash 8 2) => 32
+  (ash 8 -2) => 2
+  (ash -1 2) => -4
+  (ash -1 -2) => -1
+#+END_SRC
+
 
 procedure: (fxlogand fixnum ...)
-returns: the logical "and" of the arguments fixnum ...
+
+returns: 实参 fixnum ...的逻辑与
+
 libraries: (chezscheme)
 
-The arguments are treated as two's complement integers, regardless of the underlying representation. With no arguments, fxlogand returns -1, i.e., all bits set.
+实参均被作为补码整数处理，无论其底层的表示形式是什么。不传入实参时，fxlogand 返回 -1, 即，所有位都设为 1.
 
-(fxlogand) => -1
-(fxlogand 15) => 15
-(fxlogand -1 -1) => -1
-(fxlogand -1 0) => 0
-(fxlogand 5 3) => 1
-(fxlogand #b111000 #b101010) => #b101000
-(fxlogand #b1100 #b1111 #b1101) => #b1100
+#+BEGIN_SRC scheme
+  (fxlogand) => -1
+  (fxlogand 15) => 15
+  (fxlogand -1 -1) => -1
+  (fxlogand -1 0) => 0
+  (fxlogand 5 3) => 1
+  (fxlogand #b111000 #b101010) => #b101000
+  (fxlogand #b1100 #b1111 #b1101) => #b1100
+#+END_SRC
+
 
 procedure: (fxlogior fixnum ...)
+
 procedure: (fxlogor fixnum ...)
-returns: the logical "or" of the arguments fixnum ...
+
+returns: 实参 fixnum ...的逻辑或
+
 libraries: (chezscheme)
 
 The arguments are treated as two's complement integers, regardless of the underlying representation. With no arguments, fxlogior returns 0, i.e., all bits reset.
+实参均被作为补码整数处理，无论其底层的表示形式是什么。不传入实参时，fxlogior 返回 0, 即，所有位都被重置。
 
-(fxlogior) => 0
-(fxlogior 15) => 15
-(fxlogior -1 -1) => -1
-(fxlogior -1 0) => -1
-(fxlogior #b111000 #b101010) => #b111010
-(fxlogior #b1000 #b0100 #b0010) => #b1110
-(apply fxlogior '(1 2 4 8 16)) => 31
+#+BEGIN_SRC scheme
+  (fxlogior) => 0
+  (fxlogior 15) => 15
+  (fxlogior -1 -1) => -1
+  (fxlogior -1 0) => -1
+  (fxlogior #b111000 #b101010) => #b111010
+  (fxlogior #b1000 #b0100 #b0010) => #b1110
+  (apply fxlogior '(1 2 4 8 16)) => 31
+#+END_SRC
+
 
 procedure: (fxlogxor fixnum ...)
-returns: the logical "exclusive or" of the arguments fixnum ...
+
+returns: 实参 fixnum ...的逻辑异或
+
 libraries: (chezscheme)
 
 The arguments are treated as two's complement integers, regardless of the underlying representation. With no arguments, fxlogxor returns 0, i.e., all bits reset.
+实参均被作为补码整数处理，无论其底层的表示形式是什么。不传入实参时，fxlogxor 返回 0, 即，所有位都被重置。
 
-(fxlogxor) => 0
-(fxlogxor 15) => 15
-(fxlogxor -1 -1) => 0
-(fxlogxor -1 0) => -1
-(fxlogxor 5 3) => 6
-(fxlogxor #b111000 #b101010) => #b010010
-(fxlogxor #b1100 #b0100 #b0110) => #b1110
+#+BEGIN_SRC scheme
+  (fxlogxor) => 0
+  (fxlogxor 15) => 15
+  (fxlogxor -1 -1) => 0
+  (fxlogxor -1 0) => -1
+  (fxlogxor 5 3) => 6
+  (fxlogxor #b111000 #b101010) => #b010010
+  (fxlogxor #b1100 #b0100 #b0110) => #b1110
+#+END_SRC
+
 
 procedure: (fxlognot fixnum)
-returns: the logical "not" of fixnum
+
+returns: fixnum 的逻辑非
+
 libraries: (chezscheme)
 
-The argument is treated as a two's complement integer, regardless of the underlying representation.
+实参被作为补码整数处理，无论其底层的表示形式是什么。
 
-(fxlognot -1) => 0
-(fxlognot 0) => -1
-(fxlognot 1) => -2
-(fxlognot -2) => 1
+#+BEGIN_SRC scheme
+  (fxlognot -1) => 0
+  (fxlognot 0) => -1
+  (fxlognot 1) => -2
+  (fxlognot -2) => 1
+#+END_SRC
+
 
 procedure: (fxlogbit? index fixnum)
-returns: #t if the specified bit is set, otherwise #f
+
+返回: 如果指定位是 1, 则为 ~#t~, 否则为 ~#f~.
+
 libraries: (chezscheme)
 
-index must be a nonnegative fixnum. fixnum is treated as a two's complement integer, regardless of the underlying representation.
+index 必须是非负 fixnum. fixnum 被作为补码整数处理，无论其底层的表示形式是什么。
 
-fxlogbit? returns #t if the bit at index index of fixnum is set (one) and #f otherwise. The index is zero-based, counting from the lowest-order toward higher-order bits. The index is limited only by the fixnum range; for nonnegative values of fixnum, the bits above the highest order set bit are all considered to be zero, and for negative values, the bits above the highest order reset bit are all considered to be one.
+如果 fixnum 在索引 index 处的位被设为 1，则 fxlogbit? 返回 #t, 否则返回#f. 索引基于 0，从最低位向最高位计数。索引只受限 fixnum 的范围；对于非负的 int，在最高的设置位以上的位均被当作 0，而对负值，在最高的重置位以上的位都被当作 1.
+returns #t if the bit at index index of fixnum is set (one) and #f otherwise. The index is zero-based, counting from the lowest-order toward higher-order bits. The index is limited only by the fixnum range; for nonnegative values of fixnum, the bits above the highest order set bit are all considered to be zero, and for negative values, the bits above the highest order reset bit are all considered to be one.
 
-(fxlogbit? 0 #b1110) => #f
-(fxlogbit? 1 #b1110) => #t
-(fxlogbit? 2 #b1110) => #t
-(fxlogbit? 3 #b1110) => #t
-(fxlogbit? 4 #b1110) => #f
-(fxlogbit? 100 #b1110) => #f
+#+BEGIN_SRC scheme
+  (fxlogbit? 0 #b1110) => #f
+  (fxlogbit? 1 #b1110) => #t
+  (fxlogbit? 2 #b1110) => #t
+  (fxlogbit? 3 #b1110) => #t
+  (fxlogbit? 4 #b1110) => #f
+  (fxlogbit? 100 #b1110) => #f
 
-(fxlogbit? 0 -6) => #f  ; the two's complement of -6 is 1...1010
-(fxlogbit? 1 -6) => #t
-(fxlogbit? 2 -6) => #f
-(fxlogbit? 3 -6) => #t
-(fxlogbit? 100 -6) => #t
+  (fxlogbit? 0 -6) => #f  ; the two's complement of -6 is 1...1010
+  (fxlogbit? 1 -6) => #t
+  (fxlogbit? 2 -6) => #f
+  (fxlogbit? 3 -6) => #t
+  (fxlogbit? 100 -6) => #t
 
-(fxlogbit? (random 1000000) 0) => #f
-(fxlogbit? (random 1000000) -1) => #t
+  (fxlogbit? (random 1000000) 0) => #f
+  (fxlogbit? (random 1000000) -1) => #t
+#+END_SRC
+
 
 procedure: (fxlogtest fixnum1 fixnum2)
-returns: #t if any common bits are set, otherwise #f
+
+返回: 如果任何共同位为 1，则为 ~#t~, 否则为 ~#f~.
+
 libraries: (chezscheme)
 
 The arguments are treated as two's complement integers, regardless of the underlying representation.
+实参均被作为补码整数处理，无论其底层的表示形式是什么。
 
 fxlogtest returns #t if any bit set in one argument is also set in the other. It returns #f if the two arguments have no set bits in common.
+如果有任何位在两个实参中均为 1，则 fxlogtest 返回 #t. 如果两个实参中没有任何共同位被设为 1，则返回 #f.
 
-(fxlogtest #b10001 #b1110) => #f
-(fxlogtest #b10101 #b1110) => #t
-(fxlogtest #b111000 #b110111) => #t
+#+BEGIN_SRC scheme
+  (fxlogtest #b10001 #b1110) => #f
+  (fxlogtest #b10101 #b1110) => #t
+  (fxlogtest #b111000 #b110111) => #t
 
-(fxlogtest #b101 -6) => #f  ; the two's complement of -6 is 1...1010
-(fxlogtest #b1000 -6) => #t
-(fxlogtest 100 -6) => #t
+  (fxlogtest #b101 -6) => #f  ; the two's complement of -6 is 1...1010
+  (fxlogtest #b1000 -6) => #t
+  (fxlogtest 100 -6) => #t
 
-(fxlogtest (+ (random 1000000) 1) 0) => #f
-(fxlogtest (+ (random 1000000) 1) -1) => #t
+  (fxlogtest (+ (random 1000000) 1) 0) => #f
+  (fxlogtest (+ (random 1000000) 1) -1) => #t
+#+END_SRC
+
 
 procedure: (fxlogbit0 index fixnum)
-returns: the result of clearing bit index of fixnum
+
+returns: fixnum 在索引 index 处的位被清零后的结果
+
 libraries: (chezscheme)
 
 fixnum is treated as a two's complement integer, regardless of the underlying representation. index must be nonnegative and less than the number of bits in a fixnum, excluding the sign bit, i.e., less than (integer-length (most-positive-fixnum)). The index is zero-based, counting from the lowest-order toward higher-order bits.
+fixnum 被作为补码整数处理，无论其底层的表示形式是什么。index 必须非负，且小于一个 fixnum 中的位数（不包括符号位），即，小于 (integer-length (most-positive-fixnum)).索引基于 0，从最低位向最高位计数。
 
-fxlogbit0 is equivalent to
+fxlogbit0 等价于
 
-(lambda (i n) (fxlogand (fxlognot (fxsll 1 i)) n))
+#+BEGIN_SRC scheme
+  (lambda (i n) (fxlogand (fxlognot (fxsll 1 i)) n))
+#+END_SRC
 
-but more efficient.
+但更加高效。
 
-(fxlogbit0 3 #b10101010) => #b10100010
-(fxlogbit0 4 #b10101010) => #b10101010
-(fxlogbit0 0 -1) => -2
+#+BEGIN_SRC scheme
+  (fxlogbit0 3 #b10101010) => #b10100010
+  (fxlogbit0 4 #b10101010) => #b10101010
+  (fxlogbit0 0 -1) => -2
+#+END_SRC
+
 
 procedure: (fxlogbit1 index fixnum)
-returns: the result of setting bit index of fixnum
+
+returns: fixnum 在索引 index 处的位被设为 1 后的结果
+
 libraries: (chezscheme)
 
-fixnum is treated as a two's complement integer, regardless of the underlying representation. index must be nonnegative and less than the number of bits in a fixnum, excluding the sign bit, i.e., less than (integer-length (most-positive-fixnum)). The index is zero-based, counting from the lowest-order toward higher-order bits.
+fixnum 被作为补码整数处理，无论其底层的表示形式是什么。index 必须非负，且小于一个 fixnum 中的位数（不包括符号位），即，小于 (integer-length (most-positive-fixnum)).索引基于 0，从最低位向最高位计数。
 
-fxlogbit1 is equivalent to
+fxlogbit1 等价于
 
-(lambda (i n) (fxlogor (fxsll 1 i) n))
+#+BEGIN_SRC scheme
+  (lambda (i n) (fxlogor (fxsll 1 i) n))
+#+END_SRC
 
-but more efficient.
+但更加高效。
 
-(fxlogbit1 3 #b10101010) => #b10101010
-(fxlogbit1 4 #b10101010) => #b10111010
-(fxlogbit1 4 0) => #b10000
-(fxlogbit1 0 -2) => -1
+#+BEGIN_SRC scheme
+  (fxlogbit1 3 #b10101010) => #b10101010
+  (fxlogbit1 4 #b10101010) => #b10111010
+  (fxlogbit1 4 0) => #b10000
+  (fxlogbit1 0 -2) => -1
+#+END_SRC
+
 
 procedure: (fxsll fixnum count)
-returns: fixnum shifted left by count
+
+returns: fixnum 左移 count 位
+
 libraries: (chezscheme)
 
-fixnum is treated as a two's complement integer, regardless of the underlying representation. count must be nonnegative and not more than the number of bits in a fixnum, i.e., (+ (integer-length (most-positive-fixnum)) 1). An exception is raised with condition-type &implementation-restriction if the result cannot be represented as a fixnum.
+fixnum 被作为补码整数处理，无论其底层的表示形式是什么。count 必须非负，且不大于一个 fixnum 中的位数，即，(+ (integer-length (most-positive-fixnum)) 1). 如果结果不能表示为 fixnum，则会抛出一个条件类型的 &implementation-restriction 异常。
 
-(fxsll 1 2) => 4
-(fxsll -1 2) => -4
+#+BEGIN_SRC scheme
+  (fxsll 1 2) => 4
+  (fxsll -1 2) => -4
+#+END_SRC
+
 
 procedure: (fxsrl fixnum count)
-returns: fixnum logically shifted right by count
+
+returns: fixnum 逻辑右移 count 位
+
 libraries: (chezscheme)
 
 fixnum is treated as a two's complement integer, regardless of the underlying representation. count must be nonnegative and not more than the number of bits in a fixnum, i.e., (+ (integer-length (most-positive-fixnum)) 1).
+fixnum 被作为补码整数处理，无论其底层的表示形式是什么。count 必须非负，且不大于一个 fixnum 中的位数，即，(+ (integer-length (most-positive-fixnum)) 1).
 
-(fxsrl 4 2) => 1
-(= (fxsrl -1 1) (most-positive-fixnum)) => #t
+#+BEGIN_SRC scheme
+  (fxsrl 4 2) => 1
+  (= (fxsrl -1 1) (most-positive-fixnum)) => #t
+#+END_SRC
+
 
 procedure: (fxsra fixnum count)
-returns: fixnum arithmetically shifted right by count
+
+returns: fixnum 算术右移 count 位
+
 libraries: (chezscheme)
 
-fixnum is treated as a two's complement integer, regardless of the underlying representation. count must be nonnegative and not more than the number of bits in a fixnum, i.e., (+ (integer-length (most-positive-fixnum)) 1).
+fixnum 被作为补码整数处理，无论其底层的表示形式是什么。count 必须非负，且不大于一个 fixnum 中的位数，即，(+ (integer-length (most-positive-fixnum)) 1).
 
-(fxsra 64 3) => 8
-(fxsra -1 1) => -1
-(fxsra -64 3) => -8
+#+BEGIN_SRC scheme
+  (fxsra 64 3) => 8
+  (fxsra -1 1) => -1
+  (fxsra -64 3) => -8
+#+END_SRC
+
 
 ** Section 8.6. Random Number Generation
 
 procedure: (random real)
-returns: a nonnegative pseudo-random number less than real
+
+returns: 小于 real 的一个非负伪随机数
+
 libraries: (chezscheme)
 
 real must be a positive integer or positive inexact real number.
+real 必须是正整数，或正的不精确实数。
 
-(random 1) => 0
-(random 1029384535235) => 1029384535001, every now and then
-(random 1.0) => 0.5, every now and then
+#+BEGIN_SRC scheme
+  (random 1) => 0
+  (random 1029384535235) => 1029384535001, every now and then
+  (random 1.0) => 0.5, every now and then
+#+END_SRC
+
 
 thread parameter: random-seed
 libraries: (chezscheme)
 
 The random number generator allows the current random seed to be obtained and modified via the parameter random-seed.
+随机数生成器支持通过参数对象 random-seed 获取和修改当前的随机数种子。
 
 When called without arguments, random-seed returns the current random seed. When called with one argument, which must be a nonnegative exact integer ranging from 1 through 232 - 1, random-seed sets the current random seed to the argument.
+不带实参调用时，random-seed 返回当前的随机数种子。当带 1 个实参调用时，实参必须是 1 至 2^32 -1 之间的非负精确整数，而 random-seed 把当前的随机数种子设为此实参的值。
 
-(let ([s (random-seed)])
-  (let ([r1 (random 1.0)])
-    (random-seed s)
-    (eqv? (random 1.0) r1))) => #t
+#+BEGIN_SRC scheme
+  (let ([s (random-seed)])
+    (let ([r1 (random 1.0)])
+      (random-seed s)
+      (eqv? (random 1.0) r1))) => #t
+#+END_SRC
+
 
 ** Section 8.7. Miscellaneous Numeric Operations
 
