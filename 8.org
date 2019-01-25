@@ -1084,168 +1084,255 @@ When called without arguments, random-seed returns the current random seed. When
 ** Section 8.7. Miscellaneous Numeric Operations
 
 procedure: (= num1 num2 num3 ...)
+
 procedure: (< real1 real2 real3 ...)
+
 procedure: (> real1 real2 real3 ...)
+
 procedure: (<= real1 real2 real3 ...)
+
 procedure: (>= real1 real2 real3 ...)
-returns: #t if the relation holds, #f otherwise
+
+返回: 如果关系成立，则为 ~#t~, 否则为 ~#f~.
+
 libraries: (chezscheme)
 
+这些谓词和 R^{6}RS 中的对应版本一样，只是它们被扩展为可接受 1 个以上参数，而非 2 个以上参数。当传入 1 个参数时，这些谓词均返回 #t.
 These predicates are identical to the Revised6 Report counterparts, except they are extended to accept one or more rather than two or more arguments. When passed one argument, each of these predicates returns #t.
 
-(> 3/4) => #t
-(< 3/4) => #t
-(= 3/4) => #t
+#+BEGIN_SRC scheme
+  (> 3/4) => #t
+  (< 3/4) => #t
+  (= 3/4) => #t
+#+END_SRC
+
 
 procedure: (1+ num)
+
 procedure: (add1 num)
+
 procedure: (1- num)
+
 procedure: (-1+ num)
+
 procedure: (sub1 num)
-returns: num plus 1 or num minus 1
+
+returns: num 加 1 或 num 减 1
+
 libraries: (chezscheme)
 
-1+ and add1 are equivalent to (lambda (x) (+ x 1)); 1-, -1+, and sub1 are equivalent to (lambda (x) (- x 1)).
+1+ 和 add1 等价于 (lambda (x) (+ x 1)); 1-, -1+, 和 sub1 等价于 (lambda (x) (- x 1)).
 
-(define plus
- ; x should be a nonnegative integer
-  (lambda (x y)
-    (if (zero? x)
-        y
-        (plus (1- x) (1+ y)))))
+#+BEGIN_SRC scheme
+  (define plus
+                                          ; x should be a nonnegative integer
+    (lambda (x y)
+      (if (zero? x)
+          y
+          (plus (1- x) (1+ y)))))
 
-(plus 7 8) => 15
+  (plus 7 8) => 15
 
-(define double
- ; x should be a nonnegative integer
-  (lambda (x)
-    (if (zero? x)
-        0
-        (add1 (add1 (double (sub1 x)))))))
+  (define double
+                                          ; x should be a nonnegative integer
+    (lambda (x)
+      (if (zero? x)
+          0
+          (add1 (add1 (double (sub1 x)))))))
 
-(double 7) => 14
+  (double 7) => 14
+#+END_SRC
+
 
 procedure: (expt-mod int1 int2 int3)
-returns: int1 raised to the int2 power, modulo int3
+
+returns: int1 的 int2 次方，再对 int3 取模
+
 libraries: (chezscheme)
 
-int1, int2 and int3 must be nonnegative integers. expt-mod performs its computation in such a way that the intermediate results are never much larger than int3. This means that when int2 is large, expt-mod is more efficient than the equivalent procedure (lambda (x y z) (modulo (expt x y) z)).
+int1, int2 和 int3 必须是非负整数。expt-mod 采用的计算方式使得中间结果永远不会比 int3 大太多。这意味着，当 int2 很大时，expt-mod 要比等价过程 (lambda (x y z) (modulo (expt x y) z)) 更加高效。
 
-(expt-mod 2 4 3) => 1
-(expt-mod 2 76543 76543) => 2
+#+BEGIN_SRC scheme
+  (expt-mod 2 4 3) => 1
+  (expt-mod 2 76543 76543) => 2
+#+END_SRC
+
 
 procedure: (isqrt n)
-returns: the integer square root of n
+
+returns: n 的整数平方根
+
 libraries: (chezscheme)
 
 n must be a nonnegative integer. The integer square root of n is defined to be =>.
+n 必须是非负整数。TODO
 
-(isqrt 0) => 0
-(isqrt 16) => 4
-(isqrt 16.0) => 4.0
-(isqrt 20) => 4
-(isqrt 20.0) => 4.0
-(isqrt (* 2 (expt 10 20))) => 14142135623
+#+BEGIN_SRC scheme
+  (isqrt 0) => 0
+  (isqrt 16) => 4
+  (isqrt 16.0) => 4.0
+  (isqrt 20) => 4
+  (isqrt 20.0) => 4.0
+  (isqrt (* 2 (expt 10 20))) => 14142135623
+#+END_SRC
+
 
 procedure: (integer-length n)
-returns: see below
+
+returns: 参见下文
+
 libraries: (chezscheme)
 
 The procedure integer-length returns the length in bits of the smallest two's complement representation for n, with an assumed leading 1 (sign) bit for negative numbers. For zero, integer-length returns 0.
+过程 integer-length 返回 n 的最小补码表示形式的位数长度，并假设负数前面有一个为 1 的符号位。对于 0，integer-length 返回 0.
 
-(integer-length 0) => 0
-(integer-length 1) => 1
-(integer-length 2) => 2
-(integer-length 3) => 2
-(integer-length 4) => 3
-(integer-length #b10000000) => 8
-(integer-length #b11111111) => 8
-(integer-length -1) => 0
-(integer-length -2) => 1
-(integer-length -3) => 2
-(integer-length -4) => 2
+#+BEGIN_SRC scheme
+  (integer-length 0) => 0
+  (integer-length 1) => 1
+  (integer-length 2) => 2
+  (integer-length 3) => 2
+  (integer-length 4) => 3
+  (integer-length #b10000000) => 8
+  (integer-length #b11111111) => 8
+  (integer-length -1) => 0
+  (integer-length -2) => 1
+  (integer-length -3) => 2
+  (integer-length -4) => 2
+#+END_SRC
+
 
 procedure: (nonpositive? real)
+
 returns: #t if real is not greater than zero, #f otherwise
+返回: 如果 real 不大于 0，则为 ~#t~, 否则为 ~#f~.
+
 libraries: (chezscheme)
 
-nonpositive? is equivalent to (lambda (x) (<= x 0)).
+nonpositive? 等价于 (lambda (x) (<= x 0)).
 
-(nonpositive? 128) => #f
-(nonpositive? 0.0) => #t
-(nonpositive? 1.8e-15) => #f
-(nonpositive? -2/3) => #t
+#+BEGIN_SRC scheme
+  (nonpositive? 128) => #f
+  (nonpositive? 0.0) => #t
+  (nonpositive? 1.8e-15) => #f
+  (nonpositive? -2/3) => #t
+#+END_SRC
+
 
 procedure: (nonnegative? real)
-returns: #t if real is not less than zero, #f otherwise
+
+返回: 如果 real 不小于 0，则为 ~#t~, 否则为 ~#f~.
+
 libraries: (chezscheme)
 
-nonnegative? is equivalent to (lambda (x) (>= x 0)).
+nonnegative? 等价于 (lambda (x) (>= x 0)).
 
-(nonnegative? -65) => #f
-(nonnegative? 0) => #t
-(nonnegative? -0.0121) => #f
-(nonnegative? 15/16) => #t
+#+BEGIN_SRC scheme
+  (nonnegative? -65) => #f
+  (nonnegative? 0) => #t
+  (nonnegative? -0.0121) => #f
+  (nonnegative? 15/16) => #t
+#+END_SRC
+
 
 procedure: (conjugate num)
-returns: complex conjugate of num
+
+returns: num 的共轭复数
+
 libraries: (chezscheme)
 
-The procedure conjugate, when passed a complex argument a + bi, returns its complex conjugate a + (-b)i.
+当过程 conjugate 传入复数实参 a + bi 时，返回它的共轭复数 a + (-b)i.
 
-(conjugate 3.0+4.0i) => 3.0-4.0i
-(conjugate 1e-20-2e-30i) => 1e-20+2e-30i
-(conjugate 3) => 3
+#+BEGIN_SRC scheme
+  (conjugate 3.0+4.0i) => 3.0-4.0i
+  (conjugate 1e-20-2e-30i) => 1e-20+2e-30i
+  (conjugate 3) => 3
+#+END_SRC
+
 
 procedure: (magnitude-squared num)
-returns: magnitude of num squared
+
+returns: num 的模的平方
+
 libraries: (chezscheme)
 
-The procedure magnitude-squared, when passed a complex argument a + bi returns its magnitude squared, i.e., a2 + b2.
+对过程 magnitude-squared 传入复数实参 a + bi 时，返回它的模的平方，即，a^2 + b^2.
 
-(magnitude-squared 3.0-4.0i) => 25.0
-(magnitude-squared 3.0) => 9.0
+#+BEGIN_SRC scheme
+  (magnitude-squared 3.0-4.0i) => 25.0
+  (magnitude-squared 3.0) => 9.0
+#+END_SRC
+
 
 procedure: (sinh num)
+
 procedure: (cosh num)
+
 procedure: (tanh num)
-returns: the hyperbolic sine, cosine, or tangent of num
+
+returns: num 的 hyperbolic sine, cosine, 或 tangent
+
 libraries: (chezscheme)
 
-(sinh 0.0) => 0.0
-(cosh 0.0) => 1.0
-(tanh -0.0) => -0.0
+#+BEGIN_SRC scheme
+  (sinh 0.0) => 0.0
+  (cosh 0.0) => 1.0
+  (tanh -0.0) => -0.0
+#+END_SRC
+
 
 procedure: (asinh num)
+
 procedure: (acosh num)
+
 procedure: (atanh num)
-returns: the hyperbolic arc sine, arc cosine, or arc tangent of num
+
+returns: num 的 hyperbolic arc sine, arc cosine, 或 arc tangent
+
 libraries: (chezscheme)
 
-(acosh 0.0) => 0.0+1.5707963267948966i
-(acosh 1.0) => 0.0
-(atanh -1.0) => -inf.0
+#+BEGIN_SRC scheme
+  (acosh 0.0) => 0.0+1.5707963267948966i
+  (acosh 1.0) => 0.0
+  (atanh -1.0) => -inf.0
+#+END_SRC
+
 
 procedure: (string->number string)
+
 procedure: (string->number string radix)
-returns: the number represented by string, or #f
+
+returns: string 所表示的数字，或 #f
+
 libraries: (chezscheme)
 
 This procedure is identical to the Revised6 Report version except that radix may be any exact integer between 2 and 36, inclusive. The Revised6 Report version requires radix to be in the set {2,8,10,16}.
+这个过程和 R^{6}RS 版本一样，除了基数可以是 2 至 36（两端包含）之间的任意精确整数。R^{6}RS 版本要求基数属于集合 {2,8,10,16}.
 
-(string->number "211012" 3) => 559
-(string->number "tobeornottobe" 36) => 140613689159812836698
+#+BEGIN_SRC scheme
+  (string->number "211012" 3) => 559
+  (string->number "tobeornottobe" 36) => 140613689159812836698
+#+END_SRC
+
 
 procedure: (number->string num)
+
 procedure: (number->string num radix)
+
 procedure: (number->string num radix precision)
-returns: an external representation of num as a string
+
+returns: 作为字符串的一种 num 的外部表示形式
+an external representation of num as a string
+
 libraries: (chezscheme)
 
 This procedure is identical to the Revised6 Report version except that radix may be any exact integer between 2 and 36, inclusive. The Revised6 Report version requires radix to be in the set {2,8,10,16}.
+这个过程和 R^{6}RS 版本一样，除了基数可以是 2 至 36（两端包含）之间的任意精确整数。R^{6}RS 版本要求基数属于集合 {2,8,10,16}.
 
-(number->string 10000 4) => "2130100"
-(number->string 10000 27) => "DJA"
+#+BEGIN_SRC scheme
+  (number->string 10000 4) => "2130100"
+  (number->string 10000 27) => "DJA"
+#+END_SRC
+
 
 Chez Scheme Version 9 User's Guide
 Copyright © 2018 Cisco Systems, Inc.
