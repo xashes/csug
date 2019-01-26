@@ -1,11 +1,11 @@
-* Chapter 8. Numeric Operations
+* Chapter 8. 数字操作
 
 本章介绍了 Chez Scheme 对数字对象上的标准操作集的扩展。参见"The Scheme Programming Language, 第 4 版", 第 6 章，或 R^{6}RS 中对数字对象上标准操作的介绍。
 
 Chez Scheme 支持全部 Scheme 数字类型，包括精确和不精确整数，有理数，实数，及复数。并使用了一系列表示形式支持这些数据类型：
 
 Fixnums
-    在 fixnum 范围内表示精确整数（参见 most-negative-fixnum 和 most-positive-fixnum）。字符串，向量或 fxvector 的长度均被限定为 fixnum.
+    在 fixnum 范围内表示精确整数（参见 ~most-negative-fixnum~ 和 ~most-positive-fixnum~ ）。字符串，向量或 fxvector 的长度均被限定为 fixnum.
 
 Bignums
     表示 fixnum 范围外的任意精度的精确整数。
@@ -26,9 +26,9 @@ Inexact complexnums
 
 Chez Scheme 对数字对象的语法进行了扩展，包括 2 至 36 的任意基数，非十进制的浮点数，科学表示法，以及 IEEE 无穷数和 NAN（NAN 是 "not-a-number" 的缩写）的打印形式。
 
-任意基数由前缀#nr 指定，n 的范围是 2 至 36. 大于 9 的数字用字母 a 至 z 指定（大写小写均可）。例如，#2r101 是 510, 而#36rZ 是 3510.
+任意基数由前缀 ~#nr~ 指定， ~n~ 的范围是 2 至 36. 大于 9 的数字用字母 ~a~ 至 ~z~ 指定（大写小写均可）。例如， ~#2r101 ~ 是 510, 而 ~#36rZ ~ 是 3510.
 
-对于较大的基数，对于特定字母的解读会出现歧义，例如，e， 作为数字还是作为指数指示符；在这类情况下，字母被当作一个数字。例如，在#x3.2e5 中，e 被解读为一个数字，而不作为指数标记。而在 3.2e5 中，e 则被当作指数标记。
+对于较大的基数，对于特定字母的解读会出现歧义，例如， ~e~ ， 作为数字还是作为指数指示符；在这类情况下，字母被当作一个数字。例如，在 ~#x3.2e5~ 中， ~e~ 被解读为一个数字，而不作为指数标记。而在 ~3.2e5~ 中， ~e~ 则被当作指数标记。
 
 IEEE 无穷数被打印为+inf.0 和-inf.0, 而 IEEE NANs 被打印为 +nan.0 或-nan.0. (+nan.0 被用作所有 NANs 的输出）
 
@@ -39,7 +39,7 @@ IEEE 无穷数被打印为+inf.0 和-inf.0, 而 IEEE NANs 被打印为 +nan.0 �
   (/ +inf.0 -inf.0) => +nan.0
 #+END_SRC
 
-本章第 1 节介绍了特定类型的数字类型谓词。8.2 至 8.4 节介绍了应用于 fixnums, flonums, 和不精确的复数（flonums 和/或不精确的 complexnums）上的快速的，类型专用的数字操作。专用于 fixnum 的版本，应只用于程序员确定操作数和结果都会是 fixnum 时，即，整数在范围(most-negative-fixnum)至(most-positive-fixnum)之间时（两端均包含）。专用于 flonum 的版本，应只用于输入和输出确定为 flonum 时。flonum/complexnum 混合版本，应只用于输入确定为 flonum 或不精确的 complexnum 时。8.5 节介绍了支持把精确整数作为比特集合或序列的，任意精度和专用于 fixnum 的操作。8.6 节介绍了随机数生成，8.7 节介绍了其余各种数字操作。
+本章第 1 节介绍了特定类型的数字类型谓词。8.2 至 8.4 节介绍了应用于 fixnums, flonums, 和不精确的复数（flonums 和/或不精确的 complexnums）上的快速的，类型专用的数字操作。专用于 fixnum 的版本，应只用于程序员确定操作数和结果都会是 fixnum 时，即，整数在范围 ~(most-negative-fixnum)~ 至 ~(most-positive-fixnum)~ 之间时（两端均包含）。专用于 flonum 的版本，应只用于输入和输出确定为 flonum 时。flonum/complexnum 混合版本，应只用于输入确定为 flonum 或不精确的 complexnum 时。8.5 节介绍了支持把精确整数作为比特集合或序列的，任意精度和专用于 fixnum 的操作。8.6 节介绍了随机数生成，8.7 节介绍了其余各种数字操作。
 
 
 ** Section 8.1. 数字类型谓词
@@ -109,7 +109,7 @@ returns: 系统支持的最大负 fixnum
 
 libraries: (chezscheme)
 
-这些过程和 R^{6}RS 中的 greatest-fixnum 和 least-fixnum 过程一样。
+这些过程和 R^{6}RS 中的 ~greatest-fixnum~ 和 ~least-fixnum~ 过程一样。
 
 
 procedure: (fx= fixnum1 fixnum2 ...)
@@ -1015,7 +1015,7 @@ fixnum 被作为补码整数处理，无论其底层的表示形式是什么。c
 #+END_SRC
 
 
-** Section 8.6. Random Number Generation
+** Section 8.6. 随机数生成
 
 procedure: (random real)
 
@@ -1048,7 +1048,7 @@ libraries: (chezscheme)
 #+END_SRC
 
 
-** Section 8.7. Miscellaneous Numeric Operations
+** Section 8.7. 其它各类数字操作
 
 procedure: (= num1 num2 num3 ...)
 
