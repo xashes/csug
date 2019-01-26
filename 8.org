@@ -1,3 +1,4 @@
+#+OPTIONS: toc:nil
 * Chapter 8. 数字操作
 
 本章介绍了 Chez Scheme 对数字对象上的标准操作集的扩展。参见"The Scheme Programming Language, 第 4 版", 第 6 章，或 R^{6}RS 中对数字对象上标准操作的介绍。
