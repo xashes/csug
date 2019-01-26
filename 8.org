@@ -1,44 +1,33 @@
 * Chapter 8. Numeric Operations
 
-This chapter describes Chez Scheme extensions to the standard set of operations on numbers. See Chapter 6 of The Scheme Programming Language, 4th Edition or the Revised6 Report on Scheme for a description of standard operations on numbers.
 本章介绍了 Chez Scheme 对数字对象上的标准操作集的扩展。参见"The Scheme Programming Language, 第 4 版", 第 6 章，或 R^{6}RS 中对数字对象上标准操作的介绍。
 
 Chez Scheme 支持全部 Scheme 数字类型，包括精确和不精确整数，有理数，实数，及复数。并使用了一系列表示形式支持这些数据类型：
 
 Fixnums
-    represent exact integers in the fixnum range (see most-negative-fixnum and most-positive-fixnum). The length of a string, vector, or fxvector is constrained to be a fixnum.
     在 fixnum 范围内表示精确整数（参见 most-negative-fixnum 和 most-positive-fixnum）。字符串，向量或 fxvector 的长度均被限定为 fixnum.
 
 Bignums
-    represent arbitrary-precision exact integers outside of the fixnum range.
     表示 fixnum 范围外的任意精度的精确整数。
 
 Ratnums
-    represent arbitrary-precision exact rational numbers. Each ratnum contains an exact integer (fixnum or bignum) numerator and an exact integer denominator. Ratios are always reduced to lowest terms and never have a denominator of one or a numerator of zero.
     表示任意精度的精确有理数。每个有理数包含一个精确整数分子（fixnum 或 bignum）和一个精确整数分母。分数总是被约分为最简形式，分母从不为 1，而分子永不会为 0.
 
 Flonums
-    represent inexact real numbers. Flonums are IEEE 64-bit floating-point numbers. (Since flonums cannot represent irrational numbers, all inexact real numbers are actually rational, although they may approximate irrational quantities.)
     表示不精确的实数。Flonums 是 IEEE 64 位浮点数。（由于 flonums 不能表示无理数，所有不精确的实数实际只是指有理数，虽然它们可能近似于无理数的数值）。
 
 Exact complexnums
-    represent exact complex numbers. Each exact complexnum contains an exact rational (fixnum, bignum, or ratnum) real part and an exact rational imaginary part.
     表示精确的复数。每个复数包含一个精确有理数（fixnum, bignum, 或 ratnum）的实部，和一个精确有理数的虚部。
 
 Inexact complexnums
-    represent inexact complex numbers. Each inexact complexnum contains a flonum real part and a flonum imaginary part. 
     表示不精确的复数。每个不精确的复数包含一个浮点数实部和一个浮点数虚部。
 
-Most numbers can be represented in only one way; however, real numbers are sometimes represented as inexact complex numbers with imaginary component equal to zero.
 大多数数字只能以一种方式表示；不过，实数有时会表示为虚部为 0 的不精确复数。
 
 Chez Scheme 对数字对象的语法进行了扩展，包括 2 至 36 的任意基数，非十进制的浮点数，科学表示法，以及 IEEE 无穷数和 NAN（NAN 是 "not-a-number" 的缩写）的打印形式。
-extends the syntax of numbers with arbitrary radixes from two through 36, non decimal floating-point and scientific notation, and printed representations for IEEE infinities and NANs. (NAN stands for "not-a-number.")
 
-Arbitrary radixes are specified with the prefix #nr, where n ranges from 2 through 36. Digits beyond 9 are specified with the letters (in either upper or lower case) a through z. For example, #2r101 is 510, and #36rZ is 3510.
 任意基数由前缀#nr 指定，n 的范围是 2 至 36. 大于 9 的数字用字母 a 至 z 指定（大写小写均可）。例如，#2r101 是 510, 而#36rZ 是 3510.
 
-For higher radixes, an ambiguity arises between the interpretation of certain letters, e.g., e, as digits or exponent specifiers; in such cases, the letter is assumed to be a digit. For example, the e in #x3.2e5 is interpreted as a digit, not as an exponent marker, whereas in 3.2e5 it is treated as an exponent marker.
 对于较大的基数，对于特定字母的解读会出现歧义，例如，e， 作为数字还是作为指数指示符；在这类情况下，字母被当作一个数字。例如，在#x3.2e5 中，e 被解读为一个数字，而不作为指数标记。而在 3.2e5 中，e 则被当作指数标记。
 
 IEEE 无穷数被打印为+inf.0 和-inf.0, 而 IEEE NANs 被打印为 +nan.0 或-nan.0. (+nan.0 被用作所有 NANs 的输出）
@@ -52,9 +41,9 @@ IEEE 无穷数被打印为+inf.0 和-inf.0, 而 IEEE NANs 被打印为 +nan.0 �
 
 本章第 1 节介绍了特定类型的数字类型谓词。8.2 至 8.4 节介绍了应用于 fixnums, flonums, 和不精确的复数（flonums 和/或不精确的 complexnums）上的快速的，类型专用的数字操作。专用于 fixnum 的版本，应只用于程序员确定操作数和结果都会是 fixnum 时，即，整数在范围(most-negative-fixnum)至(most-positive-fixnum)之间时（两端均包含）。专用于 flonum 的版本，应只用于输入和输出确定为 flonum 时。flonum/complexnum 混合版本，应只用于输入确定为 flonum 或不精确的 complexnum 时。8.5 节介绍了支持把精确整数作为比特集合或序列的，任意精度和专用于 fixnum 的操作。8.6 节介绍了随机数生成，8.7 节介绍了其余各种数字操作。
 
+
 ** Section 8.1. 数字类型谓词
 
-The Revised6 Report distinguishes two types of special numeric objects: fixnums and flonums. Chez Scheme additionally distinguishes bignums (exact integers outside of the fixnum range) and ratnums (ratios of exact integers). It also provides a predicate for recognizing cflonums, which are flonums or inexact complex numbers.
 R^{6}RS 区分了两种特殊的数字对象：fixnum 和 flonum. Chez Scheme 进一步区分了 bignum（fixnum 范围之外的精确整数）和 ratnum（精确整数的比值）。它同时也提供了一个识别 cflonum 的谓词，其为 flonum 或不精确的复数。
 
 
@@ -108,7 +97,6 @@ libraries: (chezscheme)
 
 ** Section 8.2. Fixnum 操作
 
-Fixnum-specific procedures normally check their inputs and outputs (where appropriate), but at optimization level 3 the compiler generates, in most cases, code that does not perform these checks.
 专用于 fixnum 的过程，通过会检查它们的输入和输出（需要时），但编译器在优化级别 3 下生成的代码，大多数情况下不执行这些检查。
 
 procedure: (most-positive-fixnum)
@@ -215,7 +203,6 @@ returns: 参数 fixnum ...的乘积
 
 libraries: (chezscheme)
 
-When called with no arguments, fx* returns 1.
 不带参数调用时，fx*返回 1.
 
 #+BEGIN_SRC scheme
@@ -329,10 +316,9 @@ libraries: (chezscheme)
 
 ** Section 8.3. Flonum 操作
 
-Inexact real numbers are normally represented by flonums. A flonum is a single 64-bit double-precision floating point number. This section describes operations on flonums, most of which accept flonum arguments and return flonum values. In most cases, the operations are inline-coded or coded as machine language subroutines at optimize-level 3 with no argument type checking; full type checking is performed at lower optimize levels. Flonum-specific procedure names begin with the prefix "fl" to set them apart from their generic counterparts.
-不精确的实数通常以 flonum 表示。flonum 是一个 64 位双精度浮点数。本节介绍针对 flonum 的操作，其中大多数接受 flonum 类型的实参，并返回 flonum 类型的值。大多数情况下，
+不精确的实数通常以 flonum 表示。flonum 是一个单一的 64 位双精度浮点数。本节介绍针对 flonum 的操作，其中大多数接受 flonum 类型的实参，并返回 flonum 类型的值。大多数情况下，这些操作是内联编码或是在不进行实参类型检查的优化级别 3 下编码为机器语言子程序；全面的类型检查是在更低的优化级别下执行的。专用于 flonum 的过程名称带有前缀"fl"，以区分于它们的通用版本。
 
-Inexact real numbers may also be represented by inexact complexnums with imaginary parts equal to zero, which cannot be used as input to the flonum-specific operators. Such numbers are produced, however, only from operations involving complex numbers with nonzero imaginary parts, by explicit calls to fl-make-rectangular, make-rectangular, or make-polar, or by numeric input in either polar or rectangular format.
+不精确的实数也可以用虚部为 0 的不精确 complexnums 表示，这种表示形式不可用于 flonum 专用操作符的输入。然而，这些数字只会在显式调用 fl-make-rectangular, make-rectangular, 或 make-polar 时，或通过极坐标或直角坐标形式的数字输入，由涉及虚部非 0 的复数操作中生成。
 
 procedure: (flonum->fixnum flonum)
 
@@ -340,7 +326,6 @@ returns: flonum 的 fixnum 表示形式（被截短的）
 
 libraries: (chezscheme)
 
-The truncated value of flonum must fall within the fixnum range. flonum->fixnum is a restricted version of exact, which converts any numeric representation to its exact equivalent.
 flonum 被截短后的值必须落在 fixnum 范围内。flonum->fixnum 是一个精确值的限定版本，会把任何数字表示转化为它的精确等价版本。
 
 #+BEGIN_SRC scheme
@@ -364,12 +349,10 @@ procedure: (fl>= flonum1 flonum2 ...)
 
 libraries: (chezscheme)
 
-The predicate fl= returns #t if its arguments are equal. The predicate fl< returns #t if its arguments are monotonically increasing, i.e., each argument is greater than the preceding ones, while fl> returns #t if its arguments are monotonically decreasing. The predicate fl<= returns #t if its arguments are monotonically nondecreasing, i.e., each argument is not less than the preceding ones, while fl>= returns #t if its arguments are monotonically nonincreasing. When passed only one argument, each of these predicates returns #t.
 谓词 fl=在其实参相等时返回#t。谓词 fl<在其实参单调递增时返回#t，即，每个实参都大于它前一个实参，而 fl>在其实参单调递减时返回#t。谓词 fl<=在其实参单调非递减时返回#t，即，每个实参不小于它前一个实参，而 fl>=在其实参单调非递增时返回#t。只传入一个实参时，这些谓词均返回#t。
 
 IEEE NANs 不具有可比较性，即，涉及 NANs 的比较总是返回#f.
 
-These procedures are similar to the Revised6 Report procedures fl=?, fl<?, fl>?, fl<=?, and fl>=? except that the Revised6 Report procedures require two or more arguments, and their names have the "?" suffix.
 这些过程与 R^{6}RS 中的过程 fl=?, fl<?, fl>?, fl<=?, 和 fl>=?类似，除了 R^{6}RS 中的过程需要 2 个或更多参数，以及它们的名称中都有 "?" 后缀以外。
 
 #+BEGIN_SRC scheme
@@ -399,7 +382,6 @@ libraries: (chezscheme)
 
 flnonpositive?等价于(lambda (x) (fl<= x 0.0)), 而 flnonnegative?等价于(lambda (x) (fl>= x 0.0)).
 
-Even if the flonum representation distinguishes -0.0 from +0.0, both are considered nonpositive and nonnegative.
 虽然 flonum 的表示形式区分-0.0 和+0.0，但都判定为非负且非正。
 
 #+BEGIN_SRC scheme
@@ -453,20 +435,23 @@ returns: 参见下文
 
 libraries: (chezscheme)
 
-fllp returns the 12-bit integer consisting of the exponent plus highest order represented bit of a flonum (ieee 64-bit floating-point number). It can be used to compute a fast approximation of the logarithm of the number.
+fllp 返回一个 12 位整数，由指数加上一个 flonum（ieee 64 位浮点数）的最高表示位组成。它可以用于快速计算这个数的对数的近似值。
 
 
-(fllp 0.0) => 0
-(fllp 1.0) => 2046
-(fllp -1.0) => 2046
+#+BEGIN_SRC scheme
+  (fllp 0.0) => 0
+  (fllp 1.0) => 2046
+  (fllp -1.0) => 2046
 
-(fllp 1.5) => 2047
+  (fllp 1.5) => 2047
 
-(fllp +inf.0) => 4094
-(fllp -inf.0) => 4094
+  (fllp +inf.0) => 4094
+  (fllp -inf.0) => 4094
 
-(fllp #b1.0e-1111111111) => 1
-(fllp #b1.0e-10000000000) => 0
+  (fllp #b1.0e-1111111111) => 1
+  (fllp #b1.0e-10000000000) => 0
+#+END_SRC
+
 
 ** Section 8.4. 不精确复数的操作
 
@@ -532,10 +517,8 @@ returns: 一个 cflonum
 
 libraries: (chezscheme)
 
-These procedures compute the sum, difference, product, or quotient of inexact complex quantities, whether these quantities are represented by flonums or inexact complexnums. For example, if cfl+ receives two flonum arguments a and b, it returns the sum a + b; in this case, it behaves the same as fl+. With two inexact complexnum arguments a + bi and c + di, it returns the sum (a + c) + (b + d)i. If one argument is a flonum a and the other an inexact complexnum c + di, cfl+ returns (a + c) + di.
 这些过程计算不精确复数数值的和，差，积或商，不论这些数值是以 flonums 表示，或以不精确 complexnums 表示。例如，如果 cfl+收到 2 个 flonum 实参 a 和 b，它返回它们的和 a + b; 在这种情况下，它和 fl+ 的行为一样。若 2 个实参为不精确 complexnum a + bi 和 c + di, 它返回和 (a + c) + (b + d)i. 若 1 个实参为 flonum a，而另一个为不精确 complexnum c + di, cfl+ 返回 (a + c) + di.
 
-When passed zero arguments, cfl+ returns 0.0 and cfl* returns 1.0. When passed one argument, cfl- returns the additive inverse of the argument, and cfl/ returns the multiplicative inverse of the argument. When passed three or more arguments, cfl- returns the difference between its first and the sum of its remaining arguments, and cfl/ returns the quotient of its first and the product of its remaining arguments.
 当传入 0 个实参，cfl+ 返回 0.0，而 cfl* 返回 1.0. 当传入 1 个实参，cfl- 返回实参的加法逆元，而 cfl/ 返回实参的乘法逆元。当传入 3 个或更多实参，cfl- 返回其第一个实参与其余实参之和的差，而 cfl/ 返回其第一个实参与其余实参之积的商。
 
 #+BEGIN_SRC scheme
@@ -579,7 +562,6 @@ libraries: (chezscheme)
 当传入 1 个不精确的复数实参 a + bi, 过程 cfl-magnitude-squared 返回一个表示此实参的模的平方的 flonum, 即，a^2 + b^2.
 
 参见 magnitude-squared, 其为此操作符的通用版本，对于 1 个复数的任何有效表示形式，返回它的模的平方。这两个操作都类似于过程 magnitude, 其返回它的复数实参的模，sqrt(a2 + b2).
-, of its generic complex argument.
 
 #+BEGIN_SRC scheme
   (cfl-magnitude-squared 3.0) => 9.0
@@ -587,15 +569,12 @@ libraries: (chezscheme)
 #+END_SRC
 
 
-** Section 8.5. 位和逻辑运算符
+** Section 8.5. 位和逻辑操作符
 
-Chez Scheme 提供了一系列的逻辑运算符，以支持把精确整数 (fixnums 和 bignums) 作为位集合或位序列来处理。这些运算符包括 logand（逐位的逻辑与），logior（逐位的逻辑或），logxor（逐位的逻辑异或），lognot（逐位的逻辑非），logtest（测试多位），logbit?（测试单个位），logbit0（重置单个位），logbit1（设置单个位），以及 ash（算术移位）。这些运算符均把它的实参作为补码整数处理，不论这些实参的底层表示形式是什么。这种处理方法可被利用于表示无穷集合：TODO
-This treatment can be exploited to represent infinite sets: a negative number represents an infinite number of one bits beyond the leftmost zero, and a nonnegative number represents an infinite number of zero bits beyond the leftmost one bit.
+Chez Scheme 提供了一系列的逻辑操作符，以支持把精确整数 (fixnums 和 bignums) 作为位集合或位序列来处理。这些操作符包括 logand（逐位的逻辑与），logior（逐位的逻辑或），logxor（逐位的逻辑异或），lognot（逐位的逻辑非），logtest（测试多位），logbit?（测试单个位），logbit0（重置单个位），logbit1（设置单个位），以及 ash（算术移位）。这些操作符均把它的实参作为补码整数处理，不论这些实参的底层表示形式是什么。这种处理方法可被利用于表示无穷集合：a negative number represents an infinite number of one bits beyond the leftmost zero, and a nonnegative number represents an infinite number of zero bits beyond the leftmost one bit.
 
-Fixnum equivalents of the logical operators are provided, as fxlogand, fxlogior, fxlogxor, fxlognot, fxlogtest, fxlogbit?, fxlogbit0, and fxlogbit1. Three separate fixnum operators are provided for shifting: fxsll (shift-left logical), fxsrl (shift-right logical), fxsra (shift-right arithmetic). Logical and arithmetic shifts differ only for right shifts. Shift-right logical shifts in zero bits on the left end, and shift-right arithmetic replicates the sign bit.
-也提供了 fixnum 相应版本的逻辑运算符，比如 fxlogand, fxlogior, fxlogxor, fxlognot, fxlogtest, fxlogbit?, fxlogbit0, 以及 fxlogbit1. 还有三个用于移位的 fixnum 运算符: fxsll（逻辑左移位），fxsrl（逻辑右移位），fxsra（算术右移位）。逻辑和算术移位只在右移位上有差别。逻辑右移位在最左端填充 0，而算术右移位则复制符号位。
+也提供了 fixnum 相应版本的逻辑操作符，比如 fxlogand, fxlogior, fxlogxor, fxlognot, fxlogtest, fxlogbit?, fxlogbit0, 以及 fxlogbit1. 还有三个用于移位的 fixnum 操作符: fxsll（逻辑左移位），fxsrl（逻辑右移位），fxsra（算术右移位）。逻辑和算术移位只在右移位上有差别。逻辑右移位在最左端填充 0，而算术右移位则复制符号位。
 
-Logical shifts do not make sense for arbitrary-precision integers, since these have no "left end" into which bits must be shifted.
 对任意精度的整数，逻辑移位没有意义，因为这些数没有必须移位的“最左端”。
 
 
@@ -605,7 +584,6 @@ returns: 实参 int ...的逻辑与
 
 libraries: (chezscheme)
 
-The arguments must be exact integers (fixnums or bignums) and are treated as two's complement integers, regardless of the underlying representation. With no arguments, logand returns -1, i.e., all bits set.
 实参必须是精确的整数（fixnums 或 bignums），而且被作为补码整数处理，无论其底层的表示形式是什么。不传入实参时，logand 返回-1，即，所有位都设为 1.
 
 #+BEGIN_SRC scheme
@@ -628,7 +606,6 @@ returns: 实参 int ...的逻辑或
 
 libraries: (chezscheme)
 
-The arguments must be exact integers (fixnums or bignums) and are treated as two's complement integers, regardless of the underlying representation. With no arguments, logior returns 0, i.e., all bits reset.
 实参必须是精确的整数（fixnums 或 bignums），而且被作为补码整数处理，无论其底层的表示形式是什么。不传入实参时，logior 返回 0，即，所有位都被重置。
 
 #+BEGIN_SRC scheme
@@ -649,7 +626,6 @@ returns: 实参 int ...的逻辑异或
 
 libraries: (chezscheme)
 
-The arguments must be exact integers (fixnums or bignums) and are treated as two's complement integers, regardless of the underlying representation. With no arguments, logxor returns 0, i.e., all bits reset.
 实参必须是精确的整数（fixnums 或 bignums），而且被作为补码整数处理，无论其底层的表示形式是什么。不传入实参时，logxor 返回 0，即，所有位都被重置。
 
 #+BEGIN_SRC scheme
@@ -688,7 +664,6 @@ libraries: (chezscheme)
 实参必须是精确的整数（fixnums 或 bignums），而且被作为补码整数处理，无论其底层的表示形式是什么。
 
 如果在 int 的索引 index 处的位被设为 1，logbit? 返回#t, 否则返回#f. 索引基于 0，从最低位向最高位数。索引没有上限；对于非负的 int，在最高的设置位以上的位均被当作 0，而对负值，在最高的重置位以上的位都被当作 1.
-returns #t if the bit at index index of int is set (one) and #f otherwise. The index is zero-based, counting from the lowest-order toward higher-order bits. There is no upper limit on the index; for nonnegative values of int, the bits above the highest order set bit are all considered to be zero, and for negative values, the bits above the highest order reset bit are all considered to be one.
 
 logbit? 等价于
 
@@ -759,7 +734,7 @@ returns: 把 int 在索引 index 处的位清 0 后的结果
 
 libraries: (chezscheme)
 
-index 必须是一个非负的精确整数。int 必须是一个精确整数（fixnum 或 bignum），且被作为补码整数处理，无论它背后的表示形式是什么。
+index 必须是一个非负的精确整数。int 必须是一个精确整数（fixnum 或 bignum），且被作为补码整数处理，无论它底层的表示形式是什么。
 
 索引基于 0，从低位到高位计数。和 logbit?一样，索引没有上限。
 
@@ -784,7 +759,7 @@ returns: 把 int 在索引 index 处的位设为 1 后的结果
 
 libraries: (chezscheme)
 
-index 必须是一个非负的精确整数。int 必须是一个精确整数（fixnum 或 bignum），且被作为补码整数处理，无论它背后的表示形式是什么。
+index 必须是一个非负的精确整数。int 必须是一个精确整数（fixnum 或 bignum），且被作为补码整数处理，无论它底层的表示形式是什么。
 
 索引基于 0，从低位到高位计数。和 logbit?一样，索引没有上限。
 
@@ -848,7 +823,6 @@ returns: 实参 fixnum ...的逻辑或
 
 libraries: (chezscheme)
 
-The arguments are treated as two's complement integers, regardless of the underlying representation. With no arguments, fxlogior returns 0, i.e., all bits reset.
 实参均被作为补码整数处理，无论其底层的表示形式是什么。不传入实参时，fxlogior 返回 0, 即，所有位都被重置。
 
 #+BEGIN_SRC scheme
@@ -907,7 +881,6 @@ libraries: (chezscheme)
 index 必须是非负 fixnum. fixnum 被作为补码整数处理，无论其底层的表示形式是什么。
 
 如果 fixnum 在索引 index 处的位被设为 1，则 fxlogbit? 返回 #t, 否则返回#f. 索引基于 0，从最低位向最高位计数。索引只受限 fixnum 的范围；对于非负的 int，在最高的设置位以上的位均被当作 0，而对负值，在最高的重置位以上的位都被当作 1.
-returns #t if the bit at index index of fixnum is set (one) and #f otherwise. The index is zero-based, counting from the lowest-order toward higher-order bits. The index is limited only by the fixnum range; for nonnegative values of fixnum, the bits above the highest order set bit are all considered to be zero, and for negative values, the bits above the highest order reset bit are all considered to be one.
 
 #+BEGIN_SRC scheme
   (fxlogbit? 0 #b1110) => #f
@@ -934,10 +907,8 @@ procedure: (fxlogtest fixnum1 fixnum2)
 
 libraries: (chezscheme)
 
-The arguments are treated as two's complement integers, regardless of the underlying representation.
 实参均被作为补码整数处理，无论其底层的表示形式是什么。
 
-fxlogtest returns #t if any bit set in one argument is also set in the other. It returns #f if the two arguments have no set bits in common.
 如果有任何位在两个实参中均为 1，则 fxlogtest 返回 #t. 如果两个实参中没有任何共同位被设为 1，则返回 #f.
 
 #+BEGIN_SRC scheme
@@ -960,7 +931,6 @@ returns: fixnum 在索引 index 处的位被清零后的结果
 
 libraries: (chezscheme)
 
-fixnum is treated as a two's complement integer, regardless of the underlying representation. index must be nonnegative and less than the number of bits in a fixnum, excluding the sign bit, i.e., less than (integer-length (most-positive-fixnum)). The index is zero-based, counting from the lowest-order toward higher-order bits.
 fixnum 被作为补码整数处理，无论其底层的表示形式是什么。index 必须非负，且小于一个 fixnum 中的位数（不包括符号位），即，小于 (integer-length (most-positive-fixnum)).索引基于 0，从最低位向最高位计数。
 
 fxlogbit0 等价于
@@ -1022,7 +992,6 @@ returns: fixnum 逻辑右移 count 位
 
 libraries: (chezscheme)
 
-fixnum is treated as a two's complement integer, regardless of the underlying representation. count must be nonnegative and not more than the number of bits in a fixnum, i.e., (+ (integer-length (most-positive-fixnum)) 1).
 fixnum 被作为补码整数处理，无论其底层的表示形式是什么。count 必须非负，且不大于一个 fixnum 中的位数，即，(+ (integer-length (most-positive-fixnum)) 1).
 
 #+BEGIN_SRC scheme
@@ -1054,7 +1023,6 @@ returns: 小于 real 的一个非负伪随机数
 
 libraries: (chezscheme)
 
-real must be a positive integer or positive inexact real number.
 real 必须是正整数，或正的不精确实数。
 
 #+BEGIN_SRC scheme
@@ -1065,12 +1033,11 @@ real 必须是正整数，或正的不精确实数。
 
 
 thread parameter: random-seed
+
 libraries: (chezscheme)
 
-The random number generator allows the current random seed to be obtained and modified via the parameter random-seed.
 随机数生成器支持通过参数对象 random-seed 获取和修改当前的随机数种子。
 
-When called without arguments, random-seed returns the current random seed. When called with one argument, which must be a nonnegative exact integer ranging from 1 through 232 - 1, random-seed sets the current random seed to the argument.
 不带实参调用时，random-seed 返回当前的随机数种子。当带 1 个实参调用时，实参必须是 1 至 2^32 -1 之间的非负精确整数，而 random-seed 把当前的随机数种子设为此实参的值。
 
 #+BEGIN_SRC scheme
@@ -1098,7 +1065,6 @@ procedure: (>= real1 real2 real3 ...)
 libraries: (chezscheme)
 
 这些谓词和 R^{6}RS 中的对应版本一样，只是它们被扩展为可接受 1 个以上参数，而非 2 个以上参数。当传入 1 个参数时，这些谓词均返回 #t.
-These predicates are identical to the Revised6 Report counterparts, except they are extended to accept one or more rather than two or more arguments. When passed one argument, each of these predicates returns #t.
 
 #+BEGIN_SRC scheme
   (> 3/4) => #t
@@ -1164,8 +1130,7 @@ returns: n 的整数平方根
 
 libraries: (chezscheme)
 
-n must be a nonnegative integer. The integer square root of n is defined to be =>.
-n 必须是非负整数。TODO
+n 必须是非负整数。The integer square root of n is defined to be =>.TODO
 
 #+BEGIN_SRC scheme
   (isqrt 0) => 0
@@ -1183,7 +1148,6 @@ returns: 参见下文
 
 libraries: (chezscheme)
 
-The procedure integer-length returns the length in bits of the smallest two's complement representation for n, with an assumed leading 1 (sign) bit for negative numbers. For zero, integer-length returns 0.
 过程 integer-length 返回 n 的最小补码表示形式的位数长度，并假设负数前面有一个为 1 的符号位。对于 0，integer-length 返回 0.
 
 #+BEGIN_SRC scheme
@@ -1203,7 +1167,6 @@ The procedure integer-length returns the length in bits of the smallest two's co
 
 procedure: (nonpositive? real)
 
-returns: #t if real is not greater than zero, #f otherwise
 返回: 如果 real 不大于 0，则为 ~#t~, 否则为 ~#f~.
 
 libraries: (chezscheme)
@@ -1305,7 +1268,6 @@ returns: string 所表示的数字，或 #f
 
 libraries: (chezscheme)
 
-This procedure is identical to the Revised6 Report version except that radix may be any exact integer between 2 and 36, inclusive. The Revised6 Report version requires radix to be in the set {2,8,10,16}.
 这个过程和 R^{6}RS 版本一样，除了基数可以是 2 至 36（两端包含）之间的任意精确整数。R^{6}RS 版本要求基数属于集合 {2,8,10,16}.
 
 #+BEGIN_SRC scheme
@@ -1325,7 +1287,6 @@ an external representation of num as a string
 
 libraries: (chezscheme)
 
-This procedure is identical to the Revised6 Report version except that radix may be any exact integer between 2 and 36, inclusive. The Revised6 Report version requires radix to be in the set {2,8,10,16}.
 这个过程和 R^{6}RS 版本一样，除了基数可以是 2 至 36（两端包含）之间的任意精确整数。R^{6}RS 版本要求基数属于集合 {2,8,10,16}.
 
 #+BEGIN_SRC scheme
