@@ -1,7 +1,7 @@
 #+OPTIONS: toc:nil
 * 7. 对象操作
 
-本章介绍了 /Chez Scheme/ 中针对非数值对象的特定操作，包括 pairs, numbers 等标准对象，以及 boxes, records 等 /Chez Scheme/ 扩展对象。第 8 章介绍了针对数字的操作。关于对象的标准操作的更多描述，参见“The Scheme Programming Language，第 4 版”的第 6 章，或 R^{6}RS.
+本章介绍了 /Chez Scheme/ 中针对非数值对象的特定操作，包括点对，数字等标准对象，以及 boxes, records 等 /Chez Scheme/ 扩展对象。第 8 章介绍了针对数字的操作。关于对象的标准操作的更多描述，参见“The Scheme Programming Language，第 4 版”的第 6 章，或 R^{6}RS.
 
 
 *** 7.1. R^{6}RS 中缺少的类型谓词
@@ -212,7 +212,7 @@
 
  过程: (reverse! list)
 
- 返回: 对原列表反向排序的列表
+ 返回: 对 ~list~ 中元素进行逆向排序得到的列表
 
  库: (chezscheme)
 
