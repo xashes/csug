@@ -10,7 +10,7 @@ Chez Scheme closes file ports automatically after they become inaccessible to th
 ** Section 9.1. Generic Ports
 
 Chez Scheme's "generic port" facility allows the programmer to add new types of textual ports with arbitrary input/output semantics. It may be used, for example, to define any of the built-in Common Lisp [30] stream types, i.e., synonym streams, broadcast streams, concatenated streams, two-way streams, echo streams, and string streams. It may also be used to define more exotic ports, such as ports that represent windows on a bit-mapped display or ports that represent processes connected to the current process via pipes or sockets.
-Chez Scheme
+Chez Scheme 的“通用端口”功能支持程序员以任意输入/输出语义添加新的文本端口类型。
 
 Each port has an associated port handler. A port handler is a procedure that accepts messages in an object-oriented style. Each message corresponds to one of the low-level Scheme operations on ports, such as read-char and close-input-port (but not read, which is defined in terms of the lower-level operations). Most of these operations simply call the handler immediately with the corresponding message.
 
@@ -123,10 +123,10 @@ perm-other-execute:
 
 The language of the Revised6 Report provides three built-in codecs: a latin-1 codec, a utf-8 codec, and a utf-16 codec. Chez Scheme provides three additional codecs: a utf-16le codec, utf-16be codec, and an "iconv" codec for non-Unicode character sets. It also provides an alternative to the standard utf-16 codec that defaults to little-endian format rather than the default big-endian format. This section describes these codecs, plus a current-transcoder parameter that allows the programmer to determine the transcoder used for a textual port whenever the transcoder is implicit, as for open-input-file or load, along with the predicate transcoder?, which should be standard but is not.
 
-procedure: (utf-16-codec)
-procedure: (utf-16-codec endianness)
-procedure: (utf-16le-codec)
-procedure: (utf-16be-codec)
+procedure: ~(utf-16-codec)~
+procedure: ~(utf-16-codec endianness)~
+procedure: ~(utf-16le-codec)~
+procedure: ~(utf-16be-codec)~
 returns: a codec
 libraries: (chezscheme)
 
@@ -144,7 +144,7 @@ The Revised6 Report version of utf-16-codec lacks the optional endianness argume
 
 The codecs returned by utf-16le-codec and utf-16be-codec are used to read and write data in the UTF-16LE and UTF-16BE formats, i.e., UTF-16 with little-endian or big-endian byte order and no BOM. For output, these codecs are useful for controlling whether and where the BOM is emitted, since no BOM is emitted implicitly and a BOM can be emitted explicitly as an ordinary character. For input, these codecs are useful for processing files known to be in little-endian or big-endian format with no BOM.
 
-procedure: (iconv-codec code-page)
+procedure: ~(iconv-codec code-page)~
 returns: a codec
 libraries: (chezscheme)
 
@@ -159,7 +159,7 @@ libraries: (chezscheme)
 
 The transcoder value of the current-transcoder parameter is used whenever a textual file is opened with an implicit transcoder, e.g., by open-input-file and other convenience I/O procedures, compile-file include, load, and pretty-file. Its initial value is the value of the native-transcoder procedure.
 
-procedure: (transcoder? obj)
+procedure: ~(transcoder? obj)~
 returns: #t if obj is a transcoder, #f otherwise
 libraries: (chezscheme)
 
@@ -169,9 +169,9 @@ The procedures used to create, access, and alter ports directly are described in
 
 Unless otherwise specified, procedures requiring either input ports or output ports as arguments accept input/output ports as well, i.e., an input/output port is both an input port and an output port.
 
-procedure: (make-input-port handler input-buffer)
-procedure: (make-output-port handler output-buffer)
-procedure: (make-input/output-port handler input-buffer output-buffer)
+procedure: ~(make-input-port handler input-buffer)~
+procedure: ~(make-output-port handler output-buffer)~
+procedure: ~(make-input/output-port handler input-buffer output-buffer)~
 returns: a new textual port
 libraries: (chezscheme)
 
@@ -181,35 +181,35 @@ The input size of an input or input/output port is initialized to the string len
 
 The length of an input or output buffer may be zero, in which case buffering is effectively disabled.
 
-procedure: (port-handler port)
+procedure: ~(port-handler port)~
 returns: a procedure
 libraries: (chezscheme)
 
 For generic ports, port-handler returns the handler passed to one of the generic port creation procedures described above. For ports created by open-input-file and similar procedures, port-handler returns an internal handler that may be invoked in the same manner as any other handler.
 
-procedure: (port-input-buffer input-port)
-procedure: (port-input-size input-port)
-procedure: (port-input-index input-port)
-procedure: (textual-port-input-buffer textual-input-port)
-procedure: (textual-port-input-size textual-input-port)
-procedure: (textual-port-input-index textual-input-port)
-procedure: (binary-port-input-buffer binary-input-port)
-procedure: (binary-port-input-size binary-input-port)
-procedure: (binary-port-input-index binary-input-port)
+procedure: ~(port-input-buffer input-port)~
+procedure: ~(port-input-size input-port)~
+procedure: ~(port-input-index input-port)~
+procedure: ~(textual-port-input-buffer textual-input-port)~
+procedure: ~(textual-port-input-size textual-input-port)~
+procedure: ~(textual-port-input-index textual-input-port)~
+procedure: ~(binary-port-input-buffer binary-input-port)~
+procedure: ~(binary-port-input-size binary-input-port)~
+procedure: ~(binary-port-input-index binary-input-port)~
 returns: see below
 libraries: (chezscheme)
 
 These procedures return the input buffer, size, or index of the input port. The variants specialized to textual or binary ports are slightly more efficient than their generic counterparts.
 
-procedure: (set-port-input-index! input-port n)
-procedure: (set-port-input-size! input-port n)
-procedure: (set-port-input-buffer! input-port x)
-procedure: (set-textual-port-input-index! textual-input-port n)
-procedure: (set-textual-port-input-size! textual-input-port n)
-procedure: (set-textual-port-input-buffer! textual-input-port string)
-procedure: (set-binary-port-input-index! binary-input-port n)
-procedure: (set-binary-port-input-size! binary-input-port n)
-procedure: (set-binary-port-input-buffer! binary-input-port bytevector)
+procedure: ~(set-port-input-index! input-port n)~
+procedure: ~(set-port-input-size! input-port n)~
+procedure: ~(set-port-input-buffer! input-port x)~
+procedure: ~(set-textual-port-input-index! textual-input-port n)~
+procedure: ~(set-textual-port-input-size! textual-input-port n)~
+procedure: ~(set-textual-port-input-buffer! textual-input-port string)~
+procedure: ~(set-binary-port-input-index! binary-input-port n)~
+procedure: ~(set-binary-port-input-size! binary-input-port n)~
+procedure: ~(set-binary-port-input-buffer! binary-input-port bytevector)~
 returns: unspecified
 libraries: (chezscheme)
 
@@ -221,9 +221,9 @@ The procedure set-port-input-buffer! sets the input buffer field of input-port t
 
 The variants specialized to textual or binary ports are slightly more efficient than their generic counterparts.
 
-procedure: (port-input-count input-port)
-procedure: (textual-port-input-count textual-input-port)
-procedure: (binary-port-input-count binary-input-port)
+procedure: ~(port-input-count input-port)~
+procedure: ~(textual-port-input-count textual-input-port)~
+procedure: ~(binary-port-input-count binary-input-port)~
 returns: see below
 libraries: (chezscheme)
 
@@ -231,35 +231,35 @@ These procedures return an exact integer representing the number of characters o
 
 The variants specialized to textual or binary ports are slightly more efficient than their generic counterpart.
 
-procedure: (port-input-empty? input-port)
+procedure: ~(port-input-empty? input-port)~
 returns: #t if the port's input buffer contains no more data, otherwise #f
 libraries: (chezscheme)
 
 This procedure determines whether the port's input count is zero without computing or returning the actual count.
 
-procedure: (port-output-buffer output-port)
-procedure: (port-output-size output-port)
-procedure: (port-output-index output-port)
-procedure: (textual-port-output-buffer output-port)
-procedure: (textual-port-output-size output-port)
-procedure: (textual-port-output-index output-port)
-procedure: (binary-port-output-buffer output-port)
-procedure: (binary-port-output-size output-port)
-procedure: (binary-port-output-index output-port)
+procedure: ~(port-output-buffer output-port)~
+procedure: ~(port-output-size output-port)~
+procedure: ~(port-output-index output-port)~
+procedure: ~(textual-port-output-buffer output-port)~
+procedure: ~(textual-port-output-size output-port)~
+procedure: ~(textual-port-output-index output-port)~
+procedure: ~(binary-port-output-buffer output-port)~
+procedure: ~(binary-port-output-size output-port)~
+procedure: ~(binary-port-output-index output-port)~
 returns: see below
 libraries: (chezscheme)
 
 These procedures return the output buffer, size, or index of the output port. The variants specialized to textual or binary ports are slightly more efficient than their generic counterparts.
 
-procedure: (set-port-output-index! output-port n)
-procedure: (set-port-output-size! output-port n)
-procedure: (set-port-output-buffer! output-port x)
-procedure: (set-textual-port-output-index! textual-output-port n)
-procedure: (set-textual-port-output-size! textual-output-port n)
-procedure: (set-textual-port-output-buffer! textual-output-port string)
-procedure: (set-binary-port-output-index! output-port n)
-procedure: (set-binary-port-output-size! output-port n)
-procedure: (set-binary-port-output-buffer! binary-output-port bytevector)
+procedure: ~(set-port-output-index! output-port n)~
+procedure: ~(set-port-output-size! output-port n)~
+procedure: ~(set-port-output-buffer! output-port x)~
+procedure: ~(set-textual-port-output-index! textual-output-port n)~
+procedure: ~(set-textual-port-output-size! textual-output-port n)~
+procedure: ~(set-textual-port-output-buffer! textual-output-port string)~
+procedure: ~(set-binary-port-output-index! output-port n)~
+procedure: ~(set-binary-port-output-size! output-port n)~
+procedure: ~(set-binary-port-output-buffer! binary-output-port bytevector)~
 returns: unspecified
 libraries: (chezscheme)
 
@@ -271,9 +271,9 @@ The procedure set-port-output-buffer! sets the output buffer field of output-por
 
 The variants specialized to textual or binary ports are slightly more efficient than their generic counterparts.
 
-procedure: (port-output-count output-port)
-procedure: (textual-port-output-count textual-output-port)
-procedure: (binary-port-output-count binary-output-port)
+procedure: ~(port-output-count output-port)~
+procedure: ~(textual-port-output-count textual-output-port)~
+procedure: ~(binary-port-output-count binary-output-port)~
 returns: see below
 libraries: (chezscheme)
 
@@ -281,30 +281,34 @@ These procedures return an exact integer representing the amount of space in cha
 
 The variants specialized to textual or binary ports are slightly more efficient than their generic counterpart.
 
-procedure: (port-output-full? output-port)
+procedure: ~(port-output-full? output-port)~
 returns: #t if the port's input buffer has no more room, otherwise #f
 libraries: (chezscheme)
 
 This procedure determines whether the port's output count is zero without computing or returning the actual count.
 
-procedure: (mark-port-closed! port)
+procedure: ~(mark-port-closed! port)~
 returns: unspecified
 libraries: (chezscheme)
 
 This procedure directly marks the port closed so that no further input or output operations are allowed on it. It is typically used by handlers upon receipt of a close-port message.
 
-procedure: (port-closed? port)
+procedure: ~(port-closed? port)~
 returns: #t if port is closed, #f otherwise
 libraries: (chezscheme)
 
+#+begin_src scheme
 (let ([p (open-output-string)])
-  (port-closed? p)) <graphic> #f
+  (port-closed? p)) \Rightarrow #f
+#+end_src
 
+#+begin_src scheme
 (let ([p (open-output-string)])
   (close-port p)
-  (port-closed? p)) <graphic> #t
+#+end_src
+  (port-closed? p)) \Rightarrow #t
 
-procedure: (set-port-bol! output-port obj)
+procedure: ~(set-port-bol! output-port obj)~
 returns: unspecified
 libraries: (chezscheme)
 
@@ -312,11 +316,11 @@ When obj is #f, the port's beginning-of-line (BOL) flag is cleared; otherwise, t
 
 The BOL flag is consulted by fresh-line (page 240) to determine if it needs to emit a newline. This flag is maintained automatically for file output ports, string output ports, and transcript ports. The flag is set for newly created file and string output ports, except for file output ports created with the append option, for which the flag is reset. The BOL flag is clear for newly created generic ports and never set automatically, but may be set explicitly using set-port-bol!. The port is always flushed immediately before the flag is consulted, so it need not be maintained on a per-character basis for buffered ports.
 
-procedure: (port-bol? port)
+procedure: ~(port-bol? port)~
 returns: #t if port's BOL flag is set, #f otherwise
 libraries: (chezscheme)
 
-procedure: (set-port-eof! input-port obj)
+procedure: ~(set-port-eof! input-port obj)~
 returns: unspecified
 libraries: (chezscheme)
 
@@ -326,40 +330,54 @@ When obj is #f, the eof mark is cleared.
 
 The following example assumes /dev/zero provides an infinite stream of zero bytes.
 
+#+begin_src scheme
 (define p
   (parameterize ([file-buffer-size 3])
+#+end_src
     (open-file-input-port "/dev/zero")))
+#+begin_src scheme
 (set-port-eof! p #t)
-(get-u8 p) <graphic> #!eof
-(get-u8 p) <graphic> 0
+(get-u8 p) \Rightarrow #!eof
+#+end_src
+#+begin_src scheme
+(get-u8 p) \Rightarrow 0
 (set-port-eof! p #t)
-(get-u8 p) <graphic> 0
-(get-u8 p) <graphic> 0
-(get-u8 p) <graphic> #!eof
-(get-u8 p) <graphic> 0
+#+end_src
+#+begin_src scheme
+(get-u8 p) \Rightarrow 0
+(get-u8 p) \Rightarrow 0
+#+end_src
+#+begin_src scheme
+(get-u8 p) \Rightarrow #!eof
+(get-u8 p) \Rightarrow 0
+#+end_src
 
-procedure: (port-name port)
+procedure: ~(port-name port)~
 returns: the name associated with port
 libraries: (chezscheme)
 
 The name may be any object but is usually a string or #f (denoting no name). For file ports, the name is typically a string naming the file.
 
+#+begin_src scheme
 (let ([p (open-input-file "myfile.ss")])
-  (port-name p)) <graphic> "myfile.ss"
+  (port-name p)) \Rightarrow "myfile.ss"
+#+end_src
 
+#+begin_src scheme
 (let ([p (open-output-string)])
-  (port-name p)) <graphic> "string"
+  (port-name p)) \Rightarrow "string"
+#+end_src
 
-procedure: (set-port-name! port obj)
+procedure: ~(set-port-name! port obj)~
 returns: unspecified
 libraries: (chezscheme)
 
 This procedure sets port's name to obj, which should be a string or #f (denoting no name).
 
-procedure: (port-length port)
-procedure: (file-length port)
+procedure: ~(port-length port)~
+procedure: ~(file-length port)~
 returns: the length of the file or other object to which port refers
-procedure: (port-has-port-length? port)
+procedure: ~(port-has-port-length? port)~
 returns: #t if the port supports port-length, #f otherwise
 libraries: (chezscheme)
 
@@ -369,9 +387,9 @@ File lengths beyond 232 might not be reported property for compressed files on 3
 
 file-length is identical to port-length.
 
-procedure: (set-port-length! port len)
+procedure: ~(set-port-length! port len)~
 returns: unspecified
-procedure: (port-has-set-port-length!? port)
+procedure: ~(port-has-set-port-length!? port)~
 returns: #t if the port supports set-port-length!, #f otherwise
 libraries: (chezscheme)
 
@@ -379,17 +397,17 @@ A port may allow the length of the underlying stream of characters or bytes to b
 
 It is not possible to set the length of a port opened with compression to an arbitrary position, and the result of an attempt to set the length of a compressed file beyond 232 on 32-bit versions of the system is undefined.
 
-procedure: (port-nonblocking? port)
+procedure: ~(port-nonblocking? port)~
 returns: #t if the port is in nonblocking mode, #f otherwise
-procedure: (port-has-port-nonblocking?? port)
+procedure: ~(port-has-port-nonblocking?? port)~
 returns: #t if the port supports port-nonblocking?, #f otherwise
 libraries: (chezscheme)
 
 A port may allow the nonblocking status of the port to be determined. If so, the procedure port-has-port-nonblocking?? returns #t and port-nonblocking? returns a boolean value reflecting whether the port is in nonblocking mode.
 
-procedure: (set-port-nonblocking! port obj)
+procedure: ~(set-port-nonblocking! port obj)~
 returns: unspecified
-procedure: (port-has-set-port-nonblocking!? port)
+procedure: ~(port-has-set-port-nonblocking!? port)~
 returns: #t if the port supports set-port-nonblocking!, #f otherwise
 libraries: (chezscheme)
 
@@ -401,8 +419,8 @@ Although get-bytevector-some and get-string-some normally cannot return an empty
 
 Nonblocking mode is not supported under Windows.
 
-procedure: (file-position port)
-procedure: (file-position port pos)
+procedure: ~(file-position port)~
+procedure: ~(file-position port pos)~
 returns: see below
 libraries: (chezscheme)
 
@@ -410,28 +428,28 @@ When the second argument is omitted, this procedure behaves like the R6RS port-p
 
 For compressed files opened with the compressed flag, file-position returns the position in the uncompressed stream of data. Changing the position of a compressed input file opened with the compressed flag generally requires rewinding and rereading the file and might thus be slow. The position of a compressed output file opened with the compressed flag can be moved forward only; this is accomplished by writing a (compressed) sequence of zeros. File positions beyond 232 might not be reported property for compressed files on 32-bit versions of the system.
 
-procedure: (clear-input-port)
-procedure: (clear-input-port input-port)
+procedure: ~(clear-input-port)~
+procedure: ~(clear-input-port input-port)~
 returns: unspecified
 libraries: (chezscheme)
 
 If input-port is not supplied, it defaults to the current input port. This procedure discards any data in the buffer associated with input-port. This may be necessary, for example, to clear any type-ahead from the keyboard in preparation for an urgent query.
 
-procedure: (clear-output-port)
-procedure: (clear-output-port output-port)
+procedure: ~(clear-output-port)~
+procedure: ~(clear-output-port output-port)~
 returns: unspecified
 libraries: (chezscheme)
 
 If output-port is not supplied, it defaults to the current output port. This procedure discards any data in the buffer associated with output-port. This may be necessary, for example, to clear any pending output on an interactive port in preparation for an urgent message.
 
-procedure: (flush-output-port)
-procedure: (flush-output-port output-port)
+procedure: ~(flush-output-port)~
+procedure: ~(flush-output-port output-port)~
 returns: unspecified
 libraries: (chezscheme)
 
 If output-port is not supplied, it defaults to the current output port. This procedure forces any data in the buffer associated with output-port to be printed immediately. The console output port is automatically flushed after a newline and before input from the console input port; all ports are automatically flushed when they are closed. flush-output-port may be necessary, however, to force a message without a newline to be sent to the console output port or to force output to appear on a file without delay.
 
-procedure: (port-file-compressed! port)
+procedure: ~(port-file-compressed! port)~
 returns: unspecified
 libraries: (chezscheme)
 
@@ -443,7 +461,7 @@ String ports allow the creation and manipulation of strings via port operations.
 
 While string ports could be defined as generic ports, they are instead supported as primitive by the implementation.
 
-procedure: (open-input-string string)
+procedure: ~(open-input-string string)~
 returns: a new string input port
 libraries: (chezscheme)
 
@@ -451,27 +469,31 @@ A string input port is similar to a file input port, except that characters and 
 
 A string port is at "end of file" when the port reaches the end of the string. It is not necessary to close a string port, although it is okay to do so.
 
+#+begin_src scheme
 (let ([p (open-input-string "hi mom!")])
   (let ([x (read p)])
-    (list x (read p)))) <graphic> (hi mom!)
+#+end_src
+    (list x (read p)))) \Rightarrow (hi mom!)
 
-procedure: (with-input-from-string string thunk)
+procedure: ~(with-input-from-string string thunk)~
 returns: the values returned by thunk
 libraries: (chezscheme)
 
 thunk must be a procedure and should accept zero arguments. with-input-from-string parameterizes the current input port to be the result of opening string for input during the application of thunk.
 
+#+begin_src scheme
 (with-input-from-string "(cons 3 4)"
   (lambda ()
-    (eval (read)))) <graphic> (3 . 4)
+#+end_src
+    (eval (read)))) \Rightarrow (3 . 4)
 
-procedure: (open-output-string)
+procedure: ~(open-output-string)~
 returns: a new string output port
 libraries: (chezscheme)
 
 A string output port is similar to a file output port, except that characters and objects written to the port are placed in a string (which grows as needed) rather than to a file. The string built by writing to a string output port may be obtained with get-output-string. See the example given for get-output-string below. It is not necessary to close a string port, although it is okay to do so.
 
-procedure: (get-output-string string-output-port)
+procedure: ~(get-output-string string-output-port)~
 returns: the string associated with string-output-port
 libraries: (chezscheme)
 
@@ -479,24 +501,28 @@ string-output-port must be an port returned by open-output-string.
 
 As a side effect, get-output-string resets string-output-port so that subsequent output to string-output-port is placed into a fresh string.
 
+#+begin_src scheme
 (let ([p (open-output-string)])
   (write 'hi p)
+#+end_src
   (write-char #\space p)
   (write 'mom! p)
-  (get-output-string p)) <graphic> "hi mom!"
+  (get-output-string p)) \Rightarrow "hi mom!"
 
 An implementation of format (Section 9.13) might be written using string-output ports to produce string output.
 
-procedure: (with-output-to-string thunk)
+procedure: ~(with-output-to-string thunk)~
 returns: a string containing the output
 libraries: (chezscheme)
 
 thunk must be a procedure and should accept zero arguments. with-output-to-string parameterizes the current output port to a new string output port during the application of thunk. If thunk returns, the string associated with the new string output port is returned, as with get-output-string.
 
+#+begin_src scheme
 (with-output-to-string
   (lambda ()
+#+end_src
     (display "Once upon a time ...")
-    (newline))) <graphic> "Once upon a time ...\n"
+    (newline))) \Rightarrow "Once upon a time ...\n"
 
 ** Section 9.6. File Ports
 
@@ -505,13 +531,13 @@ libraries: (chezscheme)
 
 file-buffer-size is a parameter that determines the size of each buffer created when the buffer mode is not none for a port created by one of the file open operations, e.g., open-input-file or open-file-output-port. When called with no arguments, the parameter returns the current buffer size. When called with a positive fixnum k, it sets the current buffer size to k.
 
-procedure: (file-port? port)
+procedure: ~(file-port? port)~
 returns: #t if port is a file port, #f otherwise
 libraries: (chezscheme)
 
 A file port is any port based directly on an O/S file descriptor, e.g., one created by open-file-input-port, open-output-port, open-fd-input-port, etc., but not a string, bytevector, or custom port.
 
-procedure: (port-file-descriptor port)
+procedure: ~(port-file-descriptor port)~
 returns: the file descriptor associated with port
 libraries: (chezscheme)
 
@@ -536,8 +562,8 @@ libraries: (chezscheme)
 
 current-input-port is a parameter that determines the default port argument for most input procedures, including read-char, peek-char, and read, When called with no arguments, current-input-port returns the current input port. When called with one argument, which must be a textual input port, it changes the value of the current input port. The Revised6 Report version of current-input-port accepts only zero arguments, i.e., it cannot be used to change the current input port. The initial value of this parameter is the same port as the initial value of console-input-port.
 
-procedure: (open-input-file path)
-procedure: (open-input-file path options)
+procedure: ~(open-input-file path)~
+procedure: ~(open-input-file path options)~
 returns: a new input port
 libraries: (chezscheme)
 
@@ -551,14 +577,16 @@ The mutually exclusive buffered and unbuffered options determine whether input i
 
 For example, the call
 
+#+begin_src scheme
 (open-input-file "frob" '(compressed))
+#+end_src
 
 opens the file frob with decompression enabled.
 
 The Revised6 Report version of open-input-file does not support the optional options argument.
 
-procedure: (call-with-input-file path procedure)
-procedure: (call-with-input-file path procedure options)
+procedure: ~(call-with-input-file path procedure)~
+procedure: ~(call-with-input-file path procedure options)~
 returns: the values returned by procedure
 libraries: (chezscheme)
 
@@ -572,8 +600,8 @@ See open-input-file above for a description of the optional options argument.
 
 The Revised6 Report version of call-with-input-file does not support the optional input argument.
 
-procedure: (with-input-from-file path thunk)
-procedure: (with-input-from-file path thunk options)
+procedure: ~(with-input-from-file path thunk)~
+procedure: ~(with-input-from-file path thunk options)~
 returns: the values returned by thunk
 libraries: (chezscheme)
 
@@ -587,9 +615,9 @@ See open-input-file above for a description of the optional options argument.
 
 The Revised6 Report version of with-input-from-file does not support the optional options argument.
 
-procedure: (open-fd-input-port fd)
-procedure: (open-fd-input-port fd b-mode)
-procedure: (open-fd-input-port fd b-mode ?transcoder)
+procedure: ~(open-fd-input-port fd)~
+procedure: ~(open-fd-input-port fd b-mode)~
+procedure: ~(open-fd-input-port fd b-mode ?transcoder)~
 returns: a new input port for the file descriptor fd
 libraries: (chezscheme)
 
@@ -597,9 +625,9 @@ fd must be a nonnegative exact integer and should be a valid open file descripto
 
 The file descriptor is closed when the port is closed.
 
-procedure: (standard-input-port)
-procedure: (standard-input-port b-mode)
-procedure: (standard-input-port b-mode ?transcoder)
+procedure: ~(standard-input-port)~
+procedure: ~(standard-input-port b-mode)~
+procedure: ~(standard-input-port b-mode ?transcoder)~
 returns: a new input port connected to the process's standard input
 libraries: (chezscheme)
 
@@ -607,7 +635,7 @@ If ?transcoder is present and not #f, it must be a transcoder, and this procedur
 
 The Revised6 Report version of this procedure does not accept the optional b-mode and ?transcoder arguments, which limits it to an implementation-dependent buffering mode (block in Chez Scheme) and binary output.
 
-procedure: (get-string-some textual-input-port)
+procedure: ~(get-string-some textual-input-port)~
 returns: a nonempty string or the eof object
 libraries: (chezscheme)
 
@@ -615,7 +643,7 @@ If textual-input-port is at end of file, the eof object is returned. Otherwise, 
 
 An exception to the "at least one character" guarantee occurs if the port is in nonblocking mode (see set-port-nonblocking!) and no input is ready. In this case, an empty string is returned.
 
-procedure: (get-string-some! textual-input-port string start n)
+procedure: ~(get-string-some! textual-input-port string start n)~
 returns: the count of characters read, as an exact nonnegative integer, or the eof object
 libraries: (chezscheme)
 
@@ -629,7 +657,7 @@ Otherwise, this procedure reads (as if with get-char) up to n characters from th
 
 If the port is in nonblocking mode, this procedure reads no more than it can without blocking and thus might read zero characters; otherwise, it reads at least one character but no more than are available when the first character becomes available.
 
-procedure: (get-bytevector-some! binary-input-port bytevector start n)
+procedure: ~(get-bytevector-some! binary-input-port bytevector start n)~
 returns: the count of bytes read, as an exact nonnegative integer, or the eof object
 libraries: (chezscheme)
 
@@ -643,9 +671,9 @@ Otherwise, this procedure reads (as if with get-u8) up to n bytes from the port,
 
 If the port is in nonblocking mode, this procedure reads no more than it can without blocking and thus might read zero bytes; otherwise, it reads at least one byte but no more than are available when the first byte becomes available.
 
-procedure: (unread-char char)
-procedure: (unread-char char textual-input-port)
-procedure: (unget-char textual-input-port char)
+procedure: ~(unread-char char)~
+procedure: ~(unread-char char textual-input-port)~
+procedure: ~(unget-char textual-input-port char)~
 returns: unspecified
 libraries: (chezscheme)
 
@@ -653,8 +681,10 @@ For unread-char, if textual-input-port is not supplied, it defaults to the curre
 
 unread-char and unget-char are provided for applications requiring one character of lookahead and may be used in place of, or even in combination with, peek-char or lookahead-char. One character of lookahead is required in the procedure read-word, which is defined below in terms of unread-char. read-word returns the next word from a textual input port as a string, where a word is defined to be a sequence of alphabetic characters. Since it does not know until it reads one character too many that it has read the entire word, read-word uses unread-char to return the character to the input port.
 
+#+begin_src scheme
 (define read-word
   (lambda (p)
+#+end_src
     (list->string
       (let f ([c (read-char p)])
         (cond
@@ -667,8 +697,10 @@ unread-char and unget-char are provided for applications requiring one character
 
 In the alternate version below, peek-char is used instead of unread-char.
 
+#+begin_src scheme
 (define read-word
   (lambda (p)
+#+end_src
     (list->string
       (let f ([c (peek-char p)])
         (cond
@@ -680,27 +712,27 @@ In the alternate version below, peek-char is used instead of unread-char.
 
 The advantage of unread-char in this situation is that only one call to unread-char per word is required, whereas one call to peek-char is required for each character in the word plus the first character beyond. In many cases, unread-char and unget-char do not enjoy this advantage, and peek-char or lookahead-char should be used instead.
 
-procedure: (unget-u8 binary-input-port octet)
+procedure: ~(unget-u8 binary-input-port octet)~
 returns: unspecified
 libraries: (chezscheme)
 
 This procedures "unreads" the last byte read from binary-input-port. octet may or may not be ignored, depending upon the implementation. In any case, octet should be last byte read from the port. A byte should not be unread twice on the same port without an intervening call to get-u8.
 
-procedure: (input-port-ready? input-port)
+procedure: ~(input-port-ready? input-port)~
 returns: #t if data is available on input-port, #f otherwise
 libraries: (chezscheme)
 
 input-port-ready? allows a program to check to see if input is available on a textual or binary input port without hanging. If input is available or the port is at end of file, input-port-ready? returns #t. If it cannot determine from the port whether input is ready, input-port-ready? raises an exception with condition type &i/o-read-error. Otherwise, it returns #f.
 
-procedure: (char-ready?)
-procedure: (char-ready? textual-input-port)
+procedure: ~(char-ready?)~
+procedure: ~(char-ready? textual-input-port)~
 returns: #t if a character is available on textual-input-port, #f otherwise
 libraries: (chezscheme)
 
 If textual-input-port is not supplied, it defaults to the current input port. char-ready? is like input-port-ready? except it is restricted to textual input ports.
 
-procedure: (block-read textual-input-port string)
-procedure: (block-read textual-input-port string count)
+procedure: ~(block-read textual-input-port string)~
+procedure: ~(block-read textual-input-port string count)~
 returns: see below
 libraries: (chezscheme)
 
@@ -710,8 +742,8 @@ If textual-input-port is at end-of-file, an eof object is returned. Otherwise, s
 
 If textual-input-port is buffered and the buffer is nonempty, the buffered input or a portion thereof is returned; otherwise block-read bypasses the buffer entirely.
 
-procedure: (read-token)
-procedure: (read-token textual-input-port)
+procedure: ~(read-token)~
+procedure: ~(read-token textual-input-port)~
 returns: see below
 libraries: (chezscheme)
 
@@ -778,28 +810,38 @@ The set of token types is likely to change in future releases of the system; che
 
 The input port is left pointing to the first character position beyond the token, i.e., end characters from the starting position.
 
+#+begin_src scheme
 (define s (open-input-string "(a b c)"))
-(read-token s) <graphic> lparen
+(read-token s) \Rightarrow lparen
+#+end_src
                    #f
                    0
                    1
+#+begin_src scheme
 (define s (open-input-string "abc 123"))
-(read-token s) <graphic> atomic
+(read-token s) \Rightarrow atomic
+#+end_src
                    abc
                    0
                    3
+#+begin_src scheme
 (define s (open-input-string ""))
-(read-token s) <graphic> eof
+(read-token s) \Rightarrow eof
+#+end_src
                    #!eof
                    0
                    0
+#+begin_src scheme
 (define s (open-input-string "#7=#7#"))
-(read-token s) <graphic> mark
+(read-token s) \Rightarrow mark
+#+end_src
                    7
                    0
                    3
-(read-token s) <graphic> insert
+#+begin_src scheme
+(read-token s) \Rightarrow insert
                    7
+#+end_src
                    3
                    6
 
@@ -829,8 +871,8 @@ libraries: (chezscheme)
 
 current-error-port is a parameter that can be used to set or obtain the current error port. When called with no arguments, current-error-port returns the current error port. When called with one argument, which must be a textual output port, it changes the value of the current error port. The Revised6 Report version of current-error-port accepts only zero arguments, i.e., it cannot be used to change the current error port. The initial value of this parameter is the same port as the initial value of console-error-port.
 
-procedure: (open-output-file path)
-procedure: (open-output-file path options)
+procedure: ~(open-output-file path)~
+procedure: ~(open-output-file path options)~
 returns: a new output port
 libraries: (chezscheme)
 
@@ -861,14 +903,16 @@ The mode option determines the permission bits on Unix systems when the file is 
 
 For example, the call
 
+#+begin_src scheme
 (open-output-file "frob" '(compressed truncate mode #o644))
+#+end_src
 
 opens the file frob with compression enabled. If frob already exists it is truncated. On Unix-based systems, if frob does not already exist, the permission bits on the newly created file are set to logical and of #o644 and the process's umask.
 
 The Revised6 Report version of open-output-file does not support the optional options argument.
 
-procedure: (call-with-output-file path procedure)
-procedure: (call-with-output-file path procedure options)
+procedure: ~(call-with-output-file path procedure)~
+procedure: ~(call-with-output-file path procedure options)~
 returns: the values returned by procedure
 libraries: (chezscheme)
 
@@ -882,8 +926,8 @@ See open-output-file above for a description of the optional options argument.
 
 The Revised6 Report version of call-with-output-file does not support the optional options argument.
 
-procedure: (with-output-to-file path thunk)
-procedure: (with-output-to-file path thunk options)
+procedure: ~(with-output-to-file path thunk)~
+procedure: ~(with-output-to-file path thunk options)~
 returns: the value returned by thunk
 libraries: (chezscheme)
 
@@ -897,9 +941,9 @@ See open-output-file above for a description of the optional options argument.
 
 The Revised6 Report version of with-output-to-file does not support the optional options argument.
 
-procedure: (open-fd-output-port fd)
-procedure: (open-fd-output-port fd b-mode)
-procedure: (open-fd-output-port fd b-mode ?transcoder)
+procedure: ~(open-fd-output-port fd)~
+procedure: ~(open-fd-output-port fd b-mode)~
+procedure: ~(open-fd-output-port fd b-mode ?transcoder)~
 returns: a new output port for the file descriptor fd
 libraries: (chezscheme)
 
@@ -907,9 +951,9 @@ fd must be a nonnegative exact integer and should be a valid open file descripto
 
 The file descriptor is closed when the port is closed.
 
-procedure: (standard-output-port)
-procedure: (standard-output-port b-mode)
-procedure: (standard-output-port b-mode ?transcoder)
+procedure: ~(standard-output-port)~
+procedure: ~(standard-output-port b-mode)~
+procedure: ~(standard-output-port b-mode ?transcoder)~
 returns: a new output port connected to the process's standard output
 libraries: (chezscheme)
 
@@ -917,9 +961,9 @@ If ?transcoder is present and not #f, it must be a transcoder, and this procedur
 
 The Revised6 Report version of this procedure does not accept the optional b-mode and ?transcoder arguments, which limits it to an implementation-dependent buffering mode (line in Chez Scheme) and binary output.
 
-procedure: (standard-error-port)
-procedure: (standard-error-port b-mode)
-procedure: (standard-error-port b-mode ?transcoder)
+procedure: ~(standard-error-port)~
+procedure: ~(standard-error-port b-mode)~
+procedure: ~(standard-error-port b-mode ?transcoder)~
 returns: a new output port connected to the process's standard error
 libraries: (chezscheme)
 
@@ -927,9 +971,9 @@ If ?transcoder is present and not #f, it must be a transcoder, and this procedur
 
 The Revised6 Report version of this procedure does not accept the optional b-mode and ?transcoder arguments, which limits it to an implementation-dependent buffering mode (none in Chez Scheme) and binary output.
 
-procedure: (put-bytevector-some binary-output-port bytevector)
-procedure: (put-bytevector-some binary-output-port bytevector start)
-procedure: (put-bytevector-some binary-output-port bytevector start n)
+procedure: ~(put-bytevector-some binary-output-port bytevector)~
+procedure: ~(put-bytevector-some binary-output-port bytevector start)~
+procedure: ~(put-bytevector-some binary-output-port bytevector start n)~
 returns: the number of bytes written
 libraries: (chezscheme)
 
@@ -937,9 +981,9 @@ start and n must be nonnegative exact integers, and the sum of start and n must 
 
 This procedure normally writes the n bytes of bytevector starting at start to the port and advances the its position past the end of the bytes written. If the port is in nonblocking mode (see set-port-nonblocking!), however, the number of bytes written may be less than n, if the system would have to block to write more bytes.
 
-procedure: (put-string-some textual-output-port string)
-procedure: (put-string-some textual-output-port string start)
-procedure: (put-string-some textual-output-port string start n)
+procedure: ~(put-string-some textual-output-port string)~
+procedure: ~(put-string-some textual-output-port string start)~
+procedure: ~(put-string-some textual-output-port string start n)~
 returns: the number of characters written
 libraries: (chezscheme)
 
@@ -947,15 +991,15 @@ start and n must be nonnegative exact integers, and the sum of start and n must 
 
 This procedure normally writes the n characters of string starting at start to the port and advances the its position past the end of the characters written. If the port is in nonblocking mode (see set-port-nonblocking!), however, the number of characters written may be less than n, if the system would have to block to write more characters.
 
-procedure: (display-string string)
-procedure: (display-string string textual-output-port)
+procedure: ~(display-string string)~
+procedure: ~(display-string string textual-output-port)~
 returns: unspecified
 libraries: (chezscheme)
 
 display-string writes the characters contained within string to textual-output-port or to the current-output port if textual-output-port is not specified. The enclosing string quotes are not printed, and special characters within the string are not escaped. display-string is a more efficient alternative to display for displaying strings.
 
-procedure: (block-write textual-output-port string)
-procedure: (block-write textual-output-port string count)
+procedure: ~(block-write textual-output-port string)~
+procedure: ~(block-write textual-output-port string count)~
 returns: unspecified
 libraries: (chezscheme)
 
@@ -963,10 +1007,10 @@ count must be a nonnegative fixnum less than or equal to the length of string. I
 
 block-write writes the first count characters of string to textual-output-port. If the port is buffered and the buffer is nonempty, the buffer is flushed before the contents of string are written. In any case, the contents of string are written immediately, without passing through the buffer.
 
-procedure: (truncate-port output-port)
-procedure: (truncate-port output-port pos)
-procedure: (truncate-file output-port)
-procedure: (truncate-file output-port pos)
+procedure: ~(truncate-port output-port)~
+procedure: ~(truncate-port output-port pos)~
+procedure: ~(truncate-file output-port)~
+procedure: ~(truncate-file output-port pos)~
 returns: unspecified
 libraries: (chezscheme)
 
@@ -976,8 +1020,8 @@ pos must be an exact nonnegative integer. It defaults to 0.
 
 These procedures truncate the file or other object associated with output-port to pos and repositions the port to that position, i.e., it combines the functionality of set-port-length! and set-port-position! and can be called on a port only if port-has-set-port-length!? and port-has-set-port-position!? are both true of the port.
 
-procedure: (fresh-line)
-procedure: (fresh-line textual-output-port)
+procedure: ~(fresh-line)~
+procedure: ~(fresh-line textual-output-port)~
 returns: unspecified
 libraries: (chezscheme)
 
@@ -987,8 +1031,8 @@ This procedure behaves like newline, i.e., sends a newline character to textual-
 
 ** Section 9.10. Input/Output Operations
 
-procedure: (open-input-output-file path)
-procedure: (open-input-output-file path options)
+procedure: ~(open-input-output-file path)~
+procedure: ~(open-input-output-file path options)~
 returns: a new input-output port
 libraries: (chezscheme)
 
@@ -1000,9 +1044,9 @@ options, if present, is a symbolic option name or option list. Possible symbolic
 
 Input/output files are usually closed using close-port but may also be closed with either close-input-port or close-output-port.
 
-procedure: (open-fd-input/output-port fd)
-procedure: (open-fd-input/output-port fd b-mode)
-procedure: (open-fd-input/output-port fd b-mode ?transcoder)
+procedure: ~(open-fd-input/output-port fd)~
+procedure: ~(open-fd-input/output-port fd b-mode)~
+procedure: ~(open-fd-input/output-port fd b-mode ?transcoder)~
 returns: a new input/output port for the file descriptor fd
 libraries: (chezscheme)
 
@@ -1014,9 +1058,9 @@ The file descriptor is closed when the port is closed.
 
 The procedures described in this section convert bytevectors containing single- and multiple-byte sequences in non-Unicode character sets to and from Scheme strings. They are available only under Windows. Under other operating systems, and when an iconv DLL is available under Windows, bytevector->string and string->bytevector can be used with a transcoder based on a codec constructed via iconv-codec to achieve the same results, with more control over the handling of invalid characters and line endings.
 
-procedure: (multibyte->string code-page bytevector)
+procedure: ~(multibyte->string code-page bytevector)~
 returns: a string containing the characters encoded in bytevector
-procedure: (string->multibyte code-page string)
+procedure: ~(string->multibyte code-page string)~
 returns: a bytevector containing the encodings of the characters in string
 libraries: (chezscheme)
 
@@ -1030,8 +1074,8 @@ The pretty printer is a version of the write procedure that produces more human-
 
 The pretty printer's operation can be controlled via the pretty-format procedure described later in this section, which allows the programmer to specify how specific forms are to be printed, various pretty-printer controls, also described later in this section, and also by the generic input/output controls described in Section 9.14.
 
-procedure: (pretty-print obj)
-procedure: (pretty-print obj textual-output-port)
+procedure: ~(pretty-print obj)~
+procedure: ~(pretty-print obj textual-output-port)~
 returns: unspecified
 libraries: (chezscheme)
 
@@ -1039,25 +1083,29 @@ If textual-output-port is not supplied, it defaults to the current output port.
 
 pretty-print is similar to write except that it uses any number of spaces and newlines in order to print obj in a style that is pleasing to look at and which shows the nesting level via indentation. For example,
 
+#+begin_src scheme
 (pretty-print '(define factorial (lambda (n) (let fact ((i n) (a 1))
   (if (= i 0) a (fact (- i 1) (* a i)))))))
+#+end_src
 
 might produce
 
+#+begin_src scheme
 (define factorial
   (lambda (n)
+#+end_src
     (let fact ([i n] [a 1])
       (if (= i 0) a (fact (- i 1) (* a i))))))
 
-procedure: (pretty-file ifn ofn)
+procedure: ~(pretty-file ifn ofn)~
 returns: unspecified
 libraries: (chezscheme)
 
 ifn and ofn must be strings. pretty-file reads each object in turn from the file named by ifn and pretty prints the object to the file named by ofn. Comments present in the input are discarded by the reader and so do not appear in the output file. If the file named by ofn already exists, it is replaced.
 
-procedure: (pretty-format sym)
+procedure: ~(pretty-format sym)~
 returns: see below
-procedure: (pretty-format sym fmt)
+procedure: ~(pretty-format sym fmt)~
 returns: unspecified
 libraries: (chezscheme)
 
@@ -1065,7 +1113,7 @@ By default, the pretty printer uses a generic algorithm for printing each form. 
 
 In the two-argument case, the format fmt is associated with sym for future invocations of the pretty printer. fmt must be in the formatting language described below.
 
-<fmt>	<graphic>	(quote symbol)
+<fmt>	\Rightarrow	(quote symbol)
 	|	var
 	|	symbol
 	|	(read-macro string symbol)
@@ -1073,20 +1121,22 @@ In the two-argument case, the format fmt is associated with sym for future invoc
 	|	(bracket . fmt-tail)
 	|	(alt fmt fmt*)
 	|	fmt-tail
-fmt-tail	<graphic>	()
+fmt-tail	\Rightarrow	()
 	|	(tab fmt ...)
 	|	(fmt tab ...)
 	|	(tab fmt . fmt-tail)
 	|	(fmt ...)
 	|	(fmt . fmt-tail)
 	|	(fill tab fmt ...)
-tab	<graphic>	int
+tab	\Rightarrow	int
 	|	#f
 
 Some of the format forms are used for matching when there are multiple alternatives, while others are used for matching and control indentation or printing. A description of each fmt is given below.
 
+#+begin_src scheme
 (quote symbol):
     This matches only the symbol symbol.
+#+end_src
 
 var:
     This matches any symbol.
@@ -1094,43 +1144,65 @@ var:
 symbol:
     This matches any input.
 
+#+begin_src scheme
 (read-macro string symbol):
     This is used for read macros like quote and syntax. It matches any input of the form (symbol subform). For forms that match, the pretty printer prints string immediately followed by subform.
+#+end_src
 
+#+begin_src scheme
 (meta):
     This is a special case used for the meta keyword (Section 11.8) which is used as a keyword prefix of another form.
+#+end_src
 
+#+begin_src scheme
 (alt fmt fmt*):
     This compares the input against the specified formats and uses the one that is the closest match. Most often, one of the formats will match exactly, but in other cases, as when input is malformed or appears in abstract form in the template of a syntactic abstraction, none of the formats will match exactly.
+#+end_src
 
+#+begin_src scheme
 (bracket . fmt-tail):
     This matches any list-structured input and prints the input enclosed in square brackets, i.e., [ and ], rather than parentheses.
+#+end_src
 
 fmt-tail:
     This matches any list-structured input. 
 
 Indentation of list-structured forms is determined via the fmt-tail specifier used to the last two cases above. A description of each fmt-tail is given below.
 
+#+begin_src scheme
 ():
     This matches an empty list tail.
+#+end_src
 
+#+begin_src scheme
 (tab fmt ...):
     This matches the tail of any proper list; if the tail is nonempty and the list does not fit entirely on the current line, a line break is inserted before the first subform of the tail and tab (see below) determines the amount by which this and all subsequent subforms are indented.
+#+end_src
 
+#+begin_src scheme
 (fmt tab ...):
     This matches the tail of any proper list; if the tail is nonempty and the list does not fit entirely on the current line, a line break is inserted after the first subform of the tail and tab (see below) determines the amount by which all subsequent subforms are indented.
+#+end_src
 
+#+begin_src scheme
 (tab fmt . fmt-tail):
     This matches a nonempty tail if the tail of the tail matches fmt-tail. If the list does not fit entirely on the current line, a line break is inserted before the first subform of the tail and tab (see below) determines the amount by which the subform is indented.
+#+end_src
 
+#+begin_src scheme
 (fmt ...):
     This matches the tail of any proper list and specified that no line breaks are to be inserted before or after the current or subsequent subforms.
+#+end_src
 
+#+begin_src scheme
 (fmt . fmt-tail):
     This matches a nonempty tail if the tail of the tail matches fmt-tail and specifies that no line break is to be inserted before or after the current subform.
+#+end_src
 
+#+begin_src scheme
 (fill tab fmt ...):
     This matches the tail of any proper list and invokes a fill mode in which the forms are packed with as many as will fit on each line. 
+#+end_src
 
 A tab determines the amount by which a list subform is indented. If tab is a nonnegative exact integer int, the subform is indented int spaces in from the character position just after the opening parenthesis or bracket of the parent form. If tab is #f, the standard indentation is used. The standard indentation can be determined or changed via the parameter pretty-standard-indent, which is described later in this section.
 
@@ -1138,8 +1210,10 @@ In cases where a format is given that doesn't quite match, the pretty printer tr
 
 Here is an example showing the formatting of let might be specified.
 
+#+begin_src scheme
 (pretty-format 'let
   '(alt (let ([bracket var x] 0 ...) #f e #f e ...)
+#+end_src
         (let var ([bracket var x] 0 ...) #f e #f e ...)))
 
 Since let comes in two forms, named and unnamed, two alternatives are specified. In either case, the bracket fmt is used to enclose the bindings in square brackets, with all bindings after the first appearing just below the first (and just after the enclosing opening parenthesis), if they don't all fit on one line. Each body form is indented by the standard indentation.
@@ -1175,10 +1249,10 @@ The parameter pretty-maximum-lines controls how many lines pretty-print prints w
 
 ** Section 9.13. Formatted Output
 
-procedure: (format format-string obj ...)
-procedure: (format #f format-string obj ...)
-procedure: (format #t format-string obj ...)
-procedure: (format textual-output-port format-string obj ...)
+procedure: ~(format format-string obj ...)~
+procedure: ~(format #f format-string obj ...)~
+procedure: ~(format #t format-string obj ...)~
+procedure: ~(format textual-output-port format-string obj ...)~
 returns: see below
 libraries: (chezscheme)
 
@@ -1190,75 +1264,109 @@ Chez Scheme's implementation of format supports all of the Common Lisp [30] form
 
 Absent any format directives, format simply displays its string argument.
 
-(format "hi there") <graphic> "hi there"
+#+begin_src scheme
+(format "hi there") \Rightarrow "hi there"
+#+end_src
 
 The ~s directive is replaced by the printed representation of the next obj, which may be any object, in machine-readable format, as with write.
 
-(format "hi ~s" 'mom) <graphic> "hi mom"
-(format "hi ~s" "mom") <graphic> "hi \"mom\""
-(format "hi ~s~s" 'mom #\!) <graphic> "hi mom#\\!"
+#+begin_src scheme
+(format "hi ~s" 'mom) \Rightarrow "hi mom"
+(format "hi ~s" "mom") \Rightarrow "hi \"mom\""
+#+end_src
+#+begin_src scheme
+(format "hi ~s~s" 'mom #\!) \Rightarrow "hi mom#\\!"
+#+end_src
 
 The general form of a ~s directive is actually ~mincol,colinc,minpad,padchars, and the s can be preceded by an at sign ( @ ) modifier. These additional parameters are used to control padding in the output, with at least minpad copies of padchar plus an integer multiple of colinc copies of padchar to make the total width, including the written object, mincol characters wide. The padding is placed on the left if the @ modifier is present, otherwise on the right. mincol and minpad default to 0, colinc defaults to 1, and padchar defaults to space. If specified, padchar is prefixed by a single quote mark.
 
-(format "~10s" 'hello) <graphic> "hello     "
-(format "~10@s" 'hello) <graphic> "     hello"
-(format "~10,,,'*@s" 'hello) <graphic> "*****hello"
+#+begin_src scheme
+(format "~10s" 'hello) \Rightarrow "hello     "
+(format "~10@s" 'hello) \Rightarrow "     hello"
+#+end_src
+#+begin_src scheme
+(format "~10,,,'*@s" 'hello) \Rightarrow "*****hello"
+#+end_src
 
 The ~a directive is similar, but prints the object as with display.
 
-(format "hi ~s~s" "mom" #\!) <graphic> "hi \"mom\"#\\!"
-(format "hi ~a~a" "mom" #\!) <graphic> "hi mom!"
+#+begin_src scheme
+(format "hi ~s~s" "mom" #\!) \Rightarrow "hi \"mom\"#\\!"
+(format "hi ~a~a" "mom" #\!) \Rightarrow "hi mom!"
+#+end_src
 
 A tilde may be inserted into the output with ~~, and a newline may be inserted with ~% (or embedded in the string with \n).
 
-(format "~~line one,~%line two.~~") <graphic> "~line one,\nline two.~"
-(format "~~line one,\nline two.~~") <graphic> "~line one,\nline two.~"
+#+begin_src scheme
+(format "~~line one,~%line two.~~") \Rightarrow "~line one,\nline two.~"
+(format "~~line one,\nline two.~~") \Rightarrow "~line one,\nline two.~"
+#+end_src
 
 Real numbers may be printed in floating-point notation with ~f.
 
-(format "~f" 3.14159) <graphic> 3.14159
+#+begin_src scheme
+(format "~f" 3.14159) \Rightarrow 3.14159
+#+end_src
 
 Exact numbers may printed as well as inexact numbers in this manner; they are simply converted to inexact first as if with exact->inexact.
 
-(format "~f" 1/3) <graphic> "0.3333333333333333"
+#+begin_src scheme
+(format "~f" 1/3) \Rightarrow "0.3333333333333333"
+#+end_src
 
 The general form is actually ~w,d,k,overflowchar,padcharf. If specified, w determines the overall width of the output, and d the number of digits to the right of the decimal point. padchar, which defaults to space, is the pad character used if padding is needed. Padding is always inserted on the left. The number is scaled by 10k when printed; k defaults to zero. The entire w-character field is filled with copies of overflowchar if overflowchar is specified and the number cannot be printed in w characters. k defaults to 1 If an @ modifier is present, a plus sign is printed before the number for nonnegative inputs; otherwise, a sign is printed only if the number is negative.
 
-(format "~,3f" 3.14159) <graphic> "3.142"
-(format "~10f" 3.14159) <graphic> "   3.14159"
-(format "~10,,,'#f" 1e20) <graphic> "##########"
+#+begin_src scheme
+(format "~,3f" 3.14159) \Rightarrow "3.142"
+(format "~10f" 3.14159) \Rightarrow "   3.14159"
+#+end_src
+#+begin_src scheme
+(format "~10,,,'#f" 1e20) \Rightarrow "##########"
+#+end_src
 
 Real numbers may also be printed with ~e for scientific notation or with ~g, which uses either floating-point or scientific notation based on the size of the input.
 
-(format "~e" 1e23) <graphic> "1.0e+23"
-(format "~g" 1e23) <graphic> "1.0e+23"
+#+begin_src scheme
+(format "~e" 1e23) \Rightarrow "1.0e+23"
+(format "~g" 1e23) \Rightarrow "1.0e+23"
+#+end_src
 
 A real number may also be printed with ~$, which uses monetary notation defaulting to two digits to the right of the decimal point.
 
-(format "$~$" (* 39.95 1.06)) <graphic> "$42.35"
-(format "~$USD" 1/3) <graphic> "0.33USD"
+#+begin_src scheme
+(format "$~$" (* 39.95 1.06)) \Rightarrow "$42.35"
+(format "~$USD" 1/3) \Rightarrow "0.33USD"
+#+end_src
 
 Words can be pluralized automatically using p.
 
-(format "~s bear~:p in ~s den~:p" 10 1) <graphic> "10 bears in 1 den"
+#+begin_src scheme
+(format "~s bear~:p in ~s den~:p" 10 1) \Rightarrow "10 bears in 1 den"
+#+end_src
 
 Numbers may be printed out in words or roman numerals using variations on ~r.
 
-(format "~r" 2599) <graphic>  "two thousand five hundred ninety-nine"
-(format "~:r" 99) <graphic>  "ninety-ninth"
-(format "~@r" 2599) <graphic> "MMDXCIX"
+#+begin_src scheme
+(format "~r" 2599) \Rightarrow  "two thousand five hundred ninety-nine"
+(format "~:r" 99) \Rightarrow  "ninety-ninth"
+#+end_src
+#+begin_src scheme
+(format "~@r" 2599) \Rightarrow "MMDXCIX"
+#+end_src
 
 Case conversions can be performed by bracketing a portion of the format string with the ~@( and ~) directives.
 
-(format "~@(~r~)" 2599) <graphic>  "Two thousand five hundred ninety-nine"
-(format "~@:(~a~)" "Ouch!") <graphic>  "OUCH!"
+#+begin_src scheme
+(format "~@(~r~)" 2599) \Rightarrow  "Two thousand five hundred ninety-nine"
+(format "~@:(~a~)" "Ouch!") \Rightarrow  "OUCH!"
+#+end_src
 
 Some of the directives shown above have more options and parameters, and there are other directives as well, including directives for conditionals, iteration, indirection, and justification. Again, please consult a Common Lisp reference for complete documentation.
 
 An implementation of a greatly simplified version of format appears in Section 12.6 of The Scheme Programming Language, 4th Edition.
 
-procedure: (printf format-string obj ...)
-procedure: (fprintf textual-output-port format-string obj ...)
+procedure: ~(printf format-string obj ...)~
+procedure: ~(fprintf textual-output-port format-string obj ...)~
 returns: unspecified
 libraries: (chezscheme)
 
@@ -1268,9 +1376,9 @@ These procedures are simple wrappers for format. printf prints the formatted out
 
 The I/O control operations described in this section are used to control how the reader reads and printer writes, displays, or pretty-prints characters, symbols, gensyms, numbers, vectors, long or deeply nested lists or vectors, and graph-structured objects.
 
-procedure: (char-name obj)
+procedure: ~(char-name obj)~
 returns: see below
-procedure: (char-name name char)
+procedure: ~(char-name name char)~
 returns: unspecified
 libraries: (chezscheme)
 
@@ -1280,33 +1388,53 @@ Character associations created by char-name are ignored by the printer unless th
 
 In the one-argument form, obj must be a symbol or character. If it is a symbol and a character is associated with the symbol, char-name returns that character. If it is a symbol and no character is associated with the symbol, char-name returns #f. Similarly, if obj is a character, char-name returns the most recently associated symbol for the character or #f if no name is associated with the character. For example, with the default set of character names:
 
-(char-name #\space) <graphic> space
-(char-name 'space) <graphic> #\space
-(char-name 'nochar) <graphic> #f
-(char-name #\a) <graphic> #f
+#+begin_src scheme
+(char-name #\space) \Rightarrow space
+(char-name 'space) \Rightarrow #\space
+#+end_src
+#+begin_src scheme
+(char-name 'nochar) \Rightarrow #f
+(char-name #\a) \Rightarrow #f
+#+end_src
 
 When passed two arguments, name is added to the set of names associated with char, and any other association for name is dropped. char may be #f, in which case any other association for name is dropped and no new association is formed. In either case, any other names associated with char remain associated with char.
 
 The following interactive session demonstrates the use of char-name to establish and remove associations between characters and names, including the association of more than one name with a character.
 
+#+begin_src scheme
 (print-char-name #t)
-(char-name 'etx) <graphic> #f
+(char-name 'etx) \Rightarrow #f
+#+end_src
+#+begin_src scheme
 (char-name 'etx #\x3)
-(char-name 'etx) <graphic> #\etx
-(char-name #\x3) <graphic> etx
-#\etx <graphic> #\etx
-(eq? #\etx #\x3) <graphic> #t
-#!r6rs #\etx <graphic> exception: invalid character name etx
-#!chezscheme #\etx <graphic> #\etx
+(char-name 'etx) \Rightarrow #\etx
+#+end_src
+#+begin_src scheme
+(char-name #\x3) \Rightarrow etx
+#\etx \Rightarrow #\etx
+#+end_src
+#+begin_src scheme
+(eq? #\etx #\x3) \Rightarrow #t
+#!r6rs #\etx \Rightarrow exception: invalid character name etx
+#+end_src
+#!chezscheme #\etx \Rightarrow #\etx
+#+begin_src scheme
 (char-name 'etx #\space)
-(char-name #\x3) <graphic> #f
-(char-name 'etx) <graphic> #\etx
-#\space <graphic> #\etx
+(char-name #\x3) \Rightarrow #f
+#+end_src
+#+begin_src scheme
+(char-name 'etx) \Rightarrow #\etx
+#\space \Rightarrow #\etx
+#+end_src
+#+begin_src scheme
 (char-name 'etx #f)
-#\etx <graphic> exception: invalid character name etx
-#\space <graphic> #\space
+#\etx \Rightarrow exception: invalid character name etx
+#+end_src
+#\space \Rightarrow #\space
 
+#+begin_src scheme
 (When using the expression editor, it is necessary to type Control-J to force the editor to read the erroneous #\etx input on the two inputs above that result in read errors, since typing Enter causes the expression editor to read the input only if the input is well-formed.)
+#+end_src
 
 The reader does not recognize hex scalar value escapes in character names, as it does in symbols, so #\new\x6c;ine is not equivalent to #\newline. In general, programmers should avoid the use of character name symbols that cannot be entered without the use of hex scalar value escapes or other symbol-name escape mechanisms, since such character names will not be readable.
 
@@ -1315,10 +1443,14 @@ libraries: (chezscheme)
 
 When print-char-name is set to #f (the default), associations created by char-name are ignored by write, put-datum, pretty-print, and the format "~s" directive. Otherwise, these procedures use the names established by char-name when printing character objects.
 
+#+begin_src scheme
 (char-name 'etx #\x3)
-(format "~s" #\x3) <graphic> "#\\x3"
+(format "~s" #\x3) \Rightarrow "#\\x3"
+#+end_src
+#+begin_src scheme
 (parameterize ([print-char-name #t])
-  (format "~s" #\x3)) <graphic> "#\\etx"
+  (format "~s" #\x3)) \Rightarrow "#\\etx"
+#+end_src
 
 thread parameter: case-sensitive
 libraries: (chezscheme)
@@ -1327,12 +1459,18 @@ The case-sensitive parameter determines whether the reader is case-sensitive wit
 
 The value of the case-sensitive matters only if neither #!fold-case nor #!no-fold-case has appeared previously in the same input stream. That is, symbol and character name are folded if #!fold-case has been seen. They are not folded if #!no-fold-case has been seen. If neither has been seen, they are folded if and only if (case-sensitive) is #f.
 
-(case-sensitive) <graphic> #t
-(eq? 'abc 'ABC) <graphic> #f
-'ABC <graphic> ABC
+#+begin_src scheme
+(case-sensitive) \Rightarrow #t
+(eq? 'abc 'ABC) \Rightarrow #f
+#+end_src
+'ABC \Rightarrow ABC
+#+begin_src scheme
 (case-sensitive #f)
-'ABC <graphic> abc
-(eq? 'abc 'ABC) <graphic> #t
+'ABC \Rightarrow abc
+#+end_src
+#+begin_src scheme
+(eq? 'abc 'ABC) \Rightarrow #t
+#+end_src
 
 thread parameter: print-graph
 libraries: (chezscheme)
@@ -1343,15 +1481,19 @@ If graph printing is not enabled, the settings of print-length and print-level a
 
 Since objects printed through the ~s option in the format control strings of format, printf, and fprintf are printed as with write, the printing of such objects is also affected by print-graph.
 
+#+begin_src scheme
 (parameterize ([print-graph #t])
   (let ([x (list 'a 'b)])
-    (format "~s" (list x x)))) <graphic> "(#0=(a b) #0#)"
+#+end_src
+    (format "~s" (list x x)))) \Rightarrow "(#0=(a b) #0#)"
 
+#+begin_src scheme
 (parameterize ([print-graph #t])
   (let ([x (list 'a 'b)])
+#+end_src
     (set-car! x x)
     (set-cdr! x x)
-    (format "~s" x))) <graphic> "#0=(#0# . #0#)"
+    (format "~s" x))) \Rightarrow "#0=(#0# . #0#)"
 
 The graph syntax is understood by the procedure read, allowing graph structures to be printed and read consistently.
 
@@ -1369,17 +1511,25 @@ Since objects printed through the ~s option in the format control strings of for
 
 The parameters print-level and print-length are useful for controlling the volume of output in contexts where only a small portion of the output is needed to identify the object being printed. They are also useful in situations where circular structures may be printed (see also print-graph).
 
-(format "~s" '((((a) b) c) d e f g)) <graphic> "((((a) b) c) d e f g)"
+#+begin_src scheme
+(format "~s" '((((a) b) c) d e f g)) \Rightarrow "((((a) b) c) d e f g)"
+#+end_src
 
+#+begin_src scheme
 (parameterize ([print-level 2])
-  (format "~s" '((((a) b) c) d e f g))) <graphic> "(((...) c) d e f g)"
+  (format "~s" '((((a) b) c) d e f g))) \Rightarrow "(((...) c) d e f g)"
+#+end_src
 
+#+begin_src scheme
 (parameterize ([print-length 3])
-  (format "~s" '((((a) b) c) d e f g))) <graphic> "((((a) b) c) d e ...)"
+  (format "~s" '((((a) b) c) d e f g))) \Rightarrow "((((a) b) c) d e ...)"
+#+end_src
 
+#+begin_src scheme
 (parameterize ([print-level 2]
                [print-length 3])
-  (format "~s" '((((a) b) c) d e f g))) <graphic> "(((...) c) d e ...)"
+#+end_src
+  (format "~s" '((((a) b) c) d e f g))) \Rightarrow "(((...) c) d e ...)"
 
 thread parameter: print-radix
 libraries: (chezscheme)
@@ -1390,13 +1540,19 @@ When the value of print-radix is not 10, write and pretty-print print a radix pr
 
 Since objects printed through the ~s and ~a options in the format control strings of format, printf, and fprintf are printed as with write and display, the printing of such objects is also affected by print-radix.
 
-(format "~s" 11242957) <graphic> "11242957"
+#+begin_src scheme
+(format "~s" 11242957) \Rightarrow "11242957"
+#+end_src
 
+#+begin_src scheme
 (parameterize ([print-radix 16])
-  (format "~s" 11242957)) <graphic> "#xAB8DCD"
+  (format "~s" 11242957)) \Rightarrow "#xAB8DCD"
+#+end_src
 
+#+begin_src scheme
 (parameterize ([print-radix 16])
-  (format "~a" 11242957)) <graphic> "AB8DCD"
+  (format "~a" 11242957)) \Rightarrow "AB8DCD"
+#+end_src
 
 thread parameter: print-gensym
 libraries: (chezscheme)
@@ -1407,39 +1563,53 @@ Since objects printed through the ~s option in the format control strings of for
 
 When printing an object that may contain more than one occurrence of a gensym and print-graph is set to pretty or #f, it is useful to set print-graph to #t so that multiple occurrences of the same gensym are marked as identical in the output.
 
+#+begin_src scheme
 (let ([g (gensym)])
-  (format "~s" g)) <graphic> "#{g0 bdids2xl6v49vgwe-a}"
+  (format "~s" g)) \Rightarrow "#{g0 bdids2xl6v49vgwe-a}"
+#+end_src
 
+#+begin_src scheme
 (let ([g (gensym)])
   (parameterize ([print-gensym 'pretty])
-    (format "~s" g))) <graphic> "#:g1
+#+end_src
+    (format "~s" g))) \Rightarrow "#:g1
 
+#+begin_src scheme
 (let ([g (gensym)])
   (parameterize ([print-gensym #f])
-    (format "~s" g))) <graphic> "g2"
+#+end_src
+    (format "~s" g))) \Rightarrow "g2"
 
+#+begin_src scheme
 (let ([g (gensym)])
   (parameterize ([print-graph #t] [print-gensym 'pretty])
-    (format "~s" (list g g)))) <graphic> "(#0=#:g3 #0#)"
+#+end_src
+    (format "~s" (list g g)))) \Rightarrow "(#0=#:g3 #0#)"
 
+#+begin_src scheme
 (let ([g1 (gensym "x")]
       [g2 (gensym "x")]
+#+end_src
       [g3 (gensym "y")])
   (parameterize ([print-gensym 'pretty/suffix])
-    (format "~s ~s ~s" g1 g2 g3))) <graphic> "x.1 x.2 y.3"
+    (format "~s ~s ~s" g1 g2 g3))) \Rightarrow "x.1 x.2 y.3"
 
 thread parameter: print-brackets
 libraries: (chezscheme)
 
 When print-brackets is set to a true value, the pretty printer (see pretty-print) uses square brackets rather than parentheses around certain subexpressions of common control structures, e.g., around let bindings and cond clauses. print-brackets is set to #t by default.
 
+#+begin_src scheme
 (let ([p (open-output-string)])
-  (pretty-print '(let ([x 3]) x) p) <graphic> "(let ([x 3]) x)
+  (pretty-print '(let ([x 3]) x) p) \Rightarrow "(let ([x 3]) x)
+#+end_src
   (get-output-string p))             "
 
+#+begin_src scheme
 (parameterize ([print-brackets #f])
   (let ([p (open-output-string)])
-    (pretty-print '(let ([x 3]) x) p) <graphic> "(let ((x 3)) x)
+#+end_src
+    (pretty-print '(let ([x 3]) x) p) \Rightarrow "(let ((x 3)) x)
     (get-output-string p)))            "
 
 thread parameter: print-extended-identifiers
@@ -1451,27 +1621,35 @@ When this parameter is set to false (the default), identifiers in the extended s
 
 For example:
 
+#+begin_src scheme
 (parameterize ([print-extended-identifiers #f])
   (printf "~s\n~s\n"
+#+end_src
     '(1+ --- { } .xyz)
     (string->symbol "123")))
 
 prints
 
+#+begin_src scheme
 (\x31;+ \x2D;-- \x7B; \x7D; \x2E;xyz)
 \x31;23
+#+end_src
 
 while
 
+#+begin_src scheme
 (parameterize ([print-extended-identifiers #t])
   (printf "~s\n~s\n"
+#+end_src
     '(1+ --- { } .xyz)
     (string->symbol "123")))
 
 prints
 
+#+begin_src scheme
 (1+ --- { } .xyz)
 \x31;23
+#+end_src
 
 thread parameter: print-vector-length
 libraries: (chezscheme)
@@ -1482,16 +1660,24 @@ When print-vector-length is set to a true value, write, put-datum, and pretty-pr
 
 Since objects printed through the ~s option in the format control strings of format, printf, and fprintf are printed as with write, the printing of such objects is also affected by the setting of print-vector-length.
 
-(format "~s" (vector 'a 'b 'c 'c 'c)) <graphic> "#(a b c c c)"
+#+begin_src scheme
+(format "~s" (vector 'a 'b 'c 'c 'c)) \Rightarrow "#(a b c c c)"
+#+end_src
 
+#+begin_src scheme
 (parameterize ([print-vector-length #t])
-  (format "~s" (vector 'a 'b 'c 'c 'c))) <graphic> "#5(a b c)"
+  (format "~s" (vector 'a 'b 'c 'c 'c))) \Rightarrow "#5(a b c)"
+#+end_src
 
+#+begin_src scheme
 (parameterize ([print-vector-length #t])
-  (format "~s" (bytevector 1 2 3 4 4 4))) <graphic> "#6vu8(1 2 3 4)"
+  (format "~s" (bytevector 1 2 3 4 4 4))) \Rightarrow "#6vu8(1 2 3 4)"
+#+end_src
 
+#+begin_src scheme
 (parameterize ([print-vector-length #t])
-  (format "~s" (fxvector 1 2 3 4 4 4))) <graphic> "#6vfx(1 2 3 4)"
+  (format "~s" (fxvector 1 2 3 4 4 4))) \Rightarrow "#6vfx(1 2 3 4)"
+#+end_src
 
 thread parameter: print-precision
 libraries: (chezscheme)
@@ -1503,9 +1689,11 @@ libraries: (chezscheme)
 
 When print-unicode is set to #f, write, put-datum, pretty-print, and the format "~s" directive display Unicode characters with encodings 8016 (128) and above that appear within character objects, symbols, and strings using hexadecimal character escapes. When set to a true value (the default), they are displayed like other printing characters, as if by put-char.
 
-(format "~s" #\x3bb) <graphic> "#\\<graphic>"
+#+begin_src scheme
+(format "~s" #\x3bb) \Rightarrow "#\\<graphic>"
 (parameterize ([print-unicode #f])
-  (format "~s" #\x3bb)) <graphic> "#\\x3BB"
+#+end_src
+  (format "~s" #\x3bb)) \Rightarrow "#\\x3BB"
 
 ** Section 9.15. Fasl Output
 
@@ -1515,8 +1703,8 @@ An alternative fast loading, or fasl, format may be used for objects with extern
 
 Objects are printed in fasl format with fasl-write. Because the fasl format is a binary format, fasl output must be written to a binary port. For this reason, it is not possible to include data written in fasl format with textual data in the same file, as was the case in earlier versions of Chez Scheme. Similarly, the (textual) reader does not handle objects written in fasl format; the procedure fasl-read, which requires a binary input port, must be used instead.
 
-procedure: (fasl-write obj binary-output-port)
-procedure: (fasl-read binary-input-port)
+procedure: ~(fasl-write obj binary-output-port)~
+procedure: ~(fasl-read binary-input-port)~
 returns: unspecified
 libraries: (chezscheme)
 
@@ -1524,16 +1712,24 @@ fasl-write writes the fasl representation of obj to binary-output-port. An excep
 
 fasl-read reads one object from binary-input-port, which must be positioned at the front of an object written in fasl format. fasl-read returns the eof object if the file is positioned at the end of file.
 
+#+begin_src scheme
 (define bop (open-file-output-port "tmp.fsl"))
 (fasl-write '(a b c) bop)
+#+end_src
+#+begin_src scheme
 (close-port bop)
+#+end_src
 
+#+begin_src scheme
 (define bip (open-file-input-port "tmp.fsl"))
-(fasl-read bip) <graphic> (a b c)
-(fasl-read bip) <graphic> #!eof
+(fasl-read bip) \Rightarrow (a b c)
+#+end_src
+#+begin_src scheme
+(fasl-read bip) \Rightarrow #!eof
 (close-port bip)
+#+end_src
 
-procedure: (fasl-file ifn ofn)
+procedure: ~(fasl-file ifn ofn)~
 returns: unspecified
 libraries: (chezscheme)
 
@@ -1551,14 +1747,14 @@ When invoked without arguments, current-directory returns a string representing 
 
 cd is bound to the same parameter.
 
-procedure: (directory-list path)
+procedure: ~(directory-list path)~
 returns: a list of file names
 libraries: (chezscheme)
 
 path must be a string. The return value is a list of strings representing the names of files found in the directory named by path. directory-list raises an exception with condition type &i/o-filename if path does not name a directory or if the process cannot list the directory.
 
-procedure: (file-exists? path)
-procedure: (file-exists? path follow?)
+procedure: ~(file-exists? path)~
+procedure: ~(file-exists? path follow?)~
 returns: #t if the file named by path exists, #f otherwise
 libraries: (chezscheme)
 
@@ -1566,34 +1762,34 @@ path must be a string. If the optional follow? argument is true (the default), f
 
 The Revised6 Report file-exists? does not accept the optional follow? argument. Whether it follows symbolic links is unspecified.
 
-procedure: (file-regular? path)
-procedure: (file-regular? path follow?)
+procedure: ~(file-regular? path)~
+procedure: ~(file-regular? path follow?)~
 returns: #t if the file named by path is a regular file, #f otherwise
 libraries: (chezscheme)
 
 path must be a string. If the optional follow? argument is true (the default), file-regular? follows symbolic links; otherwise it does not.
 
-procedure: (file-directory? path)
-procedure: (file-directory? path follow?)
+procedure: ~(file-directory? path)~
+procedure: ~(file-directory? path follow?)~
 returns: #t if the file named by path is a directory, #f otherwise
 libraries: (chezscheme)
 
 path must be a string. If the optional follow? argument is true (the default), this procedure follows symbolic links; otherwise it does not.
 
-procedure: (file-symbolic-link? path)
+procedure: ~(file-symbolic-link? path)~
 returns: #t if the file named by path is a symbolic link, #f otherwise
 libraries: (chezscheme)
 
 path must be a string. file-symbolic-link? never follows symbolic links in making its determination.
 
-procedure: (file-access-time path/port)
-procedure: (file-access-time path/port follow?)
+procedure: ~(file-access-time path/port)~
+procedure: ~(file-access-time path/port follow?)~
 returns: the access time of the specified file
-procedure: (file-change-time path/port)
-procedure: (file-change-time path/port follow?)
+procedure: ~(file-change-time path/port)~
+procedure: ~(file-change-time path/port follow?)~
 returns: the change time of the specified file
-procedure: (file-modification-time path/port)
-procedure: (file-modification-time path/port follow?)
+procedure: ~(file-modification-time path/port)~
+procedure: ~(file-modification-time path/port follow?)~
 returns: the modification time of the specified file
 libraries: (chezscheme)
 
@@ -1601,8 +1797,8 @@ path/port must be a string or port. If path/port is a string, the time returned 
 
 The returned times are represented as time objects (Section 12.10).
 
-procedure: (mkdir path)
-procedure: (mkdir path mode)
+procedure: ~(mkdir path)~
+procedure: ~(mkdir path mode)~
 returns: unspecified
 libraries: (chezscheme)
 
@@ -1612,8 +1808,8 @@ mkdir creates a directory with the name given by path. All path path components 
 
 mkdir raises an exception with condition type &i/o-filename if the directory cannot be created.
 
-procedure: (delete-file path)
-procedure: (delete-file path error?)
+procedure: ~(delete-file path)~
+procedure: ~(delete-file path error?)~
 returns: see below
 libraries: (chezscheme)
 
@@ -1621,20 +1817,20 @@ path must be a string. delete-file removes the file named by path. If the option
 
 The Revised6 Report delete-file does not accept the optional error? argument but behaves as if error? is true.
 
-procedure: (delete-directory path)
-procedure: (delete-directory path error?)
+procedure: ~(delete-directory path)~
+procedure: ~(delete-directory path error?)~
 returns: see below
 libraries: (chezscheme)
 
 path must be a string. delete-directory removes the directory named by path. If the optional error? argument is #f (the default), delete-directory returns a boolean value: #t if the operation is successful and #f if it is not. Otherwise, delete-directory returns an unspecified value if the operation is successful and raises an exception with condition type &i/o-filename if it is not. The behavior is unspecified if the directory is not empty, but on most systems the operations will not succeed.
 
-procedure: (rename-file old-pathname new-pathname)
+procedure: ~(rename-file old-pathname new-pathname)~
 returns: unspecified
 libraries: (chezscheme)
 
 old-pathname and new-pathname must be strings. rename-file changes the name of the file named by old-pathname to new-pathname. If the file does not exist or cannot be renamed, an exception is raised with condition type &i/o-filename.
 
-procedure: (chmod path mode)
+procedure: ~(chmod path mode)~
 returns: unspecified
 libraries: (chezscheme)
 
@@ -1642,33 +1838,33 @@ path must be a string. mode must be a fixnum.
 
 chmod sets the permissions on the file named by path to mode. Bits 0, 1, and 2 of mode are the execute, write, and read permission bits for users other than the file's owner who are not in the file's group. Bits 3-5 are the execute, write, and read permission bits for users other than the file's owner but in the file's group. Bits 6-8 are the execute, write, and read permission bits for the file's owner. Bits 7-9 are the Unix sticky, set-group-id, and set-user-id bits. Under Windows, all but the user "write" bit are ignored. If the file does not exist or the permissions cannot be changed, an exception is raised with condition type &i/o-filename.
 
-procedure: (get-mode path)
-procedure: (get-mode path follow?)
+procedure: ~(get-mode path)~
+procedure: ~(get-mode path follow?)~
 returns: the current permissions mode for path
 libraries: (chezscheme)
 
 path must be a string. get-mode retrieves the permissions on the file named by path and returns them as a fixnum in the same form as the mode argument to chmod. If the optional follow? argument is true (the default), this procedure follows symbolic links; otherwise it does not.
 
-procedure: (directory-separator? char)
+procedure: ~(directory-separator? char)~
 returns: #t if char is a directory separator, #f otherwise
 libraries: (chezscheme)
 
 The character #\/ is a directory separator on all current machine types, and #\\ is a directory separator under Windows.
 
-procedure: (directory-separator)
+procedure: ~(directory-separator)~
 returns: the preferred directory separator
 libraries: (chezscheme)
 
 The preferred directory separator is #\\ for Windows and #\/ for other systems.
 
-procedure: (path-first path)
-procedure: (path-rest path)
-procedure: (path-last path)
-procedure: (path-parent path)
-procedure: (path-extension path)
-procedure: (path-root path)
+procedure: ~(path-first path)~
+procedure: ~(path-rest path)~
+procedure: ~(path-last path)~
+procedure: ~(path-parent path)~
+procedure: ~(path-extension path)~
+procedure: ~(path-root path)~
 returns: the specified component of path
-procedure: (path-absolute? path)
+procedure: ~(path-absolute? path)~
 returns: #t if path is absolute, otherwise #f
 libraries: (chezscheme)
 
@@ -1706,8 +1902,10 @@ c:a/b 	#f 	c: 	a/b 	c:a 	b 	c:a/b 	_
 
 The following procedure can be used to reproduce the tables above.
 
+#+begin_src scheme
 (define print-table
   (lambda path*
+#+end_src
     (define print-row
       (lambda (abs? path first rest parent last root extension)
         (printf "~a~11t~a~17t~a~28t~a~39t~a~50t~a~61t~a~73t~a\n"
@@ -1725,12 +1923,16 @@ The following procedure can be used to reproduce the tables above.
 
 For example, the first table can be produced with:
 
+#+begin_src scheme
 (print-table "a" "a/" "a/b" "a/b.c" "/" "/a/b.c" "~/a/b.c"
   "~u/a/b.c" "../..")
+#+end_src
 
 while the second can be produced (under Windows) with:
 
+#+begin_src scheme
 (print-table "c:" "c:/" "c:a/b" "//s/a/b.c" "//s.com")
+#+end_src
 
 ** Section 9.17. Generic Port Examples
 
@@ -1738,27 +1940,41 @@ This section presents the definitions for three types of generic ports: two-way 
 
 Two-way ports.  The first example defines make-two-way-port, which constructs a textual input/output port from a given pair of textual input and output ports. For example:
 
+#+begin_src scheme
 (define ip (open-input-string "this is the input"))
 (define op (open-output-string))
+#+end_src
+#+begin_src scheme
 (define p (make-two-way-port ip op))
+#+end_src
 
 The port returned by make-two-way-port is both an input and an output port, and it is also a textual port:
 
-(port? p) <graphic> #t
-(input-port? p) <graphic> #t
-(output-port? p) <graphic> #t
-(textual-port? p) <graphic> #t
+#+begin_src scheme
+(port? p) \Rightarrow #t
+(input-port? p) \Rightarrow #t
+#+end_src
+#+begin_src scheme
+(output-port? p) \Rightarrow #t
+(textual-port? p) \Rightarrow #t
+#+end_src
 
 Items read from a two-way port come from the constituent input port, and items written to a two-way port go to the constituent output port:
 
-(read p) <graphic> this
+#+begin_src scheme
+(read p) \Rightarrow this
 (write 'hello p)
-(get-output-string op) <graphic> hello
+#+end_src
+#+begin_src scheme
+(get-output-string op) \Rightarrow hello
+#+end_src
 
 The definition of make-two-way-port is straightforward. To keep the example simple, no local buffering is performed, although it would be more efficient to do so.
 
+#+begin_src scheme
 (define make-two-way-port
   (lambda (ip op)
+#+end_src
     (define handler
       (lambda (msg . args)
         (record-case (cons msg args)
@@ -1787,8 +2003,10 @@ Transcript ports.  The next example defines make-transcript-port, which construc
 
 Transcript ports may be used to define the Scheme procedures transcript-on and transcript-off, or the Chez Scheme procedure transcript-cafe. For example, here is a definition of transcript-cafe:
 
+#+begin_src scheme
 (define transcript-cafe
   (lambda (pathname)
+#+end_src
     (let ([tp (open-output-file pathname 'replace)])
       (let ([p (make-transcript-port
                  (console-input-port)
@@ -1807,8 +2025,10 @@ Transcript ports may be used to define the Scheme procedures transcript-on and t
 
 The implementation of transcript ports is significantly more complex than the implementation of two-way ports defined above, primarily because it buffers input and output locally. Local buffering is needed to allow the transcript file to reflect accurately the actual input and output performed in the presence of unread-char, clear-output-port, and clear-input-port. Here is the code:
 
+#+begin_src scheme
 (define make-transcript-port
   (lambda (ip op tp)
+#+end_src
     (define (handler msg . args)
       (record-case (cons msg args)
         [block-read (p str cnt)
@@ -1967,8 +2187,10 @@ The sample session below demonstrates the use of open-process, running and commu
 
 Since process ports, like transcript ports, are two-way, the implementation is somewhat similar. The main difference is that a transcript port reads from and writes to its subordinate ports, whereas a process port reads from and writes to a socket. When a process port is opened, the socket is created and subprocess invoked, and when the port is closed, the socket is closed and the subprocess is terminated.
 
+#+begin_src scheme
 (define open-process
   (lambda (command)
+#+end_src
     (define handler
       (lambda (pid socket)
         (define (flush-output who p)
