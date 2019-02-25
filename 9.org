@@ -2,7 +2,7 @@
 * Chapter 9. Input/Output Operations
 
 This chapter describes Chez Scheme's generic port facility, operations on ports, and various Chez Scheme extensions to the standard set of input/output operations. See Chapter 7 of The Scheme Programming Language, 4th Edition or the Revised6 Report on Scheme for a description of standard input/output operations. Definitions of a few sample generic ports are given in Section 9.17.
-本章介绍了 Chez Scheme 的通用端口功能，端口操作，以及 Chez Scheme 对标准输入/输出操作集的多种扩展。有关标准输入/输出操作的说明，可参见《Scheme 编程语言》第 4 版的第 7 章，或《Scheme 语言修订^{6}报告》。9.17 节给出了一些通用端口样例的定义。
+本章介绍了 Chez Scheme 的通用端口工具，端口操作，以及 Chez Scheme 对标准输入/输出操作集的多种扩展。有关标准输入/输出操作的说明，可参见《Scheme 编程语言》第 4 版的第 7 章，或《Scheme 语言修订^{6}报告》。9.17 节给出了一些通用端口样例的定义。
 
 Chez Scheme closes file ports automatically after they become inaccessible to the program or when the Scheme program exits, but it is best to close ports explicitly whenever possible.
 在程序不再可以访问文件端口后，或在 Scheme 程序退出时，Chez Scheme 会自动关闭文件端口，但只要可能的话，最好显式关闭端口。
@@ -10,9 +10,10 @@ Chez Scheme closes file ports automatically after they become inaccessible to th
 ** Section 9.1. Generic Ports
 
 Chez Scheme's "generic port" facility allows the programmer to add new types of textual ports with arbitrary input/output semantics. It may be used, for example, to define any of the built-in Common Lisp [30] stream types, i.e., synonym streams, broadcast streams, concatenated streams, two-way streams, echo streams, and string streams. It may also be used to define more exotic ports, such as ports that represent windows on a bit-mapped display or ports that represent processes connected to the current process via pipes or sockets.
-Chez Scheme 的“通用端口”功能支持程序员以任意输入/输出语义添加新的文本端口类型。
+Chez Scheme 的“通用端口”工具支持程序员添加具有任意输入/输出语义的新文本端口类型。例如，它可以用于定义任何内置的 Common Lisp [30]流类型，即，异名流，广播流，级联流，双向流，回显流和字符串流。它还可用于定义更多独特的端口，例如表示位映射显示器上的窗口的端口，或表示通过管道或套接字连接到当前进程的进程的端口。
 
 Each port has an associated port handler. A port handler is a procedure that accepts messages in an object-oriented style. Each message corresponds to one of the low-level Scheme operations on ports, such as read-char and close-input-port (but not read, which is defined in terms of the lower-level operations). Most of these operations simply call the handler immediately with the corresponding message.
+每个端口都有一个关联的端口处理器。端口处理器是一种接受面向对象风格的消息的过程。每条消息对应端口上的一个低级 Scheme 操作，例如，read-char 和 close-input-port（但 read 不是，它是基于低级别的操作定义的）。 大多数此类操作只是立即使用相应的消息调用处理程序。
 
 Standard messages adhere to the following conventions: the message name is the first argument to the handler. It is always a symbol, and it is always the name of a primitive Scheme operation on ports. The additional arguments are the same as the arguments to the primitive procedure and occur in the same order. (The port argument to some of the primitive procedures is optional; in the case of the messages passed to a handler, the port argument is always supplied.) The following messages are defined for built-in ports:
 
@@ -2190,7 +2191,6 @@ Since process ports, like transcript ports, are two-way, the implementation is s
 #+begin_src scheme
 (define open-process
   (lambda (command)
-#+end_src
     (define handler
       (lambda (pid socket)
         (define (flush-output who p)
@@ -2328,6 +2328,7 @@ Since process ports, like transcript ports, are two-way, the implementation is s
                 (set-port-input-size! p 0)
                 (set-port-output-size! p (fx- (string-length ob) 1))
                 p))))))))
+#+end_src
 
 Chez Scheme Version 9 User's Guide
 Copyright © 2018 Cisco Systems, Inc.
