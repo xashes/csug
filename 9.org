@@ -13,60 +13,73 @@ Chez Scheme's "generic port" facility allows the programmer to add new types of 
 Chez Scheme 的“通用端口”工具支持程序员添加具有任意输入/输出语义的新文本端口类型。例如，它可以用于定义任何内置的 Common Lisp [30]流类型，即，异名流，广播流，级联流，双向流，回显流和字符串流。它还可用于定义更多独特的端口，例如表示位映射显示器上的窗口的端口，或表示通过管道或套接字连接到当前进程的进程的端口。
 
 Each port has an associated port handler. A port handler is a procedure that accepts messages in an object-oriented style. Each message corresponds to one of the low-level Scheme operations on ports, such as read-char and close-input-port (but not read, which is defined in terms of the lower-level operations). Most of these operations simply call the handler immediately with the corresponding message.
-每个端口都有一个关联的端口处理器。端口处理器是一种接受面向对象风格的消息的过程。每条消息对应端口上的一个低级 Scheme 操作，例如，read-char 和 close-input-port（但 read 不是，它是基于低级别的操作定义的）。 大多数此类操作只是立即使用相应的消息调用处理程序。
+每个端口都有一个关联的端口处理程序。端口处理程序是一种接受面向对象风格的消息的过程。每条消息对应端口上的一个低级 Scheme 操作，例如，read-char 和 close-input-port（但 read 不是，它是基于低级别的操作定义的）。 大多数此类操作只是立即以相应的消息调用处理程序。
 
 Standard messages adhere to the following conventions: the message name is the first argument to the handler. It is always a symbol, and it is always the name of a primitive Scheme operation on ports. The additional arguments are the same as the arguments to the primitive procedure and occur in the same order. (The port argument to some of the primitive procedures is optional; in the case of the messages passed to a handler, the port argument is always supplied.) The following messages are defined for built-in ports:
+标准消息遵循以下约定：消息名称是处理程序的第一个参数。 它总是一个符号，且总是一个原生 Scheme 端口操作的名称。 附加参数与原生过程的参数相同，并以相同的顺序出现。（某些原生过程的 port 参数是可选的；对于传递给处理程序的消息，始终提供 port 参数。）为内置端口定义了以下消息：
 
-block-read port string count
-block-write port string count
-char-ready? port
-clear-input-port port
-clear-output-port port
-close-port port
-file-position port
-file-position port position
-file-length port
-flush-output-port port
-peek-char port
-port-name port
-read-char port
-unread-char char port
-write-char char port
+#+BEGIN_SRC scheme
+  block-read port string count
+  block-write port string count
+  char-ready? port
+  clear-input-port port
+  clear-output-port port
+  close-port port
+  file-position port
+  file-position port position
+  file-length port
+  flush-output-port port
+  peek-char port
+  port-name port
+  read-char port
+  unread-char char port
+  write-char char port
+#+END_SRC
 
-Additional messages may be accepted by user-defined ports.
+用户定义的端口可以接受其它消息。
 
 Chez Scheme input and output is normally buffered for efficiency. To support buffering, each input port contains an input buffer and each output port contains an output buffer. Bidirectional ports, ports that are both input ports and output ports, contain both input and output buffers. Input is not buffered if the input buffer is the empty string, and output is not buffered if the output buffer is the empty string. In the case of unbuffered input and output, calls to read-char, write-char, and similar messages cause the handler to be invoked immediately with the corresponding message. For buffered input and output, calls to these procedures cause the buffer to be updated, and the handler is not called under normal circumstances until the buffer becomes empty (for input) or full (for output). Handlers for buffered ports must not count on the buffer being empty or full when read-char, write-char, and similar messages are received, however, due to the possibility that (a) the handler is invoked through some other mechanism, or (b) the call to the handler is interrupted.
+Chez Scheme 的输入和输出通常会被缓冲以提高效率。为了支持缓冲，每个输入端口包含一个输入缓冲区，每个输出端口包含一个输出缓冲区。双向端口，既是输入端口又是输出端口的端口，包含输入和输出缓冲区。如果输入缓冲区是空字符串，则不缓冲输入，如果输出缓冲区是空字符串，则不缓冲输出。在无缓冲的输入和输出的情况下，对 read-char，write-char 和类似消息的调用，会导致立即以相应的消息调用处理程序。对于缓冲的输入和输出，对这些过程的调用会导致缓冲区被更新，并且在正常情况下不会调用处理程序，直到缓冲区变空（对于输入）或变满（对于输出）。但是，当接收到 read-char，write-char 和类似消息时，由于有以下可能性：（a）处理程序可能通过某种其他机制调用，或（b）对处理程序的调用被中断，因而缓冲端口的处理程序一定不能依赖于缓冲区为空或为满。
 
 In the presence of keyboard, timer, and other interrupts, it is possible for a call to a port handler to be interrupted or for the handler itself to be interrupted. If the port is accessible outside of the interrupted code, there is a possibility that the interrupt handler will cause input or output to be performed on the port. This is one reason, as stated above, that port handlers must not count on the input buffer being empty or output buffer being full when a read-char, write-char, or similar message is received. In addition, port handlers may need to manipulate the buffers only with interrupts disabled (using with-interrupts-disabled).
+在存在键盘，定时器和其他中断的情况下，可能会中断对端口处理程序的调用或者中断处理程序本身。如果端口可以在被中断的代码之外访问，则中断处理程序可能会导致在端口上执行输入或输出。如上所述，这是一个原因，当接收到 read-char，write-char 或类似消息时，端口处理程序一定不能依赖于输入缓冲区为空或输出缓冲区已满。此外，端口处理程序可能只在禁用中断的情况下需要操作缓冲区（使用 with-interrupts-disabled）。
 
 Generic ports are created via one of the port construction procedures make-input-port, make-output-port, and make-input/output-port defined later in this chapter. Ports have seven accessible fields:
+通用端口是通过本章后面定义的端口构造过程 make-input-port，make-output-port 和 make-input/output-port 之一创建的。端口有七个可访问字段：
 
 handler,
-    accessed with port-handler; 
+    通过 port-handler 访问; 
 output-buffer,
-    accessed with port-output-buffer, 
+    通过 port-output-buffer 访问, 
 output-size,
-    accessed with port-output-size, 
+    通过 port-output-size 访问, 
 output-index,
-    accessed with port-output-index, 
+    通过 port-output-index 访问, 
 input-buffer,
-    accessed with port-input-buffer, 
+    通过 port-input-buffer 访问, 
 input-size,
-    accessed with port-input-size, and 
+    通过 port-input-size 访问, 以及 
 input-index,
-    accessed with port-input-index. 
+    通过 port-input-index 访问. 
 
 The output-size and output-index fields are valid only for output ports, and the input-size and input-index fields are valid only for input ports. The output and input size and index fields may be updated as well using the corresponding "set-field!" procedure.
+output-size 和 output-index 字段仅对输出端口有效，input-size 和 input-index 字段仅对输入端口有效。输出和输入的大小和索引字段也可以使用相应的 "set-field!" 过程进行更新。
 
 A port's output size determines how much of the port's output buffer is actually available for writing by write-char. The output size is often the same as the string length of the port's output buffer, but it can be set to less (but no less than zero) at the discretion of the programmer. The output index determines to which position in the port's buffer the next character will be written. The output index should be between 0 and the output size, inclusive. If no output has occurred since the buffer was last flushed, the output index should be 0. If the index is less than the size, write-char stores its character argument into the specified character position within the buffer and increments the index. If the index is equal to the size, write-char leaves the fields of the port unchanged and invokes the handler.
+端口的输出大小决定了实际可用于 write-char 写入的端口输出缓冲区的大小。输出大小通常与端口输出缓冲区的字符串长度相同，但可以根据编程人员的判断将其设置得更小（但不小于零）。输出索引决定将在端口缓冲区中的哪个位置写入下一个字符。输出索引应介于 0 和输出大小之间（两端包含）。如果自上次刷新缓冲区以来未发生任何输出，则输出索引应为 0. 如果索引小于输出大小，则 write-char 将其字符参数存储到缓冲区中的指定字符位置并递增索引。如果索引等于输出大小，则 write-char 保持端口的字段不变并调用处理程序。
 
 A port's input size determines how much of the port's input buffer is actually available for reading by read-char. A port's input size and input index are constrained in the same manner as output size and index, i.e., the input size must be between 0 and the string length of the input buffer (inclusive), and the input index must be between 0 and the input size (inclusive). Often, the input size is less than the length of the input buffer because there are fewer characters available to read than would fit in the buffer. The input index determines from which position in the input buffer the next character will be read. If the index is less than the size, read-char extracts the character in this position, increments the index, and returns the character. If the index is equal to the size, read-char leaves the fields of the port unchanged and invokes the handler.
+端口的输入大小决定了实际可用于 read-char 读取的端口输入缓冲区的大小。端口的输入大小和输入索引的约束方式与输出大小和输出索引相同，即，输入大小必须介于 0 和输入缓冲区的字符串长度（两端包含）之间，输入索引必须介于 0 和输入大小之间（两端包含）。通常，由于可读取的字符数少于缓冲区的容量，输入大小小于输入缓冲区的长度。输入索引决定将从输入缓冲区中的哪个位置读取下一个字符。如果索引小于输入大小，则 read-char 将提取此位置中的字符，递增索引并返回该字符。如果索引等于输入大小，则 read-char 保持端口的字段不变并调用处理程序。
 
 The operation of peek-char is similar to that of read-char, except that it does not increment the input index. unread-char decrements the input index if it is greater than 0, otherwise it invokes the handler. char-ready? returns #t if the input index is less than the input size, otherwise it invokes the handler.
+peek-char 的操作类似于 read-char，除了它不增加输入索引。如果输入索引大于 0，则 unread-char 会递减输入索引，否则它会调用处理程序。如果输入索引小于输入大小，则 char-ready? 返回#t，否则它调用处理程序。
 
 Although the fields shown and discussed above are logically present in a port, actual implementation details may differ. The current Chez Scheme implementation uses a different representation that allows read-char, write-char, and similar operations to be open-coded with minimal overhead. The access and assignment operators perform the conversion between the actual representation and the one shown above.
+尽管上面显示和讨论的字段在逻辑上存在于端口中，但实际的实现细节可能不同。当前的 Chez Scheme 实现使用不同的表示，允许以最小的开销对 read-char，write-char 及类似操作进行开放编码。访问和赋值运算符执行实际表示形式与上面显示的表示形式之间的转换。
 
 Port handlers receiving a message must return a value appropriate for the corresponding operation. For example, a handler receiving a read-char message must return a character or eof object (if it returns). For operations that return unspecified values, such as close-port, the handler is not required to return any particular value.
+接收消息的端口处理程序必须返回适用于相应操作的值。例如，接收 read-char 消息的处理程序必须返回一个字符或 eof 对象（如果它返回）。对于返回未指定值的操作（例如 close-port），处理程序不需要返回任何特定值。
+
 
 ** Section 9.2. File Options
 
