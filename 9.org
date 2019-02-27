@@ -84,54 +84,71 @@ Port handlers receiving a message must return a value appropriate for the corres
 ** Section 9.2. File Options
 
 The Revised6 Report requires that the universe of a file-options enumeration set must include no-create, no-fail, and no-truncate, whose meanings are described within the description of the file-options syntax in Section 7.2 of The Scheme Programming Language, 4th Edition. Chez Scheme defines a number of additional file options:
+《Scheme 语言修订^{6}报告》要求文件选项枚举集合的全集必须包含 no-create，no-fail 和 no-truncate，其含义在《Scheme 编程语言》第 4 版 7.2 节中关于文件选项语法的介绍中有所描述。Chez Scheme 定义了许多其他文件选项：
 
 compressed:
     An output file should be compressed when written; and a compressed input file should be decompressed when read.
+    写入时应压缩输出文件; 读取时应解压缩压缩的输入文件。
 
 replace:
     For output files only, replace (remove and recreate) the existing file if it exists.
+    仅用于输出文件，替换（删除并重新创建）现有文件（如果存在）。
 
 exclusive:
     For output files only, lock the file for exclusive access. On some systems the lock is advisory, i.e., it inhibits access by other processes only if they also attempt to open exclusively.
+    仅用于输出文件，锁定文件以进行独占访问。在某些系统上，锁定是建议性的，即，只有当其它进程也试图独占打开文件时，它才会禁止它们访问。
 
 append:
     For output files only, position the output port at the end of the file before each write so that output to the port is always appended to the file.
+    仅用于输出文件，在每次写入之前将输出端口置于文件末尾，从而始终将发送到端口的输出附加到文件末尾。
 
 perm-set-user-id:
     For newly created output files under Unix-based systems only, set user-id bit.
+    仅用于基于 Unix 的系统下新创建的输出文件，设置 user-id 位。
 
 perm-set-group-id:
     For newly created output files under Unix-based systems only, set group-id bit.
+    仅用于基于 Unix 的系统下新创建的输出文件，设置 group-id 位。
 
 perm-sticky:
     For newly created output files under Unix-based systems only, set sticky bit.
+    仅用于基于 Unix 的系统下新创建的输出文件，设置 sticky 位。
 
 perm-no-user-read:
     For newly created output files under Unix-based systems only, do not set user read bit. (User read bit is set by default, unless masked by the process umask.)
+    仅用于基于 Unix 的系统下新创建的输出文件，不设置用户读取位。（用户读取位默认是设置的，除非被进程 umask 屏蔽。）
 
 perm-no-user-write:
     For newly created output files under Unix-based systems only, do not set user write bit. (User write bit is set by default, unless masked by the process umask.)
+    仅用于基于 Unix 的系统下新创建的输出文件，不设置用户写入位。（用户写入位默认是设置的，除非被进程 umask 屏蔽。）
 
 perm-user-execute:
     For newly created output files under Unix-based systems only, set user execute bit unless masked by process umask. (User execute bit is not set by default.)
+    仅用于基于 Unix 的系统下新创建的输出文件，除非被进程 umask 屏蔽，否则设置用户执行位。（用户执行位默认是不设置的。）
 
 perm-no-group-read:
     For newly created output files under Unix-based systems only, do not set group read bit. (Group read bit is set by default, unless masked by the process umask.)
+    仅用于基于 Unix 的系统下新创建的输出文件，不设置组读取位。（组读取位默认是设置的，除非被进程 umask 屏蔽。）
 
 perm-no-group-write:
     For newly created output files under Unix-based systems only, do not set group write bit. (Group write bit is set by default, unless masked by the process umask.)
+    仅用于基于 Unix 的系统下新创建的输出文件，不设置组写入位。（组写入位默认是设置的，除非被进程 umask 屏蔽。）
 
 perm-group-execute:
     For newly created output files under Unix-based systems only, set group execute bit unless masked by process umask. (Group execute bit is not set by default.)
+    仅用于基于 Unix 的系统下新创建的输出文件，除非被进程 umask 屏蔽，否则设置组执行位。（组执行位默认是不设置的。）
 
 perm-no-other-read:
     For newly created output files under Unix-based systems only, do not set other read bit. (Other read bit is set by default, unless masked by the process umask.)
+    仅用于基于 Unix 的系统下新创建的输出文件，不设置其他用户读取位。（其他用户读取位默认是设置的，除非被进程 umask 屏蔽。）
 
 perm-no-other-write:
     For newly created output files under Unix-based systems only, do not set other write bit. (Other write bit is set by default, unless masked by the process umask.)
+    仅用于基于 Unix 的系统下新创建的输出文件，不设置其他用户写入位。（其他用户写入位默认是设置的，除非被进程 umask 屏蔽。）
 
 perm-other-execute:
     For newly created output files under Unix-based systems only, set other execute bit unless masked by process umask. (Other execute bit is not set by default.) 
+    仅用于基于 Unix 的系统下新创建的输出文件，除非被进程 umask 屏蔽，否则设置其他用户执行位。（其他用户执行位默认是不设置的。）
 
 ** Section 9.3. Transcoders
 
