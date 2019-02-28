@@ -153,37 +153,47 @@ perm-other-execute:
 ** Section 9.3. Transcoders
 
 The language of the Revised6 Report provides three built-in codecs: a latin-1 codec, a utf-8 codec, and a utf-16 codec. Chez Scheme provides three additional codecs: a utf-16le codec, utf-16be codec, and an "iconv" codec for non-Unicode character sets. It also provides an alternative to the standard utf-16 codec that defaults to little-endian format rather than the default big-endian format. This section describes these codecs, plus a current-transcoder parameter that allows the programmer to determine the transcoder used for a textual port whenever the transcoder is implicit, as for open-input-file or load, along with the predicate transcoder?, which should be standard but is not.
+《Scheme 语言修订^{6}报告》提供了三种内置编解码器：latin-1 编解码器，utf-8 编解码器和 utf-16 编解码器。Chez Scheme 提供了三个额外的编解码器：utf-16le 编解码器，utf-16be 编解码器和用于非 Unicode 字符集的“iconv”编解码器。它还提供了标准 utf-16 编解码器的替代方案，默认为小端序格式而不是默认的大端序格式。本节描述了这些编解码器，以及一个 current-transcoder 参数，它允许程序员在编码转换器为隐式时决定用于文本端口的编码转换器，如 open-input-file 或 load，以及谓词 transcoder?, 标准中应该包含，但却没有。
 
 procedure: ~(utf-16-codec)~
 procedure: ~(utf-16-codec endianness)~
 procedure: ~(utf-16le-codec)~
 procedure: ~(utf-16be-codec)~
-returns: a codec
+returns: 一个编解码器
 libraries: (chezscheme)
 
-endianness must be the symbol big or the symbol little.
+endianness 必须是符号 big 或符号 little.
 
 The codec returned by utf-16-codec can be used to create and process data written UTF-16 format. When called without the endianness argument or with endianness big, utf-16-codec returns a codec for standard UTF-16 data, i.e., one that defaults to big-endian format if no byte-order mark (BOM) is found.
+utf-16-codec 返回的编解码器可用于创建和处理 UTF-16 格式的数据。当调用时不传入参数 endianness 或参数 endianness 为 big 时，utf-16-codec 返回标准 UTF-16 数据的编解码器，即，如果没有找到字节顺序标记（BOM），则默认为大端序格式的编解码器。
 
 When output is transcoded with a transcoder based on this codec, a BOM is emitted just before the first character written, and each character is written as a UTF-16 character in big-endian format. For input, a BOM is looked for at the start of the input and, if present, controls the byte order of the remaining UTF-16 characters. If no BOM is present, big-endian order is assumed. For input-output ports, the BOM is not emitted if the file is read before written, and a BOM is not looked for if the file is written before read.
+当使用基于此编解码器的编码转换器对输出进行编码转换时，会在写入第一个字符之前发出 BOM，并且每个字符都以大端序格式写为 UTF-16 字符。 对于输入，在输入的开始处查找 BOM，如果存在，则控制其余 UTF-16 字符的字节序。如果没有 BOM，则假定为大端序。对于输入-输出端口，如果在写入之前读取文件，则不会发出 BOM，如果在读取之前写入文件，则不会查找 BOM。
 
 For textual ports created via transcoded-port, a BOM written or read via the transcoder appears at the beginning of the underlying data stream or file only if the binary port passed to transcoded-port is positioned at the start of the data stream or file. When the transcoder can determine this is the case, it sets a flag that causes set-port-position!) to position the port beyond the BOM if an attempt is made to reposition the port to the start of the data stream or file, so that the BOM is preserved.
+对于通过 transcoded-port 创建的文本端口，仅当传递给 transcoded-port 的二进制端口位于数据流或文件的开头时，通过编码转换器写入或读取的 BOM 才会出现在底层数据流或文件的开头。当编码转换器可以确定是这种情况时，如果尝试将端口重新定位到数据流或文件的开头，它会设置一个标志，该标志会导致 set-port-position! 将端口定位在 BOM 之后，从而使 BOM 得以保留。
 
 When called with endianness little, utf-16-codec returns a codec that defaults to the little-endian format both for reading and for writing. For output-only streams or input/output streams that are written before read, the result is standard UTF-16, with a BOM that specifies little-endian format followed by characters in little-endian byte order. For input-only streams or input/output streams that are read before written, this codec allows programs to read from input streams that either begin with a BOM or are encoded in UTF-16LE format. This is particularly useful for handling files that might have been produced by older Windows applications that claim to produce UTF-16 files but actually produce UTF-16LE files.
+调用时参数 endianness 为 little 时，utf-16-codec 返回一个默认为小端序格式的编解码器，用于读取和写入。对于在读取之前写入的纯输出流或输入/输出流，结果为标准的 UTF-16，其中 BOM 指定小端序格式，后面跟着小端字节序的字符。对于在写入之前读取的纯输入流或输入/输出流，此编解码器允许程序从输入流中读取，这些输入流以 BOM 开头或以 UTF-16LE 格式编码。这对于处理可能由声称生成 UTF-16 文件但实际生成 UTF-16LE 文件的旧 Windows 应用程序生成的文件格外有用。
 
 The Revised6 Report version of utf-16-codec lacks the optional endianness argument.
+《Scheme 语言修订^{6}报告》版本的 utf-16-codec 缺少可选的 endianness 参数。
 
 The codecs returned by utf-16le-codec and utf-16be-codec are used to read and write data in the UTF-16LE and UTF-16BE formats, i.e., UTF-16 with little-endian or big-endian byte order and no BOM. For output, these codecs are useful for controlling whether and where the BOM is emitted, since no BOM is emitted implicitly and a BOM can be emitted explicitly as an ordinary character. For input, these codecs are useful for processing files known to be in little-endian or big-endian format with no BOM.
+utf-16le-codec 和 utf-16be-codec 返回的编解码器用于读取和写入 UTF-16LE 和 UTF-16BE 格式的数据，即，采用小端或大端字节序，且不带有 BOM 的 UTF-16. 对于输出，由于 BOM 不会隐式添加，并且 BOM 可以作为普通字符显式添加，因而这些编解码器对于控制是否以及在何处添加 BOM 十分有用。对于输入，这些编解码器对于处理已知为小端序或大端序格式而没有 BOM 的文件非常有用。
 
 procedure: ~(iconv-codec code-page)~
-returns: a codec
+returns: 一个编解码器
 libraries: (chezscheme)
 
 code-page must be a string and should identify a codec accepted by the iconv library installed on the target machine. The codec returned by this procedure can be used to convert from the non-Unicode single- and multiple-byte character sets supported by iconv. When used in the input direction, the codec converts byte sequences into Scheme strings, and when used in the output direction, it converts Scheme strings to byte sequences.
+code-page 必须是字符串，并且应该标识目标机器上安装的 iconv 库接受的编解码器。此过程返回的编解码器可用于转换 iconv 支持的非 Unicode 单字节和多字节字符集。当在输入方向上使用时，编解码器将字节序列转换为 Scheme 字符串，并且当在输出方向上使用时，它将 Scheme 字符串转换为字节序列。
 
 The set of supported code pages depends on the version of iconv available; consult the iconv documentation or use the shell command iconv --list to obtain a list of supported code pages.
+支持的代码页集取决于 iconv 的可用版本; 请参阅 iconv 文档或使用 shell 命令 iconv --list 获取支持的代码页列表。
 
 While the Windows operating system does not supply an iconv library, it is possible to use iconv-codec on Windows systems by supplying an iconv dynamic-link library (named iconv.dll, libiconv.dll, or libiconv-2.dll) that provides Posix-conformant iconv_open, iconv, and iconv_close entry points either under those names or under the alternative names libiconv_open, libiconv, and libiconv_close. The dll must be located in a standard location for dlls or in the current directory of the process the first time iconv-codec is called.
+虽然 Windows 操作系统不提供 iconv 库，但可以通过提供 iconv 动态链接库（名为 iconv.dll，libiconv.dll 或 libiconv-2.dll）在 Windows 系统上使用 iconv-codec. 这些动态链接库提供了符合 Posix 标准的 iconv_open，iconv 和 iconv_close 入口，可能就使用这些名称，或使用替代名称 libiconv_open，libiconv 和 libiconv_close。dll 必须位于 dll 的标准位置，或者在进程第一次调用 iconv-codec 时的当前目录中。
 
 thread parameter: current-transcoder
 libraries: (chezscheme)
