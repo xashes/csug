@@ -534,16 +534,20 @@ port 必须是输入或输出端口，但不是输入/输出端口。它必须�
 ** Section 9.5. String Ports
 
 String ports allow the creation and manipulation of strings via port operations. The procedure open-input-string converts a string into a textual input port, allowing the characters in the string to be read in sequence via input operations such as read-char or read. The procedure open-output-string allows new strings to be built up with output operations such as write-char and write.
+字符串端口允许通过端口操作创建和操作字符串。过程 open-input-string 将字符串转换为文本输入端口，允许通过 read-char 或 read 等输入操作按顺序读取字符串中的字符。过程 open-output-string 允许使用 write-char 和 write 等输出操作构建新的字符串。
 
 While string ports could be defined as generic ports, they are instead supported as primitive by the implementation.
+虽然字符串端口可以定义为通用端口，但它们被实现支持为原生端口。
 
 procedure: ~(open-input-string string)~
-returns: a new string input port
+returns: 新的字符串输入端口
 libraries: (chezscheme)
 
 A string input port is similar to a file input port, except that characters and objects drawn from the port come from string rather than from a file.
+字符串输入端口类似于文件输入端口，但从端口提取的字符和对象来自于字符串而不是文件。
 
 A string port is at "end of file" when the port reaches the end of the string. It is not necessary to close a string port, although it is okay to do so.
+当端口到达字符串末尾时，字符串端口位于“文件末尾”。没有必要关闭字符串端口，虽然可以这样做。
 
 #+begin_src scheme
 (let ([p (open-input-string "hi mom!")])
@@ -552,10 +556,11 @@ A string port is at "end of file" when the port reaches the end of the string. I
 #+end_src
 
 procedure: ~(with-input-from-string string thunk)~
-returns: the values returned by thunk
+returns: thunk 的返回值
 libraries: (chezscheme)
 
 thunk must be a procedure and should accept zero arguments. with-input-from-string parameterizes the current input port to be the result of opening string for input during the application of thunk.
+thunk 必须是一个过程，并且应该接受零个参数。with-input-from-string 将当前输入端口参数化为在应用 thunk 期间打开输入字符串的结果。
 
 #+begin_src scheme
 (with-input-from-string "(cons 3 4)"
@@ -564,18 +569,21 @@ thunk must be a procedure and should accept zero arguments. with-input-from-stri
 #+end_src
 
 procedure: ~(open-output-string)~
-returns: a new string output port
+returns: 新的字符串输出端口
 libraries: (chezscheme)
 
 A string output port is similar to a file output port, except that characters and objects written to the port are placed in a string (which grows as needed) rather than to a file. The string built by writing to a string output port may be obtained with get-output-string. See the example given for get-output-string below. It is not necessary to close a string port, although it is okay to do so.
+字符串输出端口类似于文件输出端口，除了写入端口的字符和对象放置在字符串（根据需要增长）而不是文件中。通过写入字符串输出端口构建的字符串可以使用 get-output-string 获得。请参阅下面给出的 get-output-string 示例。没有必要关闭字符串端口，虽然可以这样做。
 
 procedure: ~(get-output-string string-output-port)~
-returns: the string associated with string-output-port
+返回：与 string-output-port 关联的字符串
 libraries: (chezscheme)
 
 string-output-port must be an port returned by open-output-string.
+string-output-port 必须是 open-output-string 返回的端口。
 
 As a side effect, get-output-string resets string-output-port so that subsequent output to string-output-port is placed into a fresh string.
+作为副作用，get-output-string 重置 string-output-port，因此到 string-output-port 的后续输出被放入一个新字符串。
 
 #+begin_src scheme
 (let ([p (open-output-string)])
@@ -586,12 +594,14 @@ As a side effect, get-output-string resets string-output-port so that subsequent
 #+end_src
 
 An implementation of format (Section 9.13) might be written using string-output ports to produce string output.
+可以使用字符串输出端口编写 format（第 9.13 节）的实现来生成字符串输出。
 
 procedure: ~(with-output-to-string thunk)~
-returns: a string containing the output
+返回：包含输出的字符串
 libraries: (chezscheme)
 
 thunk must be a procedure and should accept zero arguments. with-output-to-string parameterizes the current output port to a new string output port during the application of thunk. If thunk returns, the string associated with the new string output port is returned, as with get-output-string.
+thunk 必须是一个过程，并且应该接受零个参数。with-output-to-string 在应用 thunk 期间将当前输出端口参数化为新的字符串输出端口。如果 thunk 返回，则返回与新字符串输出端口关联的字符串，与 get-output-string 一样。
 
 #+begin_src scheme
 (with-output-to-string
