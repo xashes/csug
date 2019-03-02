@@ -641,6 +641,8 @@ thread parameter: ~custom-port-buffer-size~
 libraries: (chezscheme)
 
 custom-port-buffer-size is a parameter that determines the sizes of the buffers associated with newly created custom ports. When called with no arguments, the parameter returns the current buffer size. When called with a positive fixnum k, it sets the current buffer size to k.
+custom-port-buffer-size 是一个参数对象，用于确定与新创建的自定义端口关联的缓冲区的大小。不带参数调用时，该参数对象返回当前缓冲区大小。 当使用正的 fixnum k 调用时，它将当前缓冲区的大小设置为 k。
+
 
 ** Section 9.8. Input Operations
 
