@@ -610,24 +610,30 @@ thunk 必须是一个过程，并且应该接受零个参数。with-output-to-st
     (newline))) \Rightarrow "Once upon a time ...\n"
 #+end_src
 
+
 ** Section 9.6. File Ports
 
 thread parameter: ~file-buffer-size~
 libraries: (chezscheme)
 
 file-buffer-size is a parameter that determines the size of each buffer created when the buffer mode is not none for a port created by one of the file open operations, e.g., open-input-file or open-file-output-port. When called with no arguments, the parameter returns the current buffer size. When called with a positive fixnum k, it sets the current buffer size to k.
+file-buffer-size 是一个参数对象，用于确定通过文件打开操作（例如，open-input-file 或 open-file-output-port）创建的端口的缓冲区模式不是 none 时，创建的每个缓冲区的大小。在不带参数调用时，该参数对象返回当前缓冲区大小。当使用正的 fixnum k 调用时，它将当前缓冲区的大小设置为 k。
 
 procedure: ~(file-port? port)~
 returns: #t if port is a file port, #f otherwise
+返回: 如果 ~port~ 是文件端口，则为 ~#t~, 否则为 ~#f~.
 libraries: (chezscheme)
 
 A file port is any port based directly on an O/S file descriptor, e.g., one created by open-file-input-port, open-output-port, open-fd-input-port, etc., but not a string, bytevector, or custom port.
+文件端口是直接基于 O/S 文件描述符的任何端口，例如，由 open-file-input-port，open-output-port，open-fd-input-port 等创建的端口，但不是字符串，字节向量，或自定义端口。
 
 procedure: ~(port-file-descriptor port)~
-returns: the file descriptor associated with port
+返回：与 port 关联的文件描述符
 libraries: (chezscheme)
 
 port must be a file port, i.e., a port for which file-port? returns #t.
+port 必须是文件端口，即，file-port? 返回 #t 的端口。
+
 
 ** Section 9.7. Custom Ports
 
