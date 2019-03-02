@@ -195,38 +195,45 @@ The set of supported code pages depends on the version of iconv available; consu
 While the Windows operating system does not supply an iconv library, it is possible to use iconv-codec on Windows systems by supplying an iconv dynamic-link library (named iconv.dll, libiconv.dll, or libiconv-2.dll) that provides Posix-conformant iconv_open, iconv, and iconv_close entry points either under those names or under the alternative names libiconv_open, libiconv, and libiconv_close. The dll must be located in a standard location for dlls or in the current directory of the process the first time iconv-codec is called.
 虽然 Windows 操作系统不提供 iconv 库，但可以通过提供 iconv 动态链接库（名为 iconv.dll，libiconv.dll 或 libiconv-2.dll）在 Windows 系统上使用 iconv-codec. 这些动态链接库提供了符合 Posix 标准的 iconv_open，iconv 和 iconv_close 入口，可能就使用这些名称，或使用替代名称 libiconv_open，libiconv 和 libiconv_close。dll 必须位于 dll 的标准位置，或者在进程第一次调用 iconv-codec 时的当前目录中。
 
-thread parameter: current-transcoder
+thread parameter: ~current-transcoder~
 libraries: (chezscheme)
 
 The transcoder value of the current-transcoder parameter is used whenever a textual file is opened with an implicit transcoder, e.g., by open-input-file and other convenience I/O procedures, compile-file include, load, and pretty-file. Its initial value is the value of the native-transcoder procedure.
+每当使用隐式编码转换器打开文本文件时，例如，通过 open-input-file 和其他便捷的 I/O 过程，compile-file include, load, 和 pretty-file, 就使用参数对象 current-transcoder 的编码转换器值。它的初始值是 native-transcoder 过程的值。
 
 procedure: ~(transcoder? obj)~
-returns: #t if obj is a transcoder, #f otherwise
+返回: 如果 ~obj~ 是编码转换器，则为 ~#t~, 否则为 ~#f~.
 libraries: (chezscheme)
 
 ** Section 9.4. Port Operations
 
 The procedures used to create, access, and alter ports directly are described in this section. Also described are several nonstandard operations on ports.
+本节描述了用于直接创建，访问和更改端口的过程。还描述了端口上的一些非标准操作。
 
 Unless otherwise specified, procedures requiring either input ports or output ports as arguments accept input/output ports as well, i.e., an input/output port is both an input port and an output port.
+除非另有说明，否则要求输入端口或输出端口作为参数的过程也接受输入/输出端口，即，输入/输出端口既是输入端口又是输出端口。
 
 procedure: ~(make-input-port handler input-buffer)~
 procedure: ~(make-output-port handler output-buffer)~
 procedure: ~(make-input/output-port handler input-buffer output-buffer)~
-returns: a new textual port
+returns: 一个新的文本端口
 libraries: (chezscheme)
 
 handler must be a procedure, and input-buffer and output-buffer must be strings. Each procedure creates a generic port. The handler associated with the port is handler, the input buffer is input-buffer, and the output buffer is output-buffer. For make-input-port, the output buffer is undefined, and for make-output-port, the input buffer is undefined.
+handler 必须是一个过程，input-buffer 和 output-buffer 必须是字符串。每个过程都创建一个通用端口。与端口关联的处理程序是 handler，输入缓冲区是 input-buffer, 输出缓冲区是 output-buffer. 对于 make-input-port，输出缓冲区未定义，而对于 make-output-port，输入缓冲区未定义。
 
 The input size of an input or input/output port is initialized to the string length of the input buffer, and the input index is set to 0. The output size and index of an output or input/output port are initialized similarly.
+输入或输入/输出端口的输入大小初始化为输入缓冲区的字符串长度，输入索引设置为 0. 输出或输入/输出端口的输出大小和索引也类似地初始化。
 
 The length of an input or output buffer may be zero, in which case buffering is effectively disabled.
+输入或输出缓冲区的长度可以为零，在这种情况下，缓冲实际上被禁用。
 
 procedure: ~(port-handler port)~
-returns: a procedure
+returns: 一个过程
 libraries: (chezscheme)
 
 For generic ports, port-handler returns the handler passed to one of the generic port creation procedures described above. For ports created by open-input-file and similar procedures, port-handler returns an internal handler that may be invoked in the same manner as any other handler.
+对于通用端口，port-handler 返回传递给上述通用端口创建过程之一的处理程序。对于由 open-input-file 和类似过程创建的端口，port-handler 返回一个内部处理程序，该处理程序可以用与任何其他处理程序相同的方式调用。
 
 procedure: ~(port-input-buffer input-port)~
 procedure: ~(port-input-size input-port)~
@@ -237,10 +244,11 @@ procedure: ~(textual-port-input-index textual-input-port)~
 procedure: ~(binary-port-input-buffer binary-input-port)~
 procedure: ~(binary-port-input-size binary-input-port)~
 procedure: ~(binary-port-input-index binary-input-port)~
-returns: see below
+returns: 参见下文
 libraries: (chezscheme)
 
 These procedures return the input buffer, size, or index of the input port. The variants specialized to textual or binary ports are slightly more efficient than their generic counterparts.
+这些过程返回输入端口的输入缓冲区，大小或索引。专用于文本或二进制端口的变体要比它们对应的通用版本略为高效。
 
 procedure: ~(set-port-input-index! input-port n)~
 procedure: ~(set-port-input-size! input-port n)~
@@ -255,28 +263,34 @@ returns: unspecified
 libraries: (chezscheme)
 
 The procedure set-port-input-index! sets the input index field of input-port to n, which must be a nonnegative integer less than or equal to the port's input size.
+过程 set-port-input-index! 将 input-port 的输入索引字段设置为 n，该字段必须是小于或等于端口输入大小的非负整数。
 
 The procedure set-port-input-size! sets the input size field of input-port to n, which must be a nonnegative integer less than or equal to the string length of the port's input buffer. It also sets the input index to 0.
-
+过程 set-port-input-size! 将 input-port 的输入大小字段设置为 n，该字段必须是小于或等于端口输入缓冲区字符串长度的非负整数。它还将输入索引设置为 0。
 The procedure set-port-input-buffer! sets the input buffer field of input-port to x, which must be a string for textual ports and a bytevector for binary ports. It also sets the input size to the length of the string or bytevector and the input index to 0.
+过程 set-port-input-buffer! 将 input-port 的输入缓冲区字段设置为 x，该字段必须是文本端口的字符串和二进制端口的字节向量。它还将输入大小设置为字符串或 bytevector 的长度，并将输入索引设置为 0。
 
 The variants specialized to textual or binary ports are slightly more efficient than their generic counterparts.
+专用于文本或二进制端口的变体要比它们对应的通用版本略为高效。
 
 procedure: ~(port-input-count input-port)~
 procedure: ~(textual-port-input-count textual-input-port)~
 procedure: ~(binary-port-input-count binary-input-port)~
-returns: see below
+returns: 参见下文
 libraries: (chezscheme)
 
 These procedures return an exact integer representing the number of characters or bytes left to be read from the port's input buffer, i.e., the difference between the buffer size and index.
+这些过程返回一个精确的整数，表示要从端口的输入缓冲区中读取的剩余字符或字节数，即缓冲区大小和索引之间的差值。
 
 The variants specialized to textual or binary ports are slightly more efficient than their generic counterpart.
+专用于文本或二进制端口的变体要比它们对应的通用版本略为高效。
 
 procedure: ~(port-input-empty? input-port)~
-returns: #t if the port's input buffer contains no more data, otherwise #f
+返回: 如果端口的输入缓冲区不包含更多数据，则为 ~#t~, 否则为 ~#f~.
 libraries: (chezscheme)
 
 This procedure determines whether the port's input count is zero without computing or returning the actual count.
+此过程确定端口的输入计数是否为零，而不必计算或返回实际计数。
 
 procedure: ~(port-output-buffer output-port)~
 procedure: ~(port-output-size output-port)~
@@ -287,10 +301,11 @@ procedure: ~(textual-port-output-index output-port)~
 procedure: ~(binary-port-output-buffer output-port)~
 procedure: ~(binary-port-output-size output-port)~
 procedure: ~(binary-port-output-index output-port)~
-returns: see below
+returns: 参见下文
 libraries: (chezscheme)
 
 These procedures return the output buffer, size, or index of the output port. The variants specialized to textual or binary ports are slightly more efficient than their generic counterparts.
+这些过程返回输出端口的输出缓冲区，大小或索引。专用于文本或二进制端口的变体要比它们对应的通用版本略为高效。
 
 procedure: ~(set-port-output-index! output-port n)~
 procedure: ~(set-port-output-size! output-port n)~
@@ -305,60 +320,68 @@ returns: unspecified
 libraries: (chezscheme)
 
 The procedure set-port-output-index! sets the output index field of the output port to n, which must be a nonnegative integer less than or equal to the port's output size.
+过程 set-port-output-index! 将输出端口的输出索引字段设置为 n，该字段必须是小于或等于端口输出大小的非负整数。
 
 The procedure set-port-output-size! sets the output size field of the output port to n, which must be a nonnegative integer less than or equal to the string length of the port's output buffer. It also sets the output index to 0.
+过程 set-port-output-size! 将输出端口的输出大小字段设置为 n，该字段必须是小于或等于端口输出缓冲区的字符串长度的非负整数。它还将输出索引设置为 0。
 
 The procedure set-port-output-buffer! sets the output buffer field of output-port to x, which must be a string for textual ports and a bytevector for binary ports. It also sets the output size to the length of the string or bytevector and the output index to 0.
+过程 set-port-output-buffer! 将 output-port 的输出缓冲区字段设置为 x，该字段必须是文本端口的字符串和二进制端口的字节向量。它还将输出大小设置为字符串或字节向量的长度，并将输出索引设置为 0。
 
 The variants specialized to textual or binary ports are slightly more efficient than their generic counterparts.
+专用于文本或二进制端口的变体要比它们对应的通用版本略为高效。
 
 procedure: ~(port-output-count output-port)~
 procedure: ~(textual-port-output-count textual-output-port)~
 procedure: ~(binary-port-output-count binary-output-port)~
-returns: see below
+returns: 参见下文
 libraries: (chezscheme)
 
 These procedures return an exact integer representing the amount of space in characters or bytes available to be written in the port's output buffer, i.e., the difference between the buffer size and index.
+这些过程返回一个精确的整数，表示可在端口输出缓冲区中写入的以字符或字节计的空间量，即缓冲区大小和索引之间的差值。
 
 The variants specialized to textual or binary ports are slightly more efficient than their generic counterpart.
+专用于文本或二进制端口的变体要比它们对应的通用版本略为高效。
 
 procedure: ~(port-output-full? output-port)~
-returns: #t if the port's input buffer has no more room, otherwise #f
+返回: 如果端口的输出缓冲区没有更多空间，则为 ~#t~, 否则为 ~#f~.
 libraries: (chezscheme)
 
 This procedure determines whether the port's output count is zero without computing or returning the actual count.
+此过程确定端口的输出计数是否为零，而不必计算或返回实际计数。
 
 procedure: ~(mark-port-closed! port)~
 returns: unspecified
 libraries: (chezscheme)
 
 This procedure directly marks the port closed so that no further input or output operations are allowed on it. It is typically used by handlers upon receipt of a close-port message.
+此过程直接把端口标记为关闭，从而禁止更多的输入或输出操作。它通常在接收到 close-port 消息时由处理程序使用。
 
 procedure: ~(port-closed? port)~
-returns: #t if port is closed, #f otherwise
+返回: 如果 ~port~ 已关闭，则为 ~#t~, 否则为 ~#f~.
 libraries: (chezscheme)
 
 #+begin_src scheme
 (let ([p (open-output-string)])
   (port-closed? p)) \Rightarrow #f
-#+end_src
 
-#+begin_src scheme
 (let ([p (open-output-string)])
   (close-port p)
-#+end_src
   (port-closed? p)) \Rightarrow #t
+#+end_src
 
 procedure: ~(set-port-bol! output-port obj)~
 returns: unspecified
 libraries: (chezscheme)
 
 When obj is #f, the port's beginning-of-line (BOL) flag is cleared; otherwise, the port's BOL flag is set.
+当 obj 为#f 时，端口的行首（BOL）标志被清除; 否则，设置端口的 BOL 标志。
 
 The BOL flag is consulted by fresh-line (page 240) to determine if it needs to emit a newline. This flag is maintained automatically for file output ports, string output ports, and transcript ports. The flag is set for newly created file and string output ports, except for file output ports created with the append option, for which the flag is reset. The BOL flag is clear for newly created generic ports and never set automatically, but may be set explicitly using set-port-bol!. The port is always flushed immediately before the flag is consulted, so it need not be maintained on a per-character basis for buffered ports.
+BOL 标志由 fresh-line（第 240 页）查询，以确定是否需要开启一个新行。对于文件输出端口，字符串输出端口和副本端口，此标志是自动维护的。新创建的文件和字符串输出端口会设置此标志，但使用 append 选项创建的文件输出端口除外，这种情况下，该标志会被重置。对于新创建的通用端口，会清除 BOL 标志，并且从不自动设置，但可以使用 set-port-bol!显式设置。在查询标志之前，总是立即刷新端口，因此不需要逐字符地维护缓冲端口。
 
 procedure: ~(port-bol? port)~
-returns: #t if port's BOL flag is set, #f otherwise
+返回: 如果 ~port~ 的 BOL 标志已设置，则为 ~#t~, 否则为 ~#f~.
 libraries: (chezscheme)
 
 procedure: ~(set-port-eof! input-port obj)~
@@ -366,45 +389,40 @@ returns: unspecified
 libraries: (chezscheme)
 
 When obj is not #f, set-port-eof! marks input-port so that, once its buffer is empty, the port is treated as if it were at eof even if more data is available in the underlying byte or character stream. Once this artificial eof has been read, the eof mark is cleared, making any additional data in the stream available beyond the eof. This feature can be used by a generic port to simulate a stream consisting of multiple input files.
+当 obj 不是#f 时，set-port-eof! 标记 input-port, 这样，一旦其缓冲区为空，即使底层字节或字符流中有更多数据可用，端口也会被视为处于 eof. 一旦这个人为制造的 eof 被读取，此 eof 标记就会被清除，使得流中的任何其他数据在 eof 之后可用。通用端口可以使用此功能来模拟由多个输入文件组成的流。
 
 When obj is #f, the eof mark is cleared.
+当 obj 为 #f 时，会清除 eof 标记。
 
 The following example assumes /dev/zero provides an infinite stream of zero bytes.
+以下示例假定/dev/zero 提供一个无限的零字节流。
 
 #+begin_src scheme
 (define p
   (parameterize ([file-buffer-size 3])
-#+end_src
     (open-file-input-port "/dev/zero")))
-#+begin_src scheme
+
 (set-port-eof! p #t)
 (get-u8 p) \Rightarrow #!eof
-#+end_src
-#+begin_src scheme
 (get-u8 p) \Rightarrow 0
 (set-port-eof! p #t)
-#+end_src
-#+begin_src scheme
 (get-u8 p) \Rightarrow 0
 (get-u8 p) \Rightarrow 0
-#+end_src
-#+begin_src scheme
 (get-u8 p) \Rightarrow #!eof
 (get-u8 p) \Rightarrow 0
 #+end_src
 
 procedure: ~(port-name port)~
-returns: the name associated with port
+返回：与 port 关联的名称
 libraries: (chezscheme)
 
 The name may be any object but is usually a string or #f (denoting no name). For file ports, the name is typically a string naming the file.
+名称可以是任何对象，但通常是字符串或#f（表示没有名称）。对于文件端口，名称通常是命名文件的字符串。
 
 #+begin_src scheme
 (let ([p (open-input-file "myfile.ss")])
   (port-name p)) \Rightarrow "myfile.ss"
-#+end_src
 
-#+begin_src scheme
 (let ([p (open-output-string)])
   (port-name p)) \Rightarrow "string"
 #+end_src
@@ -414,60 +432,72 @@ returns: unspecified
 libraries: (chezscheme)
 
 This procedure sets port's name to obj, which should be a string or #f (denoting no name).
+此过程将 port 的名称设置为 obj，它应该是字符串或#f（表示没有名称）。
 
 procedure: ~(port-length port)~
 procedure: ~(file-length port)~
-returns: the length of the file or other object to which port refers
+返回：port 引用的文件或其他对象的长度
 procedure: ~(port-has-port-length? port)~
-returns: #t if the port supports port-length, #f otherwise
+返回: 如果 ~port~ 支持 port-length，则为 ~#t~, 否则为 ~#f~.
 libraries: (chezscheme)
 
 A port may allow the length of the underlying stream of characters or bytes to be determined. If so, the procedure port-has-port-length? returns #t and port-length returns the current length. For binary ports, the length is always an exact nonnegative integer byte count. For textual ports, the representation of a length is unspecified; it may not be an exact nonnegative integer and, even if it is, it may not represent either a byte or character count. The length may be used at some later time to reset the length if the port supports set-port-length!. If port-length is called on a port that does not support it, an exception with condition type &assertion is raised.
+端口可能允许判定底层字符或字节流的长度。若是如此，过程 port-has-port-length? 返回#t，port-length 返回当前长度。对于二进制端口，长度始终是精确的非负整型字节数。对于文本端口，长度的表示形式是未指定的; 它可能不是一个精确的非负整数，即使它是，它也可能不代表字节或字符数。如果端口支持 set-port-length!，则可以在稍后的某个时间使用该长度来重置长度。如果在不支持 port-length 的端口上调用 port-length，则会抛出一个条件类型的 &assertion 异常。
 
-File lengths beyond 232 might not be reported property for compressed files on 32-bit versions of the system.
+File lengths beyond 232 might not be reported proper for compressed files on 32-bit versions of the system.
+对于 32 位版本的系统上的压缩文件，可能不会报告超过 2^32 的文件长度。
 
 file-length is identical to port-length.
+file-length 与 port-length 相同。
 
 procedure: ~(set-port-length! port len)~
 returns: unspecified
 procedure: ~(port-has-set-port-length!? port)~
-returns: #t if the port supports set-port-length!, #f otherwise
+返回: 如果 ~port~ 支持 set-port-length!，则为 ~#t~, 否则为 ~#f~.
 libraries: (chezscheme)
 
 A port may allow the length of the underlying stream of characters or bytes to be set, i.e., extended or truncated. If so, the procedure port-has-set-port-length!? returns #t and set-port-length! changes the length. For binary ports, the length len must be an exact nonnegative integer byte count. For textual ports, the representation of a length is unspecified, as described in the entry for port-length above, but len must be an appropriate length for the textual port, which is usually guaranteed to be the case only if it was obtained from a call to port-length on the same port. If set-port-length! is called on a port that does not support it, an exception with condition type &assertion is raised.
+端口可能允许设置底层字符或字节流的长度，即，扩展或缩短。若是如此，过程 port-has-set-port-length!? 返回 #t, 而 set-port-length! 改变长度。对于二进制端口，长度 len 必须是精确的非负整型字节数。对于文本端口，长度的表示形式是未指定的，如上面的 port-length 条目所述，但 len 必须是适用于文本端口的长度，通常只有在它是通过在同一端口上调用 port-length 而获得时，才能确保如此。如果 set-port-length! 在不支持它的端口上调用，则会抛出一个条件类型的 &assertion 异常。
 
 It is not possible to set the length of a port opened with compression to an arbitrary position, and the result of an attempt to set the length of a compressed file beyond 232 on 32-bit versions of the system is undefined.
+无法将以压缩模式打开的端口长度设置到任意位置，并且尝试在 32 位版本的系统上将压缩文件的长度设置为超过 2^32 的结果是未定义的。
 
 procedure: ~(port-nonblocking? port)~
-returns: #t if the port is in nonblocking mode, #f otherwise
+返回：如果端口处于非阻塞模式，则为 #t，否则为 #f
 procedure: ~(port-has-port-nonblocking?? port)~
-returns: #t if the port supports port-nonblocking?, #f otherwise
+返回: 如果端口支持 port-nonblocking?, 则为 ~#t~, 否则为 ~#f~.
 libraries: (chezscheme)
 
 A port may allow the nonblocking status of the port to be determined. If so, the procedure port-has-port-nonblocking?? returns #t and port-nonblocking? returns a boolean value reflecting whether the port is in nonblocking mode.
+端口可能允许判定端口的非阻塞状态。若是如此，过程 port-has-port-nonblocking?? 返回#t, 而 port-nonblocking? 返回一个布尔值，反映端口是否处于非阻塞模式。
 
 procedure: ~(set-port-nonblocking! port obj)~
 returns: unspecified
 procedure: ~(port-has-set-port-nonblocking!? port)~
-returns: #t if the port supports set-port-nonblocking!, #f otherwise
+返回: 如果端口支持 set-port-nonblocking!, 则为 ~#t~, 否则为 ~#f~.
 libraries: (chezscheme)
 
 A port may allow reads or writes to be performed in a "nonblocking" fashion. If so, the procedure port-has-set-port-nonblocking!? returns #t and set-port-nonblocking! sets the port to nonblocking mode (if obj is a true value) or blocking mode (if obj is #f). If set-port-nonblocking! is called on a port that does not support it, an exception with condition type &assertion is raised.
+端口可能允许以“非阻塞”方式执行读取或写入。若是如此，过程 port-has-set-port-nonblocking!? 返回#t, 而 set-port-nonblocking! 将端口设置为非阻塞模式（如果 obj 是真值）或阻塞模式（如果 obj 是#f）。如果 set-port-nonblocking! 在不支持它的端口上调用，则会抛出一个条件类型的 &assertion 异常。
 
 Ports created by the standard Revised6 port opening procedures are initially set in blocking mode by default. The same is true for most of the procedures described in this document. A generic port based on a nonblocking source may be nonblocking initially. A port returned by open-fd-input-port, open-fd-output-port, or open-fd-input/output-port is initially in nonblocking mode if the file-descriptor passed in is in nonblocking mode. Similarly, a port returned by standard-input-port, standard-output-port, or standard-error-port is initially in nonblocking mode if the underlying stdin, stdout, or stderr file descriptor is in nonblocking mode.
+默认情况下，通过标准的 R^{6}RS 端口打开过程创建的端口，初始设置为阻塞模式。对于本文档中描述的大多数过程也是如此。基于非阻塞源的通用端口可能初始为非阻塞的。如果传入的文件描述符处于非阻塞模式，则 open-fd-input-port，open-fd-output-port 或 open-fd-input/output-port 返回的端口最初处于非阻塞模式。类似地，如果底层 stdin，stdout 或 stderr 文件描述符处于非阻塞模式，则 standard-input-port, standard-output-port, 或 standard-error-port 返回的端口最初处于非阻塞模式。
 
 Although get-bytevector-some and get-string-some normally cannot return an empty bytevector or empty string, they can if the port is in nonblocking mode and no input is available. Also, get-bytevector-some! and get-string-some! may not read any data if the port is in nonblocking mode and no data is available. Similarly, put-bytevector-some and put-string-some may not write any data if the port is in nonblocking mode and no room is available.
+虽然 get-bytevector-some 和 get-string-some 通常不能返回空字节向量或空字符串，但如果端口处于非阻塞模式并且没有可用的输入，则它们可以。另外，get-bytevector-some! 和 get-string-some! 在端口处于非阻塞模式且没有可用数据时，则可能无法读取任何数据。类似地，如果端口处于非阻塞模式且没有可用空间，则 put-bytevector-some 和 put-string-some 可能无法写入任何数据。
 
-Nonblocking mode is not supported under Windows.
+Windows 不支持非阻塞模式。
 
 procedure: ~(file-position port)~
 procedure: ~(file-position port pos)~
-returns: see below
+returns: 参见下文
 libraries: (chezscheme)
 
 When the second argument is omitted, this procedure behaves like the R6RS port-position procedure, and when present, like the R6RS set-port-position! procedure.
+当省略第二个参数时，此过程的行为类似于 R^{6}RS 的 port-position 过程，而当此参数存在时，类似于 R^{6}RS 的 set-port-position! 过程。
 
 For compressed files opened with the compressed flag, file-position returns the position in the uncompressed stream of data. Changing the position of a compressed input file opened with the compressed flag generally requires rewinding and rereading the file and might thus be slow. The position of a compressed output file opened with the compressed flag can be moved forward only; this is accomplished by writing a (compressed) sequence of zeros. File positions beyond 232 might not be reported property for compressed files on 32-bit versions of the system.
+对于使用压缩标志打开的压缩文件，file-position 返回未压缩数据流中的位置。更改使用压缩标志打开的压缩输入文件的位置通常需要回退和重读文件，因此可能很慢。使用压缩标志打开的压缩输出文件的位置只能向前移动; 这是通过写入一个（压缩的）零序列来完成的。 对于 32 位版本的系统上的压缩文件，可能不会报告超过 2^32 的文件位置。
 
 procedure: ~(clear-input-port)~
 procedure: ~(clear-input-port input-port)~
@@ -475,6 +505,7 @@ returns: unspecified
 libraries: (chezscheme)
 
 If input-port is not supplied, it defaults to the current input port. This procedure discards any data in the buffer associated with input-port. This may be necessary, for example, to clear any type-ahead from the keyboard in preparation for an urgent query.
+如果未提供 input-port，则默认为当前输入端口。此过程会清除与 input-port 关联的缓冲区中的所有数据。这可能是必要的，例如，为了准备紧急查询，清除来自键盘的所有先前输入。
 
 procedure: ~(clear-output-port)~
 procedure: ~(clear-output-port output-port)~
@@ -482,6 +513,7 @@ returns: unspecified
 libraries: (chezscheme)
 
 If output-port is not supplied, it defaults to the current output port. This procedure discards any data in the buffer associated with output-port. This may be necessary, for example, to clear any pending output on an interactive port in preparation for an urgent message.
+如果未提供 output-port，则默认为当前输出端口。此过程会清除与 output-port 关联的缓冲区中的所有数据。这可能是必要的，例如，为了准备紧急消息，清除交互端口上的任何待处理输出。
 
 procedure: ~(flush-output-port)~
 procedure: ~(flush-output-port output-port)~
@@ -489,12 +521,15 @@ returns: unspecified
 libraries: (chezscheme)
 
 If output-port is not supplied, it defaults to the current output port. This procedure forces any data in the buffer associated with output-port to be printed immediately. The console output port is automatically flushed after a newline and before input from the console input port; all ports are automatically flushed when they are closed. flush-output-port may be necessary, however, to force a message without a newline to be sent to the console output port or to force output to appear on a file without delay.
+如果未提供 output-port，则默认为当前输出端口。此过程会强制立即打印与 output-port 关联的缓冲区中的所有数据。控制台输出端口在换行符之后及从控制台输入端口获得输入之前自动刷新; 所有端口在关闭时自动刷新。不过，flush-output-port 可能是必要的，以强制将没有换行符的消息发送到控制台输出端口或强制输出无延迟地出现在文件中。
 
 procedure: ~(port-file-compressed! port)~
 returns: unspecified
 libraries: (chezscheme)
 
 port must be an input or an output port, but not an input/output port. It must be a file port pointing to a regular file, i.e., a file on disk rather than, e.g., a socket. The port can be a binary or textual port. If the port is an output port, subsequent output sent to the port will be compressed. If the port is an input port, subsequent input will be decompressed if and only if the port is currently pointing at compressed data. This procedure has no effect if the port is already set for compression.
+port 必须是输入或输出端口，但不是输入/输出端口。它必须是指向常规文件的文件端口，即，磁盘上的文件而不是例如套接字等。端口可以是二进制或文本端口。如果端口是输出端口，则发送到端口的后续输出会被压缩。如果端口是输入端口，当且仅当端口当前指向压缩数据时，后续输入才会被解压缩。如果端口已设置为压缩，则此过程无效。
+
 
 ** Section 9.5. String Ports
 
@@ -513,8 +548,8 @@ A string port is at "end of file" when the port reaches the end of the string. I
 #+begin_src scheme
 (let ([p (open-input-string "hi mom!")])
   (let ([x (read p)])
-#+end_src
     (list x (read p)))) \Rightarrow (hi mom!)
+#+end_src
 
 procedure: ~(with-input-from-string string thunk)~
 returns: the values returned by thunk
@@ -525,8 +560,8 @@ thunk must be a procedure and should accept zero arguments. with-input-from-stri
 #+begin_src scheme
 (with-input-from-string "(cons 3 4)"
   (lambda ()
-#+end_src
     (eval (read)))) \Rightarrow (3 . 4)
+#+end_src
 
 procedure: ~(open-output-string)~
 returns: a new string output port
@@ -545,10 +580,10 @@ As a side effect, get-output-string resets string-output-port so that subsequent
 #+begin_src scheme
 (let ([p (open-output-string)])
   (write 'hi p)
-#+end_src
   (write-char #\space p)
   (write 'mom! p)
   (get-output-string p)) \Rightarrow "hi mom!"
+#+end_src
 
 An implementation of format (Section 9.13) might be written using string-output ports to produce string output.
 
@@ -561,13 +596,13 @@ thunk must be a procedure and should accept zero arguments. with-output-to-strin
 #+begin_src scheme
 (with-output-to-string
   (lambda ()
-#+end_src
     (display "Once upon a time ...")
     (newline))) \Rightarrow "Once upon a time ...\n"
+#+end_src
 
 ** Section 9.6. File Ports
 
-thread parameter: file-buffer-size
+thread parameter: ~file-buffer-size~
 libraries: (chezscheme)
 
 file-buffer-size is a parameter that determines the size of each buffer created when the buffer mode is not none for a port created by one of the file open operations, e.g., open-input-file or open-file-output-port. When called with no arguments, the parameter returns the current buffer size. When called with a positive fixnum k, it sets the current buffer size to k.
@@ -586,7 +621,7 @@ port must be a file port, i.e., a port for which file-port? returns #t.
 
 ** Section 9.7. Custom Ports
 
-thread parameter: custom-port-buffer-size
+thread parameter: ~custom-port-buffer-size~
 libraries: (chezscheme)
 
 custom-port-buffer-size is a parameter that determines the sizes of the buffers associated with newly created custom ports. When called with no arguments, the parameter returns the current buffer size. When called with a positive fixnum k, it sets the current buffer size to k.
@@ -598,7 +633,7 @@ libraries: (chezscheme)
 
 console-input-port is a parameter that determines the input port used by the waiter and interactive debugger. When called with no arguments, it returns the console input port. When called with one argument, which must be a textual input port, it changes the value of the console input port. The initial value of this parameter is a port tied to the standard input (stdin) stream of the Scheme process.
 
-thread parameter: current-input-port
+thread parameter: ~current-input-port~
 libraries: (chezscheme)
 
 current-input-port is a parameter that determines the default port argument for most input procedures, including read-char, peek-char, and read, When called with no arguments, current-input-port returns the current input port. When called with one argument, which must be a textual input port, it changes the value of the current input port. The Revised6 Report version of current-input-port accepts only zero arguments, i.e., it cannot be used to change the current input port. The initial value of this parameter is the same port as the initial value of console-input-port.
@@ -774,7 +809,7 @@ If textual-input-port is not supplied, it defaults to the current input port. ch
 
 procedure: ~(block-read textual-input-port string)~
 procedure: ~(block-read textual-input-port string count)~
-returns: see below
+returns: 参见下文
 libraries: (chezscheme)
 
 count must be a nonnegative fixnum less than or equal to the length of string. If not provided, it defaults to the length of string.
@@ -785,7 +820,7 @@ If textual-input-port is buffered and the buffer is nonempty, the buffered input
 
 procedure: ~(read-token)~
 procedure: ~(read-token textual-input-port)~
-returns: see below
+returns: 参见下文
 libraries: (chezscheme)
 
 Parsing of a Scheme datum is conceptually performed in two steps. First, the sequence of characters that form the datum are grouped into tokens, such as symbols, numbers, left parentheses, and double quotes. During this first step, whitespace and comments are discarded. Second, these tokens are grouped into data.
@@ -895,19 +930,19 @@ libraries: (chezscheme)
 
 console-output-port is a parameter that determines the output port used by the waiter and interactive debugger. When called with no arguments, it returns the console output port. When called with one argument, which must be a textual output port, it changes the value of the console output port. The initial value of this parameter is a port tied to the standard output (stdout) stream of the Scheme process.
 
-thread parameter: current-output-port
+thread parameter: ~current-output-port~
 libraries: (chezscheme)
 
 current-output-port is a parameter that determines the default port argument for most output procedures, including write-char, newline, write, display, and pretty-print. When called with no arguments, current-output-port returns the current output port. When called with one argument, which must be a textual output port, it changes the value of the current output port. The Revised6 Report version of current-output-port accepts only zero arguments, i.e., it cannot be used to change the current output port. The initial value of this parameter is the same port as the initial value of console-output-port.
 
-thread parameter: console-error-port
+thread parameter: ~console-error-port~
 libraries: (chezscheme)
 
 console-error-port is a parameter that can be used to set or obtain the console error port, which determines the port to which conditions and other messages are printed by the default exception handler. When called with no arguments, console-error-port returns the console error port. When called with one argument, which must be a textual output port, it changes the value of the console error port.
 
 If the system determines that the standard output (stdout) and standard error (stderr) streams refer to the same file, socket, pipe, virtual terminal, device, etc., this parameter is initially set to the same value as the parameter console-output-port. Otherwise, this parameter is initially set to a different port tied to the standard error (stderr) stream of the Scheme process.
 
-thread parameter: current-error-port
+thread parameter: ~current-error-port~
 libraries: (chezscheme)
 
 current-error-port is a parameter that can be used to set or obtain the current error port. When called with no arguments, current-error-port returns the current error port. When called with one argument, which must be a textual output port, it changes the value of the current error port. The Revised6 Report version of current-error-port accepts only zero arguments, i.e., it cannot be used to change the current error port. The initial value of this parameter is the same port as the initial value of console-error-port.
@@ -1145,7 +1180,7 @@ libraries: (chezscheme)
 ifn and ofn must be strings. pretty-file reads each object in turn from the file named by ifn and pretty prints the object to the file named by ofn. Comments present in the input are discarded by the reader and so do not appear in the output file. If the file named by ofn already exists, it is replaced.
 
 procedure: ~(pretty-format sym)~
-returns: see below
+returns: 参见下文
 procedure: ~(pretty-format sym fmt)~
 returns: unspecified
 libraries: (chezscheme)
@@ -1217,17 +1252,17 @@ Indentation of list-structured forms is determined via the fmt-tail specifier us
 
 #+begin_src scheme
 (tab fmt ...):
-    This matches the tail of any proper list; if the tail is nonempty and the list does not fit entirely on the current line, a line break is inserted before the first subform of the tail and tab (see below) determines the amount by which this and all subsequent subforms are indented.
+    This matches the tail of any proper list; if the tail is nonempty and the list does not fit entirely on the current line, a line break is inserted before the first subform of the tail and tab (参见下文) determines the amount by which this and all subsequent subforms are indented.
 #+end_src
 
 #+begin_src scheme
 (fmt tab ...):
-    This matches the tail of any proper list; if the tail is nonempty and the list does not fit entirely on the current line, a line break is inserted after the first subform of the tail and tab (see below) determines the amount by which all subsequent subforms are indented.
+    This matches the tail of any proper list; if the tail is nonempty and the list does not fit entirely on the current line, a line break is inserted after the first subform of the tail and tab (参见下文) determines the amount by which all subsequent subforms are indented.
 #+end_src
 
 #+begin_src scheme
 (tab fmt . fmt-tail):
-    This matches a nonempty tail if the tail of the tail matches fmt-tail. If the list does not fit entirely on the current line, a line break is inserted before the first subform of the tail and tab (see below) determines the amount by which the subform is indented.
+    This matches a nonempty tail if the tail of the tail matches fmt-tail. If the list does not fit entirely on the current line, a line break is inserted before the first subform of the tail and tab (参见下文) determines the amount by which the subform is indented.
 #+end_src
 
 #+begin_src scheme
@@ -1259,8 +1294,8 @@ Here is an example showing the formatting of let might be specified.
 
 Since let comes in two forms, named and unnamed, two alternatives are specified. In either case, the bracket fmt is used to enclose the bindings in square brackets, with all bindings after the first appearing just below the first (and just after the enclosing opening parenthesis), if they don't all fit on one line. Each body form is indented by the standard indentation.
 
-thread parameter: pretty-line-length
-thread parameter: pretty-one-line-limit
+thread parameter: ~pretty-line-length~
+thread parameter: ~pretty-one-line-limit~
 libraries: (chezscheme)
 
 The value of each of these parameters must be a positive fixnum.
@@ -1269,21 +1304,21 @@ The parameters pretty-line-length and pretty-one-line-limit control the output p
 
 pretty-one-line-limit is similar to pretty-line-length, except that it is relative to the first nonblank position on each line of output. It is also a soft limit.
 
-thread parameter: pretty-initial-indent
+thread parameter: ~pretty-initial-indent~
 libraries: (chezscheme)
 
 The value of this parameter must be a nonnegative fixnum.
 
 The parameter pretty-initial-indent is used to tell pretty-print where on an output line it has been called. If pretty-initial-indent is zero (the default), pretty-print assumes that the first line of output it produces will start at the beginning of the line. If set to a nonzero value n, pretty-print assumes that the first line will appear at character position n and will adjust its printing of subsequent lines.
 
-thread parameter: pretty-standard-indent
+thread parameter: ~pretty-standard-indent~
 libraries: (chezscheme)
 
 The value of this parameter must be a nonnegative fixnum.
 
 This determines the amount by which pretty-print indents subexpressions of most forms, such as let expressions, from the form's keyword or first subexpression.
 
-thread parameter: pretty-maximum-lines
+thread parameter: ~pretty-maximum-lines~
 libraries: (chezscheme)
 
 The parameter pretty-maximum-lines controls how many lines pretty-print prints when it is called. If set to #f (the default), no limit is imposed; if set to a nonnegative fixnum n, at most n lines are printed.
@@ -1294,7 +1329,7 @@ procedure: ~(format format-string obj ...)~
 procedure: ~(format #f format-string obj ...)~
 procedure: ~(format #t format-string obj ...)~
 procedure: ~(format textual-output-port format-string obj ...)~
-returns: see below
+returns: 参见下文
 libraries: (chezscheme)
 
 When the first argument to format is a string or #f (first and second forms above), format constructs an output string from format-string and the objects obj .... Characters are copied from format-string to the output string from left to right, until format-string is exhausted. The format string may contain one or more format directives, which are multi-character sequences prefixed by a tilde ( ~ ). Each directive is replaced by some other text, often involving one or more of the obj ... arguments, as determined by the semantics of the directive.
@@ -1418,7 +1453,7 @@ These procedures are simple wrappers for format. printf prints the formatted out
 The I/O control operations described in this section are used to control how the reader reads and printer writes, displays, or pretty-prints characters, symbols, gensyms, numbers, vectors, long or deeply nested lists or vectors, and graph-structured objects.
 
 procedure: ~(char-name obj)~
-returns: see below
+returns: 参见下文
 procedure: ~(char-name name char)~
 returns: unspecified
 libraries: (chezscheme)
@@ -1479,7 +1514,7 @@ The following interactive session demonstrates the use of char-name to establish
 
 The reader does not recognize hex scalar value escapes in character names, as it does in symbols, so #\new\x6c;ine is not equivalent to #\newline. In general, programmers should avoid the use of character name symbols that cannot be entered without the use of hex scalar value escapes or other symbol-name escape mechanisms, since such character names will not be readable.
 
-thread parameter: print-char-name
+thread parameter: ~print-char-name~
 libraries: (chezscheme)
 
 When print-char-name is set to #f (the default), associations created by char-name are ignored by write, put-datum, pretty-print, and the format "~s" directive. Otherwise, these procedures use the names established by char-name when printing character objects.
@@ -1493,7 +1528,7 @@ When print-char-name is set to #f (the default), associations created by char-na
   (format "~s" #\x3)) \Rightarrow "#\\etx"
 #+end_src
 
-thread parameter: case-sensitive
+thread parameter: ~case-sensitive~
 libraries: (chezscheme)
 
 The case-sensitive parameter determines whether the reader is case-sensitive with respect to symbol and character names. When set to true (the default, as required by the Revised6 Report) the case of alphabetic characters within symbol names is significant. When set to #f, case is insignificant. More precisely, when set to #f, symbol and character names are folded (as if by string-foldcase); otherwise, they are left as they appear in the input.
@@ -1513,7 +1548,7 @@ The value of the case-sensitive matters only if neither #!fold-case nor #!no-fol
 (eq? 'abc 'ABC) \Rightarrow #t
 #+end_src
 
-thread parameter: print-graph
+thread parameter: ~print-graph~
 libraries: (chezscheme)
 
 When print-graph is set to a true value, write and pretty-print locate and print objects with shared structure, including cycles, in a notation that may be read subsequently with read. This notation employs the syntax "#n=obj," where n is a nonnegative integer and obj is the printed representation of an object, to label the first occurrence of obj in the output. The syntax "#n#" is used to refer to the object labeled by n thereafter in the output. print-graph is set to #f by default.
@@ -1538,8 +1573,8 @@ Since objects printed through the ~s option in the format control strings of for
 
 The graph syntax is understood by the procedure read, allowing graph structures to be printed and read consistently.
 
-thread parameter: print-level
-thread parameter: print-length
+thread parameter: ~print-level~
+thread parameter: ~print-length~
 libraries: (chezscheme)
 
 These parameters can be used to limit the extent to which nested or multiple-element structures are printed. When called without arguments, print-level returns the current print level and print-length returns the current print length. When called with one argument, which must be a nonnegative fixnum or #f, print-level sets the current print level and print-length sets the current print length to the argument.
@@ -1572,7 +1607,7 @@ The parameters print-level and print-length are useful for controlling the volum
 #+end_src
   (format "~s" '((((a) b) c) d e f g))) \Rightarrow "(((...) c) d e ...)"
 
-thread parameter: print-radix
+thread parameter: ~print-radix~
 libraries: (chezscheme)
 
 The print-radix parameter determines the radix in which numbers are printed by write, pretty-print, and display. Its value should be an integer between 2 and 36, inclusive. Its default value is 10.
@@ -1595,7 +1630,7 @@ Since objects printed through the ~s and ~a options in the format control string
   (format "~a" 11242957)) \Rightarrow "AB8DCD"
 #+end_src
 
-thread parameter: print-gensym
+thread parameter: ~print-gensym~
 libraries: (chezscheme)
 
 When print-gensym is set to #t (the default) gensyms are printed with an extended symbol syntax that includes both the pretty name and the unique name of the gensym: #{pretty-name unique-name}. When set to pretty, the pretty name only is shown, with the prefix #:. When set to pretty/suffix, the printer prints the gensym's "pretty" name along with a suffix based on the gensym's "unique" name, separated by a dot ( "." ). If the gensym's unique name is generated automatically during the current session, the suffix is that portion of the unique name that is not common to all gensyms created during the current session. Otherwise, the suffix is the entire unique name. When set to #f, the pretty name only is shown, with no prefix.
@@ -1635,7 +1670,7 @@ When printing an object that may contain more than one occurrence of a gensym an
   (parameterize ([print-gensym 'pretty/suffix])
     (format "~s ~s ~s" g1 g2 g3))) \Rightarrow "x.1 x.2 y.3"
 
-thread parameter: print-brackets
+thread parameter: ~print-brackets~
 libraries: (chezscheme)
 
 When print-brackets is set to a true value, the pretty printer (see pretty-print) uses square brackets rather than parentheses around certain subexpressions of common control structures, e.g., around let bindings and cond clauses. print-brackets is set to #t by default.
@@ -1653,7 +1688,7 @@ When print-brackets is set to a true value, the pretty printer (see pretty-print
     (pretty-print '(let ([x 3]) x) p) \Rightarrow "(let ((x 3)) x)
     (get-output-string p)))            "
 
-thread parameter: print-extended-identifiers
+thread parameter: ~print-extended-identifiers~
 libraries: (chezscheme)
 
 Chez Scheme extends the syntax of identifiers as described in Section 1.1, except within a set of forms prefixed by #!r6rs (which is implied by in a library or top-level program).
@@ -1692,7 +1727,7 @@ prints
 \x31;23
 #+end_src
 
-thread parameter: print-vector-length
+thread parameter: ~print-vector-length~
 libraries: (chezscheme)
 
 When print-vector-length is set to a true value, write, put-datum, and pretty-print includes the length for all vectors between the "#" and open parenthesis, all bytevectors between the "#vu8" and open parenthesis, and all fxvectors between the "#vfx" and open parenthesis. This parameter is set to #f by default.
@@ -1720,12 +1755,12 @@ Since objects printed through the ~s option in the format control strings of for
   (format "~s" (fxvector 1 2 3 4 4 4))) \Rightarrow "#6vfx(1 2 3 4)"
 #+end_src
 
-thread parameter: print-precision
+thread parameter: ~print-precision~
 libraries: (chezscheme)
 
 When print-precision is set to #f (the default), write, put-datum, pretty-print, and the format "~s" directive do not include the vertical-bar "mantissa-width" syntax after each floating-point number. When set to a nonnegative exact integer, the mantissa width is included, as per the precision argument to number->string.
 
-thread parameter: print-unicode
+thread parameter: ~print-unicode~
 libraries: (chezscheme)
 
 When print-unicode is set to #f, write, put-datum, pretty-print, and the format "~s" directive display Unicode characters with encodings 8016 (128) and above that appear within character objects, symbols, and strings using hexadecimal character escapes. When set to a true value (the default), they are displayed like other printing characters, as if by put-char.
@@ -1851,7 +1886,7 @@ mkdir raises an exception with condition type &i/o-filename if the directory can
 
 procedure: ~(delete-file path)~
 procedure: ~(delete-file path error?)~
-returns: see below
+returns: 参见下文
 libraries: (chezscheme)
 
 path must be a string. delete-file removes the file named by path. If the optional error? argument is #f (the default), delete-file returns a boolean value: #t if the operation is successful and #f if it is not. Otherwise, delete-file returns an unspecified value if the operation is successful and raises an exception with condition type &i/o-filename if it is not.
@@ -1860,7 +1895,7 @@ The Revised6 Report delete-file does not accept the optional error? argument but
 
 procedure: ~(delete-directory path)~
 procedure: ~(delete-directory path error?)~
-returns: see below
+returns: 参见下文
 libraries: (chezscheme)
 
 path must be a string. delete-directory removes the directory named by path. If the optional error? argument is #f (the default), delete-directory returns a boolean value: #t if the operation is successful and #f if it is not. Otherwise, delete-directory returns an unspecified value if the operation is successful and raises an exception with condition type &i/o-filename if it is not. The behavior is unspecified if the directory is not empty, but on most systems the operations will not succeed.
