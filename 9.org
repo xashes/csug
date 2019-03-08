@@ -646,124 +646,159 @@ custom-port-buffer-size 是一个参数对象，用于确定与新创建的自�
 
 ** Section 9.8. Input Operations
 
-global parameter: console-input-port
+global parameter: ~console-input-port~
 libraries: (chezscheme)
 
 console-input-port is a parameter that determines the input port used by the waiter and interactive debugger. When called with no arguments, it returns the console input port. When called with one argument, which must be a textual input port, it changes the value of the console input port. The initial value of this parameter is a port tied to the standard input (stdin) stream of the Scheme process.
+console-input-port 是一个参数对象，用于确定服务器和交互式调试器使用的输入端口。当不带参数调用时，它返回控制台输入端口。 当使用一个参数（必须是文本输入端口）调用时，它会更改控制台输入端口的值。此参数对象的初始值是绑定到 Scheme 进程的标准输入（stdin）流的端口。
 
 thread parameter: ~current-input-port~
 libraries: (chezscheme)
 
 current-input-port is a parameter that determines the default port argument for most input procedures, including read-char, peek-char, and read, When called with no arguments, current-input-port returns the current input port. When called with one argument, which must be a textual input port, it changes the value of the current input port. The Revised6 Report version of current-input-port accepts only zero arguments, i.e., it cannot be used to change the current input port. The initial value of this parameter is the same port as the initial value of console-input-port.
+current-input-port 是一个参数对象，用于确定大多数输入过程的默认端口参数，包括 read-char，peek-char 和 read。当不带参数调用时，current-input-port 返回当前输入端口。当使用一个参数（必须是文本输入端口）调用时，它会更改当前输入端口的值。Current-input-port 的 R^{6}RS 版本只接受零个参数，即它不能用于更改当前输入端口。 此参数对象的初始值与 console-input-port 的初始值相同。
 
 procedure: ~(open-input-file path)~
 procedure: ~(open-input-file path options)~
-returns: a new input port
+returns: 新的输入端口
 libraries: (chezscheme)
 
 path must be a string. open-input-file opens a textual input port for the file named by path. An exception is raised with condition type &i/o-filename if the file does not exist or cannot be opened for input.
+path 必须是一个字符串。open-input-file 为 path 命名的文件打开一个文本输入端口。如果文件不存在或无法打开以接收输入，则会抛出一个条件类型的 &i/o-filename 异常。
 
 options, if present, is a symbolic option name or option list. Possible symbolic option names are compressed, uncompressed, buffered, and unbuffered. An option list is a list containing zero or more symbolic option names.
+options（如果存在）是符号选项名称或选项列表。可能的符号选项名称是 compressed, uncompressed, buffered, 和 unbuffered. 选项列表是包含零个或多个符号选项名称的列表。
 
 The mutually exclusive compressed and uncompressed options determine whether the input file should be decompressed if it is compressed. (See open-output-file.) The default is uncompressed, so the uncompressed option is useful only as documentation.
+互斥的 compressed 和 uncompressed 选项决定输入文件被压缩时，是否应该解压缩。（请参见 open-output-file.）默认值是 uncompressed, 因此 uncompressed 选项仅作为文档使用。
 
 The mutually exclusive buffered and unbuffered options determine whether input is buffered. When input is buffered, it is read in large blocks and buffered internally for efficiency to reduce the number of operating system requests. When the unbuffered option is specified, input is unbuffered, but not fully, since one character of buffering is required to support peek-char and unread-char. Input is buffered by default, so the buffered option is useful only as documentation.
+互斥的 buffered 和 unbuffered 选项决定输入是否被缓冲。当缓冲输入时，它会以大块读取，并在内部进行缓冲以提高效率，从而减少操作系统请求的数量。当指定 unbuffered 选项时，输入是无缓冲的，但也不是完全如此，因为需要一个缓冲字符来支持 peek-char 和 unread-char. 默认情况下，输入是缓冲的，因此 buffered 选项仅作为文档使用。
 
 For example, the call
+例如，调用
 
 #+begin_src scheme
 (open-input-file "frob" '(compressed))
 #+end_src
 
 opens the file frob with decompression enabled.
+打开文件 frob 时启用解压缩。
 
 The Revised6 Report version of open-input-file does not support the optional options argument.
+Open-input-file 的 R^{6}RS 版本不支持可选的 options 参数。
 
 procedure: ~(call-with-input-file path procedure)~
 procedure: ~(call-with-input-file path procedure options)~
-returns: the values returned by procedure
+returns: procedure 的返回值
 libraries: (chezscheme)
 
 path must be a string. procedure should accept one argument.
+path 必须是一个字符串。procedure 应该接受一个参数。
 
 call-with-input-file creates a new input port for the file named by path, as if with open-input-file, and passes this port to procedure. If procedure returns normally, call-with-input-file closes the input port and returns the values returned by procedure.
+call-with-input-file 为 path 命名的文件创建一个新的输入端口，就像使用 open-input-file 一样，并将此端口传递给 procedure。如果 procedure 正常返回，call-with-input-file 将关闭输入端口并返回 procedure 返回的值。
 
 call-with-input-file does not automatically close the input port if a continuation created outside of procedure is invoked, since it is possible that another continuation created inside of procedure will be invoked at a later time, returning control to procedure. If procedure does not return, an implementation is free to close the input port only if it can prove that the input port is no longer accessible. As shown in Section 5.6 of The Scheme Programming Language, 4th Edition, dynamic-wind may be used to ensure that the port is closed if a continuation created outside of procedure is invoked.
+如果在 procedure 外部创建的 continuation 被调用，则 call-with-input-file 不会自动关闭输入端口，因为稍后可能会调用在 procedure 内创建的另一个 continuation，将控制权返回给 procedure。如果 procedure 没有返回，则只有在可以确认输入端口不再可访问的情况下，实现才可以自由关闭输入端口。如《Scheme 编程语言》第 4 版第 5.6 节所示，如果在 procedure 外部创建的 continuation 被调用，则 dynamic-wind 可用于确保端口被关闭。
 
 See open-input-file above for a description of the optional options argument.
+有关可选 options 参数的说明，请参阅上文的 open-input-file 条目。
 
 The Revised6 Report version of call-with-input-file does not support the optional input argument.
+Call-with-input-file 的 R^{6}RS 版本不支持可选的 input 参数。
 
 procedure: ~(with-input-from-file path thunk)~
 procedure: ~(with-input-from-file path thunk options)~
-returns: the values returned by thunk
+returns: thunk 的返回值
 libraries: (chezscheme)
 
 path must be a string. thunk must be a procedure and should accept zero arguments.
+path 必须是一个字符串。thunk 必须是一个过程，并且应该接受零个参数。
 
 with-input-from-file temporarily changes the current input port to be the result of opening the file named by path, as if with open-input-file, during the application of thunk. If thunk returns, the port is closed and the current input port is restored to its old value.
+with-input-from-file 在应用 thunk 期间，暂时将当前输入端口更改为打开 path 命名的文件的结果，就像使用 open-input-file 一样。如果 thunk 返回，则关闭端口并将当前输入端口恢复为其旧值。
 
 The behavior of with-input-from-file is unspecified if a continuation created outside of thunk is invoked before thunk returns. An implementation may close the port and restore the current input port to its old value---but it may not.
+如果在 thunk 返回之前调用在 thunk 之外创建的 continuation, 则 with-input-from-file 的行为是未定义的。实现可能会关闭端口并将当前输入端口恢复为其旧值---但它也可能不会这么做。
 
 See open-input-file above for a description of the optional options argument.
+有关可选 options 参数的说明，请参阅上文的 open-input-file 条目。
 
 The Revised6 Report version of with-input-from-file does not support the optional options argument.
+with-input-from-file 的 R^{6}RS 版本不支持可选的 options 参数。
 
 procedure: ~(open-fd-input-port fd)~
 procedure: ~(open-fd-input-port fd b-mode)~
 procedure: ~(open-fd-input-port fd b-mode ?transcoder)~
-returns: a new input port for the file descriptor fd
+返回：文件描述符 fd 的新输入端口
 libraries: (chezscheme)
 
 fd must be a nonnegative exact integer and should be a valid open file descriptor. If ?transcoder is present and not #f, it must be a transcoder, and this procedure returns a textual input port whose transcoder is ?transcoder. Otherwise, this procedure returns a binary input port. See the lead-in to Section 7.2 of The Scheme Programming Language, 4th Edition for a description of the constraints on and effects of the other arguments.
+fd 必须是非负的精确整数，并且应该是有效的打开文件描述符。如果存在 ?transcoder, 而且不为 #f，则它必须是一个编码转换器，并且此过程返回一个文本输入端口，其编码转换器为 ?transcoder. 否则，此过程返回二进制输入端口。有关其他参数的约束和影响的说明，请参见《Scheme 编程语言》第 4 版第 7.2 节中的引言。
 
 The file descriptor is closed when the port is closed.
+关闭端口时会关闭文件描述符。
 
 procedure: ~(standard-input-port)~
 procedure: ~(standard-input-port b-mode)~
 procedure: ~(standard-input-port b-mode ?transcoder)~
-returns: a new input port connected to the process's standard input
+返回：连接到进程标准输入的新输入端口
 libraries: (chezscheme)
 
-If ?transcoder is present and not #f, it must be a transcoder, and this procedure returns a textual input port whose transcoder is ?transcoder. Otherwise, this procedure returns a binary input port. The buffer mode b-mode defaults to block.
+If "?transcoder" is present and not #f, it must be a transcoder, and this procedure returns a textual input port whose transcoder is "?transcoder". Otherwise, this procedure returns a binary input port. The buffer mode b-mode defaults to block.
+如果存在 ?transcoder, 且不为#f，则它必须是编码转换器，并且该过程返回一个文本输入端口，其编码转换器是 ?transcoder. 否则，此过程返回二进制输入端口。缓冲模式 b-mode 默认为 block.
 
-The Revised6 Report version of this procedure does not accept the optional b-mode and ?transcoder arguments, which limits it to an implementation-dependent buffering mode (block in Chez Scheme) and binary output.
+The Revised6 Report version of this procedure does not accept the optional b-mode and "?transcoder" arguments, which limits it to an implementation-dependent buffering mode (block in Chez Scheme) and binary output.
+此过程的 R^{6}RS 版本不接受可选的 b-mode 和 ?transcoder 参数，这将其限制为依赖于实现的缓冲模式（Chez Scheme 中为 block）和二进制输出。
 
 procedure: ~(get-string-some textual-input-port)~
-returns: a nonempty string or the eof object
+返回：非空字符串或 eof 对象
 libraries: (chezscheme)
 
 If textual-input-port is at end of file, the eof object is returned. Otherwise, get-string-some reads (as if with get-u8) at least one character and possibly more, and returns a string containing these characters. The port's position is advanced past the characters read. The maximum number of characters read by this operation is implementation-dependent.
+如果 textual-input-port 位于文件末尾，则返回 eof 对象。否则，get-string-some 读取（就像使用 get-u8 一样）至少一个，或更多字符，并返回包含这些字符的字符串。端口的位置前进到读取的字符之后。此操作读取的最大字符数与实现有关。
 
 An exception to the "at least one character" guarantee occurs if the port is in nonblocking mode (see set-port-nonblocking!) and no input is ready. In this case, an empty string is returned.
+如果端口处于非阻塞模式（请参阅 set-port-nonblocking!）且没有已就绪的输入，则会发生确保“至少一个字符”的异常。在这种情况下，返回一个空字符串。
 
 procedure: ~(get-string-some! textual-input-port string start n)~
-returns: the count of characters read, as an exact nonnegative integer, or the eof object
+返回：读取的字符数，为精确的非负整数，或 eof 对象
 libraries: (chezscheme)
 
 start and n must be exact nonnegative integers, and the sum of start and n must not exceed the length of string.
+start 和 n 必须是精确的非负整数，start 和 n 的和不得超过 string 的长度。
 
 If n is 0, this procedure returns zero without attempting to read from textual-input-port and without modifying string.
+如果 n 为 0，则此过程返回零，而不尝试从 textual-input-port 读取，并且不修改 string.
 
 Otherwise, if textual-input-port is at end of file, this procedure returns the eof object, except it returns zero when the port is in nonblocking mode (see set-port-nonblocking!) and the port cannot be determined to be at end of file without blocking. In either case, string is not modified.
+否则，如果 textual-input-port 位于文件末尾，则此过程返回 eof 对象，但在端口处于非阻塞模式（请参阅 set-port-nonblocking!），并且不利用阻塞无法确定端口位于文件结尾时，它返回 0. 在两种情况下，它都不会修改 string.
 
 Otherwise, this procedure reads (as if with get-char) up to n characters from the port, stores the characters in consecutive locations of string starting at start, advances the port's position just past the characters read, and returns the count of characters read.
+否则，此过程从端口读取（和使用 get-char 一样）最多 n 个字符，将字符存储在 string 始于 start 的连续位置上，把端口位置前进到读取的字符之后，并返回读取的字符数。
 
 If the port is in nonblocking mode, this procedure reads no more than it can without blocking and thus might read zero characters; otherwise, it reads at least one character but no more than are available when the first character becomes available.
+如果端口处于非阻塞模式，则此过程不会读取比它不使用阻塞时能够读取的更多字符，因此可能读取零个字符; 否则，它会读取至少一个字符，但不会超过当第一个字符变为可用时可用的字符。
 
 procedure: ~(get-bytevector-some! binary-input-port bytevector start n)~
-returns: the count of bytes read, as an exact nonnegative integer, or the eof object
+返回：读取的字节数，为精确的非负整数或 eof 对象
 libraries: (chezscheme)
 
 start and n must be exact nonnegative integers, and the sum of start and n must not exceed the length of bytevector.
+start 和 n 必须是精确的非负整数，start 和 n 的和不得超过 bytevector 的长度。
 
 If n is 0, this procedure returns zero without attempting to read from binary-input-port and without modifying bytevector.
+如果 n 为 0，则此过程返回零，而不尝试从 binary-input-port 读取并且不修改 bytevector.
 
 Otherwise, if binary-input-port is at end of file, this procedure returns the eof object, except it returns zero when the port is in nonblocking mode (see set-port-nonblocking!) and the port cannot be determined to be at end of file without blocking. In either case, bytevector is not modified.
+否则，如果 binary-input-port 位于文件末尾，则此过程返回 eof 对象，但在端口处于非阻塞模式（请参阅 set-port-nonblocking!），并且不利用阻塞无法确定端口位于文件结尾时，它返回 0. 在两种情况下，它都不会修改 bytevector.
 
 Otherwise, this procedure reads (as if with get-u8) up to n bytes from the port, stores the bytes in consecutive locations of bytevector starting at start, advances the port's position just past the bytes read, and returns the count of bytes read.
+否则，此过程从端口读取（如同使用 get-u8）最多 n 个字节，将字节存储在 bytevector 始于 start 的连续位置上，把端口的位置前进到读取的字节之后，并返回读取的字节数。
 
 If the port is in nonblocking mode, this procedure reads no more than it can without blocking and thus might read zero bytes; otherwise, it reads at least one byte but no more than are available when the first byte becomes available.
+如果端口处于非阻塞模式，则此过程不会读取比它不使用阻塞时能够读取的更多字节，因此可能读取零个字节; 否则，它会读取至少一个字节，但不会超过当第一个字节变为可用时可用的字节。
 
 procedure: ~(unread-char char)~
 procedure: ~(unread-char char textual-input-port)~
@@ -772,13 +807,14 @@ returns: unspecified
 libraries: (chezscheme)
 
 For unread-char, if textual-input-port is not supplied, it defaults to the current input port. These procedures "unread" the last character read from textual-input-port. char may or may not be ignored, depending upon the implementation. In any case, char should be last character read from the port. A character should not be unread twice on the same port without an intervening call to read-char or get-char.
+对于 unread-char，如果未提供 textual-input-port，则默认为当前输入端口。这些过程“未读”从 textual-input-port 读取的最后一个字符。char 可能会也可能不会被忽略，具体取决于实现。 在任何情况下，char 应该是从端口读取的最后一个字符。如果没有对 read-char 或 get-char 进行中间调用，则一个字符不应在同一端口上被未读两次。
 
 unread-char and unget-char are provided for applications requiring one character of lookahead and may be used in place of, or even in combination with, peek-char or lookahead-char. One character of lookahead is required in the procedure read-word, which is defined below in terms of unread-char. read-word returns the next word from a textual input port as a string, where a word is defined to be a sequence of alphabetic characters. Since it does not know until it reads one character too many that it has read the entire word, read-word uses unread-char to return the character to the input port.
+unread-char 和 unget-char 是为需要一个前瞻字符的应用提供的，可用于代替，甚至与 peek-char 或 lookahead-char 结合使用。过程 read-word 需要一个前瞻字符，它基于 unread-char 定义如下。read-word 将文本输入端口中的下一个单词作为字符串返回，其中单词被定义为一个字母字符序列。由于直到它读取到一个多余字符后，才能知道读完了整个单词，因此 read-word 使用 unread-char 将那个字符返还给输入端口。
 
 #+begin_src scheme
 (define read-word
   (lambda (p)
-#+end_src
     (list->string
       (let f ([c (read-char p)])
         (cond
@@ -788,13 +824,14 @@ unread-char and unget-char are provided for applications requiring one character
           [else
            (unread-char c p)
            '()])))))
+#+end_src
 
 In the alternate version below, peek-char is used instead of unread-char.
+在下面的替代版本中，使用 peek-char 而不是 unread-char.
 
 #+begin_src scheme
 (define read-word
   (lambda (p)
-#+end_src
     (list->string
       (let f ([c (peek-char p)])
         (cond
@@ -803,27 +840,32 @@ In the alternate version below, peek-char is used instead of unread-char.
            (read-char p)
            (cons c (f (peek-char p)))]
           [else '()])))))
+#+end_src
 
 The advantage of unread-char in this situation is that only one call to unread-char per word is required, whereas one call to peek-char is required for each character in the word plus the first character beyond. In many cases, unread-char and unget-char do not enjoy this advantage, and peek-char or lookahead-char should be used instead.
+在这种情况下，unread-char 的优势是每个单词只需要调用一次 unread-char，而对于单词中的每个字符以及单词之后的第一个字符，都需要调用 peek-char。在许多情况下，unread-char 和 unget-char 不享有此优势，则应该转而使用 peek-char 或 lookahead-char。
 
 procedure: ~(unget-u8 binary-input-port octet)~
 returns: unspecified
 libraries: (chezscheme)
 
 This procedures "unreads" the last byte read from binary-input-port. octet may or may not be ignored, depending upon the implementation. In any case, octet should be last byte read from the port. A byte should not be unread twice on the same port without an intervening call to get-u8.
+此过程“回退”从 binary-input-port 读取的最后一个字节。octet 可能会也可能不会被忽略，具体取决于实现。在任何情况下，octet 应该是从端口读取的最后一个字节。如果没有对 get-u8 的中间调用，则不应在同一端口上回退一个字节两次。
 
 procedure: ~(input-port-ready? input-port)~
-returns: #t if data is available on input-port, #f otherwise
+返回: 如果 ~input-port~ 上有可用数据，则为 ~#t~, 否则为 ~#f~.
 libraries: (chezscheme)
 
 input-port-ready? allows a program to check to see if input is available on a textual or binary input port without hanging. If input is available or the port is at end of file, input-port-ready? returns #t. If it cannot determine from the port whether input is ready, input-port-ready? raises an exception with condition type &i/o-read-error. Otherwise, it returns #f.
+input-port-ready? 允许程序在不挂起的情况下检查输入是否在文本或二进制输入端口上可用。如果输入可用或端口位于文件末尾，则 input-port-ready? 返回#t. 如果它无法确定端口的输入是否就绪，则会抛出一个条件类型的 i/o-read-error 异常。否则，它返回#f.
 
 procedure: ~(char-ready?)~
 procedure: ~(char-ready? textual-input-port)~
-returns: #t if a character is available on textual-input-port, #f otherwise
+返回: 如果 ~textual-input-port~ 上有可用字符，则为 ~#t~, 否则为 ~#f~.
 libraries: (chezscheme)
 
 If textual-input-port is not supplied, it defaults to the current input port. char-ready? is like input-port-ready? except it is restricted to textual input ports.
+如果未提供 textual-input-port，则默认为当前输入端口。char-ready? 类似于 input-port-ready?, 只是它仅限于文本输入端口。
 
 procedure: ~(block-read textual-input-port string)~
 procedure: ~(block-read textual-input-port string count)~
@@ -831,10 +873,13 @@ returns: 参见下文
 libraries: (chezscheme)
 
 count must be a nonnegative fixnum less than or equal to the length of string. If not provided, it defaults to the length of string.
+count 必须是小于或等于 string 长度的非负 fixnum. 如果未提供，则默认为 string 的长度。
 
 If textual-input-port is at end-of-file, an eof object is returned. Otherwise, string is filled with as many characters as are available for reading from textual-input-port up to count, and the number of characters placed in the string is returned.
+如果 textual-input-port 位于文件末尾，则返回 eof 对象。否则，会以 textual-input-port 中可读的至多 count 个字符填充 string, 并返回置于字符串中的字符数。
 
 If textual-input-port is buffered and the buffer is nonempty, the buffered input or a portion thereof is returned; otherwise block-read bypasses the buffer entirely.
+如果缓冲了 textual-input-port 并且缓冲区是非空的，则返回缓冲的输入或其一部分; 否则 block-read 完全绕过缓冲区。
 
 procedure: ~(read-token)~
 procedure: ~(read-token textual-input-port)~
@@ -842,108 +887,112 @@ returns: 参见下文
 libraries: (chezscheme)
 
 Parsing of a Scheme datum is conceptually performed in two steps. First, the sequence of characters that form the datum are grouped into tokens, such as symbols, numbers, left parentheses, and double quotes. During this first step, whitespace and comments are discarded. Second, these tokens are grouped into data.
+解析 Scheme datum 在概念上分两步执行。首先，形成 datum 的字符序列被分组为 token, 例如符号，数字，左括号和双引号。在这第一步中，空格和注释会被丢弃。接着，这些 token 被分组为数据。
 
 read performs both of these steps and creates an internal representation of each datum it parses. read-token may be used to perform the first step only, one token at a time. read-token is intended to be used by editors and program formatters that must be able to parse a program or datum without actually reading it.
+读取执行这两个步骤并创建它解析的每个 datum 的内部表示。read-token 可用于仅执行第一步，一次一个 token. read-token 旨在供编辑器和程序格式化工具使用，它们必须能够解析程序或 datum 而无需实际读取它。
 
 If textual-input-port is not supplied, it defaults to the current input port. One token is read from the input port and returned as four values:
+如果未提供 textual-input-port，则默认为当前输入端口。它从输入端口读取一个 token 并返回四个值：
 
 type:
     a symbol describing the type of token read,
+    描述读取的 token 类型的符号，
 
 value:
-    the token value,
+    token 的值，
 
 start:
     the position of the first character of the token, relative to the starting position of the input port, and
-
+    token 的第一个字符相对于输入端口的起始位置的位置，和
 end:
     the first position beyond the token, relative to the starting position of the input port. 
-
+    token 之后的第一个位置，相对于输入端口的起始位置。
+    
 When the token type fully specifies the token, read-token returns #f for the value. The token types are listed below with the corresponding value in parentheses.
+当 token 类型完全指定 token 时，read-token 返回#f 作为值。下面列出了 token 类型，括号中有相应的值。
 
 atomic
     (atom) an atomic value, i.e., a symbol, boolean, number, character, #!eof, or #!bwp 
+    (atom) 一个原子值，即，符号，布尔值，数字，字符，#!eof 或#!bwp
+
 box
-    (#f) box prefix, i.e., #& 
+    (#f) box 前缀，即， #& 
 dot
-    (#f) dotted pair separator, i.e., . 
+    (#f) 点对分隔符，即， . 
 eof
-    (#!eof) end of file 
+    (#!eof) 文件末尾
 fasl
-    (#f) fasl prefix, i.e., #@ 
+    (#f) fasl 前缀，即， #@ 
 insert
-    (n) graph reference, i.e., #n# 
+    (n) 图引用，即， #n# 
 lbrack
-    (#f) open square bracket 
+    (#f) 左方括号
 lparen
-    (#f) open parenthesis 
+    (#f) 左圆括号
 mark
-    (n) graph mark, i.e., #n= 
+    (n) 图标记，即， #n= 
 quote
-    (quote, quasiquote, syntax, unquote, unquote-splicing, or datum-comment) an abbreviation mark, e.g., ' or ,@ or datum-comment prefix 
+    (quote, quasiquote, syntax, unquote, unquote-splicing, or datum-comment) 缩写标记，例如， ' 或 ,@ 或 datum 注释前缀
 rbrack
-    (#f) close square bracket 
+    (#f) 右方括号
 record-brack
-    (#f) record open bracket, i.e., #[ 
+    (#f) record 左方括号，即， #[ 
 rparen
-    (#f) close parenthesis 
+    (#f) 右圆括号
 vfxnparen
-    (n) fxvector prefix, i.e., #nvfx( 
+    (n) fxvector 前缀，即， #nvfx( 
 vfxparen
-    (#f) fxvector prefix, i.e., #vfx( 
+    (#f) fxvector 前缀，即， #vfx( 
 vnparen
-    (n) vector prefix, i.e., #n( 
+    (n) 向量前缀，即， #n( 
 vparen
-    (#f) vector prefix, i.e., #( 
+    (#f) 向量前缀，即， #( 
 vu8nparen
-    (n) bytevector prefix, i.e., #nvu8( 
+    (n) 字节向量前缀，即， #nvu8( 
 vu8paren
-    (#f) bytevector prefix, i.e., #vu8( 
+    (#f) 字节向量前缀，即， #vu8( 
 
 The set of token types is likely to change in future releases of the system; check the release notes for details on such changes.
+在将来的系统版本中，token 类型集可能会发生变化; 有关此类更改的详细信息，请查看发行说明。
 
 The input port is left pointing to the first character position beyond the token, i.e., end characters from the starting position.
+输入端口指向 token 之后的第一个字符位置，即从起始位置开始的结束字符。
 
 #+begin_src scheme
 (define s (open-input-string "(a b c)"))
 (read-token s) \Rightarrow lparen
-#+end_src
                    #f
                    0
                    1
-#+begin_src scheme
 (define s (open-input-string "abc 123"))
 (read-token s) \Rightarrow atomic
-#+end_src
                    abc
                    0
                    3
-#+begin_src scheme
 (define s (open-input-string ""))
 (read-token s) \Rightarrow eof
-#+end_src
                    #!eof
                    0
                    0
-#+begin_src scheme
 (define s (open-input-string "#7=#7#"))
 (read-token s) \Rightarrow mark
-#+end_src
                    7
                    0
                    3
-#+begin_src scheme
 (read-token s) \Rightarrow insert
                    7
-#+end_src
                    3
                    6
+#+end_src
 
 The information read-token returns is not always sufficient for reconstituting the exact sequence of characters that make up a token. For example, 1.0 and 1e0 both return type atomic with value 1.0. The exact sequence of characters may be obtained only by repositioning the port and reading a block of characters of the appropriate length, using the relative positions given by start and end.
+read-token 返回的信息并不总是足以重构构成 token 的精确字符序列。例如，1.0 和 1e0 都返回类型为 atomic 的值 1.0. 只有通过重新定位端口并使用通过 start 和 end 给出的相对位置读取适当长度的字符块，才能获得精确的字符序列。
+
 
 ** Section 9.9. Output Operations
 
-global parameter: console-output-port
+global parameter: ~console-output-port~
 libraries: (chezscheme)
 
 console-output-port is a parameter that determines the output port used by the waiter and interactive debugger. When called with no arguments, it returns the console output port. When called with one argument, which must be a textual output port, it changes the value of the console output port. The initial value of this parameter is a port tied to the standard output (stdout) stream of the Scheme process.
@@ -1833,8 +1882,8 @@ ifn and ofn must be strings. fasl-file may be used to convert a file in human-re
 
 This section describes operations on files, directories, and pathnames.
 
-global parameter: current-directory
-global parameter: cd
+global parameter: ~current-directory~
+global parameter: ~cd~
 libraries: (chezscheme)
 
 When invoked without arguments, current-directory returns a string representing the current working directory. Otherwise, the current working directory is changed to the directory specified by the argument, which must be a string representing a valid directory pathname.
