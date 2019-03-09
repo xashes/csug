@@ -996,143 +996,182 @@ global parameter: ~console-output-port~
 libraries: (chezscheme)
 
 console-output-port is a parameter that determines the output port used by the waiter and interactive debugger. When called with no arguments, it returns the console output port. When called with one argument, which must be a textual output port, it changes the value of the console output port. The initial value of this parameter is a port tied to the standard output (stdout) stream of the Scheme process.
+console-output-port 是一个参数对象，用于确定服务器和交互式调试器使用的输出端口。当不带参数调用时，它返回控制台输出端口。当使用一个参数（必须是文本输出端口）调用时，它会更改控制台输出端口的值。此参数对象的初始值是绑定到 Scheme 进程的标准输出（stdout）流的端口。
 
 thread parameter: ~current-output-port~
 libraries: (chezscheme)
 
 current-output-port is a parameter that determines the default port argument for most output procedures, including write-char, newline, write, display, and pretty-print. When called with no arguments, current-output-port returns the current output port. When called with one argument, which must be a textual output port, it changes the value of the current output port. The Revised6 Report version of current-output-port accepts only zero arguments, i.e., it cannot be used to change the current output port. The initial value of this parameter is the same port as the initial value of console-output-port.
+current-output-port 是一个参数对象，用于确定大多数输出过程的默认端口参数，包括 write-char，newline，write，display 和 pretty-print. 当不带参数调用时，current-output-port 返回当前输出端口。当使用一个参数（必须是文本输出端口）调用时，它会更改当前输出端口的值。Current-output-port 的 R^{6}RS 版本只接受零个参数，即它不能用于更改当前输出端口。此参数对象的初始值与 console-output-port 的初始值相同。
 
 thread parameter: ~console-error-port~
 libraries: (chezscheme)
 
 console-error-port is a parameter that can be used to set or obtain the console error port, which determines the port to which conditions and other messages are printed by the default exception handler. When called with no arguments, console-error-port returns the console error port. When called with one argument, which must be a textual output port, it changes the value of the console error port.
+console-error-port 是一个参数对象，可用于设置或获取控制台错误端口，该端口确定默认异常处理程序将条件和其他消息打印到的端口。在不带参数调用时，console-error-port 将返回控制台错误端口。当使用一个参数（必须是文本输出端口）调用时，它会更改控制台错误端口的值。
 
 If the system determines that the standard output (stdout) and standard error (stderr) streams refer to the same file, socket, pipe, virtual terminal, device, etc., this parameter is initially set to the same value as the parameter console-output-port. Otherwise, this parameter is initially set to a different port tied to the standard error (stderr) stream of the Scheme process.
+如果系统确定标准输出（stdout）和标准错误（stderr）流引用了相同的文件，套接字，管道，虚拟终端，设备等，则此参数对象初始化为与 console-output-port 相同的值。否则，此参数对象初始化为与 Scheme 进程的标准错误（stderr）流相关联的一个不同端口。
 
 thread parameter: ~current-error-port~
 libraries: (chezscheme)
 
 current-error-port is a parameter that can be used to set or obtain the current error port. When called with no arguments, current-error-port returns the current error port. When called with one argument, which must be a textual output port, it changes the value of the current error port. The Revised6 Report version of current-error-port accepts only zero arguments, i.e., it cannot be used to change the current error port. The initial value of this parameter is the same port as the initial value of console-error-port.
+current-error-port 是一个可用于设置或获取当前错误端口的参数对象。当不带参数调用时，current-error-port 返回当前错误端口。当使用一个参数（必须是文本输出端口）调用时，它会更改当前错误端口的值。Current-error-port 的 R^{6}RS 版本只接受零个参数，即它不能用于更改当前错误端口。此参数对象的初始值与 console-error-port 的初始值相同。
 
 procedure: ~(open-output-file path)~
 procedure: ~(open-output-file path options)~
-returns: a new output port
+returns: 新的输出端口
 libraries: (chezscheme)
 
 path must be a string. open-output-file opens a textual output port for the file named by path.
+path 必须是一个字符串。open-output-file 为 path 命名的文件打开文本输出端口。
 
 options, if present, is a symbolic option name or option list. Possible symbolic option names are error, truncate, replace, append, compressed, uncompressed, buffered, unbuffered, exclusive, and nonexclusive. An option list is a list containing zero or more symbolic option names and possibly the two-element option mode mode.
+options（如果存在的话）是一个符号选项名或选项列表。可能的符号选项名是 error，truncate，replace，append，compressed，uncompressed，buffered，unbuffered，exclusive 和 nonexclusive。选项列表是包含零个或多个符号选项名以及可能的双元素选项 ~mode~ /mode/ 的列表。
 
 The mutually exclusive error, truncate, replace, and append options are used to direct what happens when the file to be opened already exists.
+互斥的 error，truncate，replace 和 append 选项用于指示当要打开的文件已存在时会发生什么。
 
 error:
     An exception is raised with condition-type &i/o-filename. 
+    抛出一个条件类型的&i/o-filename 异常。
 replace:
-    The existing file is deleted before the new file is opened. 
+    在打开新文件之前删除现有文件。
 truncate:
     The existing file is opened and truncated to zero length. 
+    打开现有文件，并将其长度截短为 0.
 append:
     The existing file is opened and the output port is positioned at the end of the file before each write so that output to the port is always appended to the file. 
+    在每次写入之前打开现有文件并将输出端口置于文件末尾，从而始终将发送到端口的输出附加到文件末尾。
 
 The default behavior is to raise an exception.
+默认行为是抛出异常。
 
 The mutually exclusive compressed and uncompressed options determine whether the output file is to be compressed. Compression is performed with the use of the zlib compression library developed by Jean-loup Gailly and Mark Adler. It is therefore compatible with the gzip program, which means that gzip may be used to uncompress files produced by Chez Scheme and visa versa. Files are uncompressed by default, so the uncompressed option is useful only as documentation.
+互斥的 compressed 和 uncompressed 选项确定是否要压缩输出文件。使用由 Jean-loup Gailly 和 Mark Adler 开发的 zlib 压缩库来执行压缩。 因此它与 gzip 程序兼容，这意味着 gzip 可用于解压缩由 Chez Scheme 生成的文件，反之亦然。默认情况下，文件是未压缩的，因此 uncompressed 选项仅作为文档使用。
 
 The mutually exclusive buffered and unbuffered options determine whether output is buffered. Unbuffered output is sent immediately to the file, whereas buffered output not written until the port's output buffer is filled or the port is flushed (via flush-output-port) or closed (via flush-output-port or by the storage management system when the port becomes inaccessible). Output is buffered by default for efficiency, so the buffered option is useful only as documentation.
+互斥的 buffered 和 unbuffered 选项确定输出是否被缓冲。无缓冲输出立即发送到文件，而缓冲输出不会写入，直到端口的输出缓冲区被填满或端口被刷新（通过 flush-output-port）或关闭（通过 flush-output-port 或在端口不再可访问时通过存储管理系统）。默认情况下，输出会被缓冲以提高效率，因此 buffered 选项仅作为文档使用。
 
 The mutually exclusive exclusive and nonexclusive options determine whether access to the file is "exclusive." When the exclusive option is specified, the file is locked until the port is closed to prevent access by other processes. On some systems the lock is advisory, i.e., it inhibits access by other processes only if they also attempt to open exclusively. Nonexclusive access is the default, so the nonexclusive option is useful only as documentation.
+互斥的 exclusive 和 nonexclusive 选项决定了对文件的访问是否是“独占的”。指定独占选项后，文件将被锁定，直到端口关闭，以阻止其他进程访问。在某些系统上，锁是建议性的，即，只有当其它进程也试图独占打开文件时，它才会禁止它们访问。非独占访问是默认选项，因此 nonexclusive 选项仅作为文档有用。
 
 The mode option determines the permission bits on Unix systems when the file is created by the operation, subject to the process umask. The subsequent element in the options list must be an exact integer specifying the permissions in the manner of the Unix open function. The mode option is ignored under Windows.
+mode 选项决定此操作创建文件时在 Unix 系统上的权限位，具体取决于进程 umask。选项列表中的后续元素必须是一个精确的整数，以 Unix open 函数的方式指定权限。Windows 下会忽略 mode 选项。
 
 For example, the call
+例如，调用
 
 #+begin_src scheme
 (open-output-file "frob" '(compressed truncate mode #o644))
 #+end_src
 
 opens the file frob with compression enabled. If frob already exists it is truncated. On Unix-based systems, if frob does not already exist, the permission bits on the newly created file are set to logical and of #o644 and the process's umask.
+打开文件 frob 并启用压缩。如果 frob 已经存在则会被截短。在基于 Unix 的系统上，如果 frob 尚不存在，则新创建的文件上的权限位将被设置为#o644 和进程的 umask 的逻辑与。
 
 The Revised6 Report version of open-output-file does not support the optional options argument.
+Open-output-file 的 R^{6}RS 版本不支持可选的 options 参数。
 
 procedure: ~(call-with-output-file path procedure)~
 procedure: ~(call-with-output-file path procedure options)~
-returns: the values returned by procedure
+returns: procedure 的返回值
 libraries: (chezscheme)
 
 path must be a string. procedure should accept one argument.
+path 必须是一个字符串。程序应该接受一个参数。
 
 call-with-output-file creates a new output port for the file named by path, as if with open-output-file, and passes this port to procedure. If procedure returns, call-with-output-file closes the output port and returns the values returned by procedure.
+call-with-output-file 为 path 命名的文件创建一个新的输出端口，就像使用 open-output-file 一样，并将此端口传递给 procedure. 如果 procedure 返回，call-with-output-file 将关闭输出端口并返回 procedure 返回的值。
 
 call-with-output-file does not automatically close the output port if a continuation created outside of procedure is invoked, since it is possible that another continuation created inside of procedure will be invoked at a later time, returning control to procedure. If procedure does not return, an implementation is free to close the output port only if it can prove that the output port is no longer accessible. As shown in Section 5.6 of The Scheme Programming Language, 4th Edition, dynamic-wind may be used to ensure that the port is closed if a continuation created outside of procedure is invoked.
+如果在 procedure 外部创建的 continuation 被调用，则 call-with-output-file 不会自动关闭输出端口，因为稍后可能会调用在 procedure 内创建的另一个 continuation，将控制权返回给 procedure。如果 procedure 没有返回，则只有在可以确认输出端口不再可访问的情况下，实现才可以自由关闭输出端口。如《Scheme 编程语言》第 4 版第 5.6 节所示，如果在 procedure 外部创建的 continuation 被调用，则 dynamic-wind 可用于确保端口被关闭。
 
 See open-output-file above for a description of the optional options argument.
+有关可选 options 参数的说明，请参阅上面的 open-output-file.
 
 The Revised6 Report version of call-with-output-file does not support the optional options argument.
+Call-with-output-file 的 R^{6}RS 版本不支持可选的 options 参数。
 
 procedure: ~(with-output-to-file path thunk)~
 procedure: ~(with-output-to-file path thunk options)~
-returns: the value returned by thunk
+returns: thunk 的返回值
 libraries: (chezscheme)
 
 path must be a string. thunk must be a procedure and should accept zero arguments.
+path 必须是一个字符串。thunk 必须是一个过程，并且应该接受零个参数。
 
 with-output-to-file temporarily rebinds the current output port to be the result of opening the file named by path, as if with open-output-file, during the application of thunk. If thunk returns, the port is closed and the current output port is restored to its old value.
+with-output-from-file 在应用 thunk 期间，暂时将当前输出端口重绑定为打开 path 命名的文件的结果，就像使用 open-output-file 一样。如果 thunk 返回，则关闭端口并将当前输出端口恢复为其旧值。
 
 The behavior of with-output-to-file is unspecified if a continuation created outside of thunk is invoked before thunk returns. An implementation may close the port and restore the current output port to its old value---but it may not.
+如果在 thunk 返回之前调用在 thunk 之外创建的 continuation, 则 with-output-from-file 的行为是未定义的。实现可能会关闭端口并将当前输出端口恢复为其旧值---但它也可能不会这么做。
 
 See open-output-file above for a description of the optional options argument.
+有关可选 options 参数的说明，请参阅上面的 open-output-file.
 
 The Revised6 Report version of with-output-to-file does not support the optional options argument.
+with-output-to-file 的 R^{6}RS 版本不支持可选的 options 参数。
 
 procedure: ~(open-fd-output-port fd)~
 procedure: ~(open-fd-output-port fd b-mode)~
 procedure: ~(open-fd-output-port fd b-mode ?transcoder)~
-returns: a new output port for the file descriptor fd
+返回：文件描述符 fd 的新输出端口
 libraries: (chezscheme)
 
 fd must be a nonnegative exact integer and should be a valid open file descriptor. If ?transcoder is present and not #f, it must be a transcoder, and this procedure returns a textual output port whose transcoder is ?transcoder. Otherwise, this procedure returns a binary output port. See the lead-in to Section 7.2 of The Scheme Programming Language, 4th Edition for a description of the constraints on and effects of the other arguments.
+fd 必须是非负的精确整数，并且应该是有效的打开文件描述符。如果存在 ?transcoder, 而且不为 #f，则它必须是一个编码转换器，并且此过程返回一个文本输出端口，其编码转换器为 ?transcoder. 否则，此过程返回二进制输出端口。有关其他参数的约束和影响的说明，请参见《Scheme 编程语言》第 4 版第 7.2 节中的引言。
 
 The file descriptor is closed when the port is closed.
+关闭端口时会关闭文件描述符。
 
 procedure: ~(standard-output-port)~
 procedure: ~(standard-output-port b-mode)~
 procedure: ~(standard-output-port b-mode ?transcoder)~
-returns: a new output port connected to the process's standard output
+返回：连接到进程的标准输出的新输出端口
 libraries: (chezscheme)
 
 If ?transcoder is present and not #f, it must be a transcoder, and this procedure returns a textual output port whose transcoder is ?transcoder. Otherwise, this procedure returns a binary output port. The buffer mode b-mode defaults to line, which differs from block in Chez Scheme only for textual output ports.
+如果存在 ?transcoder, 且不为#f，则它必须是编码转换器，并且该过程返回一个文本输出端口，其编码转换器是 ?transcoder. 否则，此过程返回二进制输出端口。缓冲模式 b-mode 默认为 line, 在 Chez Scheme 中，它与 block 仅在针对文本输出端口时有区别。
 
 The Revised6 Report version of this procedure does not accept the optional b-mode and ?transcoder arguments, which limits it to an implementation-dependent buffering mode (line in Chez Scheme) and binary output.
+此过程的 R^{6}RS 版本不接受可选的 b-mode 和 ?transcoder 参数，这将其限制为依赖于实现的缓冲模式（Chez Scheme 中为 line）和二进制输出。
 
 procedure: ~(standard-error-port)~
 procedure: ~(standard-error-port b-mode)~
 procedure: ~(standard-error-port b-mode ?transcoder)~
-returns: a new output port connected to the process's standard error
+返回：连接到进程的标准错误的新输出端口
 libraries: (chezscheme)
 
 If ?transcoder is present and not #f, it must be a transcoder, and this procedure returns a textual output port whose transcoder is ?transcoder. Otherwise, this procedure returns a binary output port. The buffer mode b-mode defaults to none. See the lead-in to Section 7.2 of The Scheme Programming Language, 4th Edition for a description of the constraints on and effects of the other arguments.
+如果存在 ?transcoder, 且不为#f，则它必须是编码转换器，并且该过程返回一个文本输出端口，其编码转换器是 ?transcoder. 否则，此过程返回二进制输出端口。缓冲模式 b-mode 默认为 none. 有关其他参数的约束和影响的说明，请参见《Scheme 编程语言》第 4 版第 7.2 节中的引言。
 
 The Revised6 Report version of this procedure does not accept the optional b-mode and ?transcoder arguments, which limits it to an implementation-dependent buffering mode (none in Chez Scheme) and binary output.
+此过程的 R^{6}RS 版本不接受可选的 b-mode 和 ?transcoder 参数，这将其限制为依赖于实现的缓冲模式（Chez Scheme 中为 none）和二进制输出。
 
 procedure: ~(put-bytevector-some binary-output-port bytevector)~
 procedure: ~(put-bytevector-some binary-output-port bytevector start)~
 procedure: ~(put-bytevector-some binary-output-port bytevector start n)~
-returns: the number of bytes written
+returns: 写入的字节数
 libraries: (chezscheme)
 
 start and n must be nonnegative exact integers, and the sum of start and n must not exceed the length of bytevector. If not supplied, start defaults to zero and n defaults to the difference between the length of bytevector and start.
+start 和 n 必须是非负的精确整数，start 和 n 的和不得超过 bytevector 的长度。如果未提供，则 start 默认为零，而 n 默认为 bytevector 的长度和 start 之间的差值。
 
 This procedure normally writes the n bytes of bytevector starting at start to the port and advances the its position past the end of the bytes written. If the port is in nonblocking mode (see set-port-nonblocking!), however, the number of bytes written may be less than n, if the system would have to block to write more bytes.
+此过程通常将 bytevector 始于 start 的 n 个字节写入端口，并将其位置前进到写入的字节末尾之后。不过，如果端口处于非阻塞模式（请参阅 set-port-nonblocking!），而若系统必须阻塞才能写入更多字节，则写入的字节数可能小于 n.
 
 procedure: ~(put-string-some textual-output-port string)~
 procedure: ~(put-string-some textual-output-port string start)~
 procedure: ~(put-string-some textual-output-port string start n)~
-returns: the number of characters written
+returns: 写入的字符数
 libraries: (chezscheme)
 
 start and n must be nonnegative exact integers, and the sum of start and n must not exceed the length of string. If not supplied, start defaults to zero and n defaults to the difference between the length of string and start.
+start 和 n 必须是非负的精确整数，start 和 n 的和不得超过 string 的长度。如果未提供，则 start 默认为零，而 n 默认为 string 的长度和 start 之间的差值。
 
 This procedure normally writes the n characters of string starting at start to the port and advances the its position past the end of the characters written. If the port is in nonblocking mode (see set-port-nonblocking!), however, the number of characters written may be less than n, if the system would have to block to write more characters.
+此过程通常将 string 始于 start 的 n 个字符写入端口，并将其位置前进到写入的字符末尾之后。不过，如果端口处于非阻塞模式（请参阅 set-port-nonblocking!），而若系统必须阻塞才能写入更多字符，则写入的字符数可能小于 n.
 
 procedure: ~(display-string string)~
 procedure: ~(display-string string textual-output-port)~
@@ -1140,6 +1179,7 @@ returns: unspecified
 libraries: (chezscheme)
 
 display-string writes the characters contained within string to textual-output-port or to the current-output port if textual-output-port is not specified. The enclosing string quotes are not printed, and special characters within the string are not escaped. display-string is a more efficient alternative to display for displaying strings.
+如果未指定 textual-output-port，display-string 将把 string 中包含的字符写入 textual-output-port 或当前输出端口。封闭字符串的引号不会被打印，也不会转义字符串中的特殊字符。对于字符串的显示，display-string 是对 display 的一个更有效的替代。
 
 procedure: ~(block-write textual-output-port string)~
 procedure: ~(block-write textual-output-port string count)~
@@ -1147,8 +1187,10 @@ returns: unspecified
 libraries: (chezscheme)
 
 count must be a nonnegative fixnum less than or equal to the length of string. If not provided, it defaults to the length of string.
+count 必须是小于或等于 string 长度的非负 fixnum. 如果未提供，则默认为 string 的长度。
 
 block-write writes the first count characters of string to textual-output-port. If the port is buffered and the buffer is nonempty, the buffer is flushed before the contents of string are written. In any case, the contents of string are written immediately, without passing through the buffer.
+block-write 将 string 的前 count 个字符写入 textual-output-port. 如果端口是缓冲的并且缓冲区非空，则会在写入 string 的内容之前刷新缓冲区。在所有情况下，string 的内容都会立即写入，而不会通过缓冲区。
 
 procedure: ~(truncate-port output-port)~
 procedure: ~(truncate-port output-port pos)~
@@ -1158,10 +1200,13 @@ returns: unspecified
 libraries: (chezscheme)
 
 truncate-port and truncate-file are identical.
+truncate-port 和 truncate-file 是完全相同的。
 
 pos must be an exact nonnegative integer. It defaults to 0.
+pos 必须是一个精确的非负整数。它默认为 0.
 
 These procedures truncate the file or other object associated with output-port to pos and repositions the port to that position, i.e., it combines the functionality of set-port-length! and set-port-position! and can be called on a port only if port-has-set-port-length!? and port-has-set-port-position!? are both true of the port.
+这些过程将与 output-port 相关联的文件或其他对象截短到 pos 位置，并将端口重新定位到该位置，即它结合了 set-port-length! 和 set-port-position! 的功能，并且只有在 port-has-set-port-length!? 和 port-has-set-port-position!? 对于端口都为真时，才能在端口上调用它。
 
 procedure: ~(fresh-line)~
 procedure: ~(fresh-line textual-output-port)~
@@ -1169,8 +1214,11 @@ returns: unspecified
 libraries: (chezscheme)
 
 If textual-output-port is not supplied, it defaults to the current output port.
+如果未提供 textual-output-port，则默认为当前输出端口。
 
 This procedure behaves like newline, i.e., sends a newline character to textual-output-port, unless it can determine that the port is already positioned at the start of a line. It does this by flushing the port and consulting the "beginning-of-line" (BOL) flag associated with the port. (See page 220.)
+此过程的行为类似于 newline, 即，发送一个换行符到 textual-output-port，除非它可以确定该端口已经位于一行的开头。它通过刷新端口并查询与端口关联的“行首”（BOL）标志来实现此目的。（参见第 220 页）
+
 
 ** Section 9.10. Input/Output Operations
 
