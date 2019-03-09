@@ -1254,16 +1254,20 @@ The file descriptor is closed when the port is closed.
 ** Section 9.11. Non-Unicode Bytevector/String Conversions
 
 The procedures described in this section convert bytevectors containing single- and multiple-byte sequences in non-Unicode character sets to and from Scheme strings. They are available only under Windows. Under other operating systems, and when an iconv DLL is available under Windows, bytevector->string and string->bytevector can be used with a transcoder based on a codec constructed via iconv-codec to achieve the same results, with more control over the handling of invalid characters and line endings.
+本节中描述的过程将包含非 Unicode 字符集中的单字节和多字节序列的字节向量与 Scheme 字符串进行转换。它们仅在 Windows 下可用。在其他操作系统下，以及当 Windows 下有可用的 iconv DLL 时，bytevector->string 和 string->bytevector 可以与基于通过 iconv-codec 构造的编解码器的编码转换器一起使用，以实现相同的结果，并且可以更好地控制对无效字符和行尾的处理。
 
 procedure: ~(multibyte->string code-page bytevector)~
-returns: a string containing the characters encoded in bytevector
+returns: 一个字符串，包含编码在 bytevector 中的字符
 procedure: ~(string->multibyte code-page string)~
-returns: a bytevector containing the encodings of the characters in string
+returns: 一个字节向量，包含 string 中字符的编码
 libraries: (chezscheme)
 
 These procedures are available only under Windows. The procedure multibyte->string is a wrapper for the Windows API MultiByteToWideChar function, and string->multibyte is a wrapper for the Windows API WideCharToMultiByte function.
+这些过程仅在 Windows 下可用。过程 multibyte->string 是 Windows API MultiByteToWideChar 函数的封装，而 string->multibyte 是 Windows API WideCharToMultiByte 函数的封装。
 
 code-page declares the encoding of the byte sequences in the input or output bytevectors. It must be an exact nonnegative integer identifying a code page or one of the symbols cp-acp, cp-maccp, cp-oemcp, cp-symbol, cp-thread-acp, cp-utf7, or cp-utf8, which have the same meanings as the API function meanings for the like-named constants.
+code-page 声明了输入或输出字节向量中字节序列的编码。它必须是一个精确的非负整数，用于标识代码页或符号 cp-acp，cp-maccp，cp-oemcp，cp-symbol，cp-thread-acp，cp-utf7 或 cp-utf8 之一，它们与类似名称常量的 API 函数含义相同。
+
 
 ** Section 9.12. Pretty Printing
 
