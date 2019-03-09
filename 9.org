@@ -1224,16 +1224,20 @@ This procedure behaves like newline, i.e., sends a newline character to textual-
 
 procedure: ~(open-input-output-file path)~
 procedure: ~(open-input-output-file path options)~
-returns: a new input-output port
+returns: 新的输入-输出端口
 libraries: (chezscheme)
 
 path must be a string. open-input-output-file opens a textual input-output port for the file named by path.
+path 必须是一个字符串。open-input-output-file 为 path 命名的文件打开一个文本输入-输出端口。
 
 The port may be used to read from or write to the named file. The file is created if it does not already exist.
+该端口可用于读取或写入指定的文件。如果文件尚不存在，则创建该文件。
 
 options, if present, is a symbolic option name or option list. Possible symbolic option names are buffered, unbuffered, exclusive, and nonexclusive. An option list is a list containing zero or more symbolic option names and possibly the two-element option mode mode. See the description of open-output-file for an explanation of these options.
+options（如果存在的话）是一个符号选项名或选项列表。可能的符号选项名是 buffered, unbuffered, exclusive, 和 nonexclusive. 选项列表是包含零个或多个符号选项名以及可能的双元素选项 ~mode~ /mode/ 的列表。有关这些选项的说明，请参阅 open-output-file 的描述。
 
 Input/output files are usually closed using close-port but may also be closed with either close-input-port or close-output-port.
+输入/输出文件通常使用 close-port 关闭，但也可以使用 close-input-port 或 close-output-port 关闭。
 
 procedure: ~(open-fd-input/output-port fd)~
 procedure: ~(open-fd-input/output-port fd b-mode)~
@@ -1242,8 +1246,10 @@ returns: a new input/output port for the file descriptor fd
 libraries: (chezscheme)
 
 fd must be a nonnegative exact integer and should be a valid open file descriptor. If ?transcoder is present and not #f, it must be a transcoder, and this procedure returns a textual input/output port whose transcoder is ?transcoder. Otherwise, this procedure returns a binary input/output port. See the lead-in to Section 7.2 of The Scheme Programming Language, 4th Edition for a description of the constraints on and effects of the other arguments.
+fd 必须是非负的精确整数，并且应该是有效的打开文件描述符。如果存在 ?transcoder, 而且不为 #f，则它必须是一个编码转换器，并且此过程返回一个文本输入/输出端口，其编码转换器为 ?transcoder. 否则，此过程返回二进制输入/输出端口。有关其他参数的约束和影响的说明，请参见《Scheme 编程语言》第 4 版第 7.2 节中的引言。
 
 The file descriptor is closed when the port is closed.
+关闭端口时会关闭文件描述符。
 
 ** Section 9.11. Non-Unicode Bytevector/String Conversions
 
