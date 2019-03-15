@@ -1272,8 +1272,10 @@ code-page 声明了输入或输出字节向量中字节序列的编码。它必�
 ** Section 9.12. Pretty Printing
 
 The pretty printer is a version of the write procedure that produces more human-readable output via introduced whitespace, i.e., line breaks and indentation. The pretty printer is the default printer used by the read-eval-print loop (waiter) to print the output(s) of each evaluated form. The pretty printer may also be invoked explicitly by calling the procedure pretty-print.
+美观打印器是 write 过程的一个版本，它通过引入空白字符，即换行和缩进，生成可读性更好的输出。美观打印器是读-写-打印循环（服务员）使用的默认打印器，用于打印每个求值形式的输出。也可以通过调用过程 pretty-print 显式调用美观打印器。
 
 The pretty printer's operation can be controlled via the pretty-format procedure described later in this section, which allows the programmer to specify how specific forms are to be printed, various pretty-printer controls, also described later in this section, and also by the generic input/output controls described in Section 9.14.
+美观打印器的操作可以通过本节后面介绍的 pretty-format 过程进行控制，该过程允许程序员指定特定形式的打印方式，本节后面还介绍了多种 pretty-printer 的控制方式，以及如何通过 9.14 节中描述的通用输入/输出控制。
 
 procedure: ~(pretty-print obj)~
 procedure: ~(pretty-print obj textual-output-port)~
@@ -1281,28 +1283,31 @@ returns: unspecified
 libraries: (chezscheme)
 
 If textual-output-port is not supplied, it defaults to the current output port.
+如果未提供 textual-output-port，则默认为当前输出端口。
 
 pretty-print is similar to write except that it uses any number of spaces and newlines in order to print obj in a style that is pleasing to look at and which shows the nesting level via indentation. For example,
+pretty-print 类似于 write，除了它使用任意数量的空格和换行符以便以一种悦目的样式打印 obj，例如，它通过缩进显示嵌套级别。
 
 #+begin_src scheme
 (pretty-print '(define factorial (lambda (n) (let fact ((i n) (a 1))
   (if (= i 0) a (fact (- i 1) (* a i)))))))
 #+end_src
 
-might produce
+可以生成
 
 #+begin_src scheme
 (define factorial
   (lambda (n)
-#+end_src
     (let fact ([i n] [a 1])
       (if (= i 0) a (fact (- i 1) (* a i))))))
+#+end_src
 
 procedure: ~(pretty-file ifn ofn)~
 returns: unspecified
 libraries: (chezscheme)
 
 ifn and ofn must be strings. pretty-file reads each object in turn from the file named by ifn and pretty prints the object to the file named by ofn. Comments present in the input are discarded by the reader and so do not appear in the output file. If the file named by ofn already exists, it is replaced.
+ifn 和 ofn 必须是字符串。pretty-file 从 ifn 命名的文件中依次读取各个对象，并将该对象美观打印到由 ofn 命名的文件中。输入中存在的注释将被读取器丢弃，因此不会出现在输出文件中。如果 ofn 命名的文件已存在，则替换它。
 
 procedure: ~(pretty-format sym)~
 returns: 参见下文
@@ -1311,10 +1316,13 @@ returns: unspecified
 libraries: (chezscheme)
 
 By default, the pretty printer uses a generic algorithm for printing each form. This procedure is used to override this default and guide the pretty-printers treatment of specific forms. The symbol sym names a syntactic form or procedure. With just one argument, pretty-format returns the current format associated with sym, or #f if no format is associated with sym.
+默认情况下，美观打印器使用通用算法打印各个形式。此过程用于覆盖此默认值并指导 pretty-printer 对特定形式的处理。符号 sym 命名一个语法形式或过程。只传入一个参数时，pretty-format 返回与 sym 关联的当前格式，如果没有格式与 sym 关联，则返回#f.
 
 In the two-argument case, the format fmt is associated with sym for future invocations of the pretty printer. fmt must be in the formatting language described below.
+传入两个参数时，会把格式 fmt 与 sym 相关联，以用于将来对美观打印器的调用。fmt 必须采用下面描述的格式化语言。
 
-<fmt>	\Rightarrow	(quote symbol)
+#+begin_quote
+<fmt>	\rightarrow	(quote symbol)
 	|	var
 	|	symbol
 	|	(read-macro string symbol)
@@ -1322,131 +1330,137 @@ In the two-argument case, the format fmt is associated with sym for future invoc
 	|	(bracket . fmt-tail)
 	|	(alt fmt fmt*)
 	|	fmt-tail
-fmt-tail	\Rightarrow	()
+fmt-tail	\rightarrow	()
 	|	(tab fmt ...)
 	|	(fmt tab ...)
 	|	(tab fmt . fmt-tail)
 	|	(fmt ...)
 	|	(fmt . fmt-tail)
 	|	(fill tab fmt ...)
-tab	\Rightarrow	int
+tab	\rightarrow	int
 	|	#f
+#+end_quote
 
 Some of the format forms are used for matching when there are multiple alternatives, while others are used for matching and control indentation or printing. A description of each fmt is given below.
+当存在多个备选方案时，一些格式形式用于匹配，而其他格式形式用于匹配和控制缩进或打印。下面给出每个 fmt 的描述。
 
-#+begin_src scheme
 (quote symbol):
     This matches only the symbol symbol.
-#+end_src
+    只匹配符号 symbol.
 
 var:
     This matches any symbol.
+    匹配任意符号。
 
 symbol:
     This matches any input.
+    匹配任意输入。
 
-#+begin_src scheme
 (read-macro string symbol):
     This is used for read macros like quote and syntax. It matches any input of the form (symbol subform). For forms that match, the pretty printer prints string immediately followed by subform.
-#+end_src
+    用于读取宏，如 quote 和 syntax. 它匹配此形式（符号子形式）的任何输入。对于匹配的形式，美观打印器会打印紧跟着子形式的字符串。
 
-#+begin_src scheme
 (meta):
     This is a special case used for the meta keyword (Section 11.8) which is used as a keyword prefix of another form.
-#+end_src
+    这是一个用于 meta 关键字的特殊情况（第 11.8 节），它用作另一个形式的关键字前缀。
 
-#+begin_src scheme
 (alt fmt fmt*):
     This compares the input against the specified formats and uses the one that is the closest match. Most often, one of the formats will match exactly, but in other cases, as when input is malformed or appears in abstract form in the template of a syntactic abstraction, none of the formats will match exactly.
-#+end_src
+    这会将输入与指定格式进行比较，并使用最接近的格式。大多数情况下，其中一种格式会完全匹配，但在其他情况下，如输入有错误或出现在语法抽象模板中的抽象形式中时，没有格式能完全匹配。
 
-#+begin_src scheme
 (bracket . fmt-tail):
     This matches any list-structured input and prints the input enclosed in square brackets, i.e., [ and ], rather than parentheses.
-#+end_src
+    匹配任何列表结构的输入并打印括在方括号中的输入，即, [ and ], 而不是圆括号。
 
 fmt-tail:
     This matches any list-structured input. 
+    匹配任意列表结构的输入。
 
 Indentation of list-structured forms is determined via the fmt-tail specifier used to the last two cases above. A description of each fmt-tail is given below.
+列表结构形式的缩进是通过上面最后两种情况中使用的 fmt-tail 说明符确定的。下面给出每个 fmt-tail 的描述。
 
-#+begin_src scheme
 ():
     This matches an empty list tail.
-#+end_src
+    匹配空列表尾部。
 
-#+begin_src scheme
 (tab fmt ...):
     This matches the tail of any proper list; if the tail is nonempty and the list does not fit entirely on the current line, a line break is inserted before the first subform of the tail and tab (参见下文) determines the amount by which this and all subsequent subforms are indented.
-#+end_src
 
-#+begin_src scheme
 (fmt tab ...):
     This matches the tail of any proper list; if the tail is nonempty and the list does not fit entirely on the current line, a line break is inserted after the first subform of the tail and tab (参见下文) determines the amount by which all subsequent subforms are indented.
-#+end_src
+    匹配任意完全列表的尾部; 如果尾部不为空并且列表不能完全放入当前行，则在尾部的第一个子形式之后插入一个换行符，而所有后续子形式的缩进量由 tab（参见下文）决定。
 
-#+begin_src scheme
 (tab fmt . fmt-tail):
     This matches a nonempty tail if the tail of the tail matches fmt-tail. If the list does not fit entirely on the current line, a line break is inserted before the first subform of the tail and tab (参见下文) determines the amount by which the subform is indented.
-#+end_src
+    如果尾部的尾部匹配 fmt-tail, 则此形式匹配一个非空尾部。如果列表不能完全放入当前行，则在尾部的第一个子形式之前插入一个换行符，而子形式的缩进量由 tab（参见下文）决定。
 
-#+begin_src scheme
 (fmt ...):
     This matches the tail of any proper list and specified that no line breaks are to be inserted before or after the current or subsequent subforms.
-#+end_src
+    匹配任意完全列表的尾部，并指定，在当前或后续的子形式之前或之后不插入任何换行符。
 
-#+begin_src scheme
 (fmt . fmt-tail):
     This matches a nonempty tail if the tail of the tail matches fmt-tail and specifies that no line break is to be inserted before or after the current subform.
-#+end_src
+    如果尾部的尾部匹配 fmt-tail, 则此形式匹配一个非空尾部，并指定，在当前子形式之前或之后不插入任何换行符。
 
-#+begin_src scheme
 (fill tab fmt ...):
     This matches the tail of any proper list and invokes a fill mode in which the forms are packed with as many as will fit on each line. 
-#+end_src
+    匹配任意完全列表的尾部，并调用填充模式，在此模式下，每行会填入尽可能多的内容。
 
 A tab determines the amount by which a list subform is indented. If tab is a nonnegative exact integer int, the subform is indented int spaces in from the character position just after the opening parenthesis or bracket of the parent form. If tab is #f, the standard indentation is used. The standard indentation can be determined or changed via the parameter pretty-standard-indent, which is described later in this section.
+tab 决定列表子形式的缩进量。如果 tab 是非负的精确整数 int，则子形式从父形式的左圆括号或左方括号之后的字符位置缩进 int 个空格。如果 tab 是#f，则使用标准缩进。可以通过参数对象 pretty-standard-indent 确定或更改标准缩进，本节稍后将对此进行介绍。
 
 In cases where a format is given that doesn't quite match, the pretty printer tries to use the given format as far as it can. For example, if a format matches a list-structured form with a specific number of subforms, but more or fewer subform are given, the pretty printer will discard or replicate subform formats as necessary.
+如果给出的格式不完全匹配，那么美观打印器会尝试尽可能使用给定的格式。例如，如果格式与具有特定数量子形式的列表结构形式匹配，但是给出的子形式偏多或偏少，则美观打印器将根据需要丢弃或复制子形式格式。
 
 Here is an example showing the formatting of let might be specified.
+这是一个示例，显示 let 的格式可能已指定。
 
 #+begin_src scheme
 (pretty-format 'let
   '(alt (let ([bracket var x] 0 ...) #f e #f e ...)
-#+end_src
         (let var ([bracket var x] 0 ...) #f e #f e ...)))
+#+end_src
 
 Since let comes in two forms, named and unnamed, two alternatives are specified. In either case, the bracket fmt is used to enclose the bindings in square brackets, with all bindings after the first appearing just below the first (and just after the enclosing opening parenthesis), if they don't all fit on one line. Each body form is indented by the standard indentation.
+由于 let 有两种形式，命名的和未命名的，因此指定了两种备选形式。在任何一种情况下， ~bracket~ /fmt/ 用于将绑定封装在方括号中，如果一行中放不下所有绑定，则其中第一个绑定之后的所有绑定显示在第一个绑定的正下方（且紧跟在外围的圆括号之后）。每个 body 形式以标准缩进缩进。
 
 thread parameter: ~pretty-line-length~
 thread parameter: ~pretty-one-line-limit~
 libraries: (chezscheme)
 
 The value of each of these parameters must be a positive fixnum.
+这些参数对象的值都必须是正的 fixnum.
 
 The parameters pretty-line-length and pretty-one-line-limit control the output produced by pretty-print. pretty-line-length determines after which character position (starting from the first) on a line the pretty printer attempts to cut off output. This is a soft limit only; if necessary, the pretty-printer will go beyond pretty-line-length.
+参数对象 pretty-line-length 和 pretty-one-line-limit 控制 pretty-print 产生的输出。pretty-line-length 决定美观打印器会在一行中的哪个字符位置（从第一个开始）之后尝试截断输出。这只是一个软限制；如果有必要，pretty-printer 会超出 pretty-line-length 的限制。
 
 pretty-one-line-limit is similar to pretty-line-length, except that it is relative to the first nonblank position on each line of output. It is also a soft limit.
+pretty-one-line-limit 类似于 pretty-line-length, 只是它是相对于输出中每行的第一个非空白位置计算。这也是一个软限制。
 
 thread parameter: ~pretty-initial-indent~
 libraries: (chezscheme)
 
 The value of this parameter must be a nonnegative fixnum.
+此参数对象的值必须是非负 fixnum.
 
 The parameter pretty-initial-indent is used to tell pretty-print where on an output line it has been called. If pretty-initial-indent is zero (the default), pretty-print assumes that the first line of output it produces will start at the beginning of the line. If set to a nonzero value n, pretty-print assumes that the first line will appear at character position n and will adjust its printing of subsequent lines.
+参数对象 pretty-initial-indent 用于指示 pretty-print 在输出行上调用它的位置。如果 pretty-initial-indent 为零（默认值），则 pretty-print 假定它产生的第一行输出将从行的开头开始。如果设置为非零值 n，则 pretty-print 假定第一行将出现在字符位置 n，并将调整其后续行的打印。
 
 thread parameter: ~pretty-standard-indent~
 libraries: (chezscheme)
 
 The value of this parameter must be a nonnegative fixnum.
+此参数对象的值必须是非负 fixnum.
 
 This determines the amount by which pretty-print indents subexpressions of most forms, such as let expressions, from the form's keyword or first subexpression.
+它决定 pretty-print 对大多数形式（比如 let 表达式）的子表达式，从形式的关键字或第一个子表达式开始的缩进量。
 
 thread parameter: ~pretty-maximum-lines~
 libraries: (chezscheme)
 
 The parameter pretty-maximum-lines controls how many lines pretty-print prints when it is called. If set to #f (the default), no limit is imposed; if set to a nonnegative fixnum n, at most n lines are printed.
+参数对象 pretty-maximum-lines 控制 pretty-print 被调用时其打印的行数。如果设置为#f（默认值），则不施加限制; 如果设置为非负的 fixnum n, 则最多打印 n 行。
+
 
 ** Section 9.13. Formatted Output
 
@@ -1458,24 +1472,27 @@ returns: 参见下文
 libraries: (chezscheme)
 
 When the first argument to format is a string or #f (first and second forms above), format constructs an output string from format-string and the objects obj .... Characters are copied from format-string to the output string from left to right, until format-string is exhausted. The format string may contain one or more format directives, which are multi-character sequences prefixed by a tilde ( ~ ). Each directive is replaced by some other text, often involving one or more of the obj ... arguments, as determined by the semantics of the directive.
+当 format 的第一个参数是一个字符串或#f（上面的第一个和第二个形式）时，format 以 format-string 和对象 obj... 构造一个输出字符串。字符从 format-string 从左到右复制到输出字符串，直到读完 format-string. 格式字符串可以包含一个或多个格式指令，这些指令是以波浪号（~）为前缀的多字符序列。每个指令都被其他一些文本替换，通常涉及一个或多个 obj ...参数，具体由指令的语义决定。
 
 When the first argument is #t, output is sent to the current output port instead, as with printf. When the first argument is a port, output is sent to that port, as with fprintf. printf and fprintf are described later in this section.
+当第一个参数是#t 时，输出将被发送到当前输出端口，和使用 printf 一样。当第一个参数是端口时，输出将发送到该端口，和使用 fprintf 一样。printf 和 fprintf 将在本节后面介绍。
 
 Chez Scheme's implementation of format supports all of the Common Lisp [30] format directives except for those specific to the Common Lisp pretty printer. Please consult a Common Lisp reference or the Common Lisp Hyperspec, for complete documentation. A few of the most useful directives are described below.
+format 的 Chez Scheme 实现支持所有 Common Lisp [30]格式指令，除了那些专用于 Common Lisp 美观打印器的指令。完整文档请参阅 Common Lisp 参考或 Common Lisp Hyperspec. 下面介绍了一些最有用的指令。
 
 Absent any format directives, format simply displays its string argument.
+如果没有任何格式指令，format 便直接显示其字符串参数。
 
 #+begin_src scheme
 (format "hi there") \Rightarrow "hi there"
 #+end_src
 
 The ~s directive is replaced by the printed representation of the next obj, which may be any object, in machine-readable format, as with write.
+~s 指令由下一个 obj 的机器可读格式的打印形式替换，和使用 write 一样，obj 可以是任何对象。
 
 #+begin_src scheme
 (format "hi ~s" 'mom) \Rightarrow "hi mom"
 (format "hi ~s" "mom") \Rightarrow "hi \"mom\""
-#+end_src
-#+begin_src scheme
 (format "hi ~s~s" 'mom #\!) \Rightarrow "hi mom#\\!"
 #+end_src
 
@@ -1484,8 +1501,6 @@ The general form of a ~s directive is actually ~mincol,colinc,minpad,padchars, a
 #+begin_src scheme
 (format "~10s" 'hello) \Rightarrow "hello     "
 (format "~10@s" 'hello) \Rightarrow "     hello"
-#+end_src
-#+begin_src scheme
 (format "~10,,,'*@s" 'hello) \Rightarrow "*****hello"
 #+end_src
 
@@ -1520,8 +1535,6 @@ The general form is actually ~w,d,k,overflowchar,padcharf. If specified, w deter
 #+begin_src scheme
 (format "~,3f" 3.14159) \Rightarrow "3.142"
 (format "~10f" 3.14159) \Rightarrow "   3.14159"
-#+end_src
-#+begin_src scheme
 (format "~10,,,'#f" 1e20) \Rightarrow "##########"
 #+end_src
 
