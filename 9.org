@@ -1497,6 +1497,7 @@ The ~s directive is replaced by the printed representation of the next obj, whic
 #+end_src
 
 The general form of a ~s directive is actually ~mincol,colinc,minpad,padchars, and the s can be preceded by an at sign ( @ ) modifier. These additional parameters are used to control padding in the output, with at least minpad copies of padchar plus an integer multiple of colinc copies of padchar to make the total width, including the written object, mincol characters wide. The padding is placed on the left if the @ modifier is present, otherwise on the right. mincol and minpad default to 0, colinc defaults to 1, and padchar defaults to space. If specified, padchar is prefixed by a single quote mark.
+~~s~ 指令的一般形式实际上是 /~mincol/, /colinc/, /minpad/, /padchars/, s 之前可以有一个 at 符号（@）修饰符。这些附加参数用于控制输出中的填充，以至少 minpad 个 padchar 的拷贝加上 colinc 个 padchar 的拷贝的整数倍来构成总宽度，包括写入对象，宽为 mincol 个字符。如果存在@修饰符，则填充位于左侧，否则位于右侧。mincol 和 minpad 默认为 0，colinc 默认为 1，padchar 默认为空格。指定 padchar 时，它以单引号作为前缀。
 
 #+begin_src scheme
 (format "~10s" 'hello) \Rightarrow "hello     "
@@ -1505,6 +1506,7 @@ The general form of a ~s directive is actually ~mincol,colinc,minpad,padchars, a
 #+end_src
 
 The ~a directive is similar, but prints the object as with display.
+~a 指令类似，但以 display 的方式打印对象。
 
 #+begin_src scheme
 (format "hi ~s~s" "mom" #\!) \Rightarrow "hi \"mom\"#\\!"
@@ -1512,6 +1514,7 @@ The ~a directive is similar, but prints the object as with display.
 #+end_src
 
 A tilde may be inserted into the output with ~~, and a newline may be inserted with ~% (or embedded in the string with \n).
+可以使用~~将波浪号插入到输出中，并且可以使用~%插入换行符（或者使用\n 嵌入到字符串中）。
 
 #+begin_src scheme
 (format "~~line one,~%line two.~~") \Rightarrow "~line one,\nline two.~"
@@ -1519,18 +1522,21 @@ A tilde may be inserted into the output with ~~, and a newline may be inserted w
 #+end_src
 
 Real numbers may be printed in floating-point notation with ~f.
+实数可以用~f 以浮点表示法打印。
 
 #+begin_src scheme
 (format "~f" 3.14159) \Rightarrow 3.14159
 #+end_src
 
 Exact numbers may printed as well as inexact numbers in this manner; they are simply converted to inexact first as if with exact->inexact.
+和不精确数一样，精确数也可以以这种方式打印；它们会先转换为不精确数，就如同使用 exact->inexact.
 
 #+begin_src scheme
 (format "~f" 1/3) \Rightarrow "0.3333333333333333"
 #+end_src
 
 The general form is actually ~w,d,k,overflowchar,padcharf. If specified, w determines the overall width of the output, and d the number of digits to the right of the decimal point. padchar, which defaults to space, is the pad character used if padding is needed. Padding is always inserted on the left. The number is scaled by 10k when printed; k defaults to zero. The entire w-character field is filled with copies of overflowchar if overflowchar is specified and the number cannot be printed in w characters. k defaults to 1 If an @ modifier is present, a plus sign is printed before the number for nonnegative inputs; otherwise, a sign is printed only if the number is negative.
+一般形式实际上是 ~w,d,k,overflowchar,padcharf. 如果指定，w 确定输出的总宽度，d 确定小数点右边的位数。padchar, 默认为 space，是需要填充时使用的填充字符。填充始终插入到左侧。打印时，数字按 10^k 缩放; k 默认为零。如果指定了 overflowchar, 且该数字无法以 w 个字符打印，则整个 w 字符字段将以 overflowchar 的拷贝填充。如果存在@修饰符，则 k 默认为 1, 在输入的非负数字之前打印加号; 否则，仅在数字为负时才打印符号。
 
 #+begin_src scheme
 (format "~,3f" 3.14159) \Rightarrow "3.142"
@@ -1539,6 +1545,7 @@ The general form is actually ~w,d,k,overflowchar,padcharf. If specified, w deter
 #+end_src
 
 Real numbers may also be printed with ~e for scientific notation or with ~g, which uses either floating-point or scientific notation based on the size of the input.
+实数也可以使用~e 以科学计数法打印，或使用~g, 根据输入的大小采用浮点表示法或科学计数法。
 
 #+begin_src scheme
 (format "~e" 1e23) \Rightarrow "1.0e+23"
@@ -1546,6 +1553,7 @@ Real numbers may also be printed with ~e for scientific notation or with ~g, whi
 #+end_src
 
 A real number may also be printed with ~$, which uses monetary notation defaulting to two digits to the right of the decimal point.
+实数也可以使用〜$打印，它使用货币符号，默认为小数点右边的两位数。
 
 #+begin_src scheme
 (format "$~$" (* 39.95 1.06)) \Rightarrow "$42.35"
@@ -1553,22 +1561,23 @@ A real number may also be printed with ~$, which uses monetary notation defaulti
 #+end_src
 
 Words can be pluralized automatically using p.
+可以使用 p 自动把单词变为复数形式。
 
 #+begin_src scheme
 (format "~s bear~:p in ~s den~:p" 10 1) \Rightarrow "10 bears in 1 den"
 #+end_src
 
 Numbers may be printed out in words or roman numerals using variations on ~r.
+可以使用~r 的变体以单词或罗马数字打印数字。
 
 #+begin_src scheme
 (format "~r" 2599) \Rightarrow  "two thousand five hundred ninety-nine"
 (format "~:r" 99) \Rightarrow  "ninety-ninth"
-#+end_src
-#+begin_src scheme
 (format "~@r" 2599) \Rightarrow "MMDXCIX"
 #+end_src
 
 Case conversions can be performed by bracketing a portion of the format string with the ~@( and ~) directives.
+可以通过使用 ~~@(~ 和 ~~)~ 指令括起格式字符串的一部分来执行大小写转换。
 
 #+begin_src scheme
 (format "~@(~r~)" 2599) \Rightarrow  "Two thousand five hundred ninety-nine"
@@ -1576,8 +1585,10 @@ Case conversions can be performed by bracketing a portion of the format string w
 #+end_src
 
 Some of the directives shown above have more options and parameters, and there are other directives as well, including directives for conditionals, iteration, indirection, and justification. Again, please consult a Common Lisp reference for complete documentation.
+上面显示的一些指令有更多选项和参数，而且还有其他指令，包括条件，迭代，间接和对齐的指令。同样，请参阅 Common Lisp 参考以获取完整的文档。
 
 An implementation of a greatly simplified version of format appears in Section 12.6 of The Scheme Programming Language, 4th Edition.
+在 《Scheme 编程语言》第 4 版的第 12.6 节，有一个极为简化的 format 版本的实现。
 
 procedure: ~(printf format-string obj ...)~
 procedure: ~(fprintf textual-output-port format-string obj ...)~
@@ -1585,10 +1596,13 @@ returns: unspecified
 libraries: (chezscheme)
 
 These procedures are simple wrappers for format. printf prints the formatted output to the current output, as with a first-argument of #t to format, and fprintf prints the formatted output to the textual-output-port, as when the first argument to format is a port.
+这些过程是 format 的简单封装器。printf 将格式化的输出打印到当前输出，就像 format 的第一个参数为 #t 时一样，而 fprintf 将格式化的输出打印到 textual-output-port，就像 format 的第一个参数为端口时一样。
+
 
 ** Section 9.14. Input/Output Control Operations
 
 The I/O control operations described in this section are used to control how the reader reads and printer writes, displays, or pretty-prints characters, symbols, gensyms, numbers, vectors, long or deeply nested lists or vectors, and graph-structured objects.
+本节中描述的 I/O 控制操作用于控制读取器如何读取，以及打印器如何 write, display, 或 pretty-print 字符，符号，gensyms，数字，向量，长或深度嵌套的列表或向量，和图结构对象。
 
 procedure: ~(char-name obj)~
 returns: 参见下文
@@ -1597,6 +1611,7 @@ returns: unspecified
 libraries: (chezscheme)
 
 char-name is used to associate names (symbols) with characters or to retrieve the most recently associated name or character for a given character or name. A name can map to only one character, but more than one name can map to the same character. The name most recently associated with a character determines how that character prints, and each name associated with a character may be used after the #\ character prefix to name that character on input.
+char-name 用于将名称（符号）与字符关联，或者获取给定字符或名称的最近关联的名称或字符。名称只能映射到一个字符，但多个名称可以映射到同一个字符。最近与字符关联的名称决定了字符如何打印，并且每个与字符关联的名称，可以用在#\字符前缀之后，以在输入中命名该字符。
 
 Character associations created by char-name are ignored by the printer unless the parameter print-char-name is set to a true value. The reader recognizes character names established by char-name except after #!r6rs, which is implied within a library or R6RS top-level program.
 
@@ -1605,8 +1620,6 @@ In the one-argument form, obj must be a symbol or character. If it is a symbol a
 #+begin_src scheme
 (char-name #\space) \Rightarrow space
 (char-name 'space) \Rightarrow #\space
-#+end_src
-#+begin_src scheme
 (char-name 'nochar) \Rightarrow #f
 (char-name #\a) \Rightarrow #f
 #+end_src
@@ -1618,37 +1631,23 @@ The following interactive session demonstrates the use of char-name to establish
 #+begin_src scheme
 (print-char-name #t)
 (char-name 'etx) \Rightarrow #f
-#+end_src
-#+begin_src scheme
 (char-name 'etx #\x3)
 (char-name 'etx) \Rightarrow #\etx
-#+end_src
-#+begin_src scheme
 (char-name #\x3) \Rightarrow etx
 #\etx \Rightarrow #\etx
-#+end_src
-#+begin_src scheme
 (eq? #\etx #\x3) \Rightarrow #t
 #!r6rs #\etx \Rightarrow exception: invalid character name etx
-#+end_src
 #!chezscheme #\etx \Rightarrow #\etx
-#+begin_src scheme
 (char-name 'etx #\space)
 (char-name #\x3) \Rightarrow #f
-#+end_src
-#+begin_src scheme
 (char-name 'etx) \Rightarrow #\etx
 #\space \Rightarrow #\etx
-#+end_src
-#+begin_src scheme
 (char-name 'etx #f)
 #\etx \Rightarrow exception: invalid character name etx
-#+end_src
 #\space \Rightarrow #\space
-
-#+begin_src scheme
-(When using the expression editor, it is necessary to type Control-J to force the editor to read the erroneous #\etx input on the two inputs above that result in read errors, since typing Enter causes the expression editor to read the input only if the input is well-formed.)
 #+end_src
+
+(When using the expression editor, it is necessary to type Control-J to force the editor to read the erroneous #\etx input on the two inputs above that result in read errors, since typing Enter causes the expression editor to read the input only if the input is well-formed.)
 
 The reader does not recognize hex scalar value escapes in character names, as it does in symbols, so #\new\x6c;ine is not equivalent to #\newline. In general, programmers should avoid the use of character name symbols that cannot be entered without the use of hex scalar value escapes or other symbol-name escape mechanisms, since such character names will not be readable.
 
@@ -1660,8 +1659,6 @@ When print-char-name is set to #f (the default), associations created by char-na
 #+begin_src scheme
 (char-name 'etx #\x3)
 (format "~s" #\x3) \Rightarrow "#\\x3"
-#+end_src
-#+begin_src scheme
 (parameterize ([print-char-name #t])
   (format "~s" #\x3)) \Rightarrow "#\\etx"
 #+end_src
@@ -1676,13 +1673,9 @@ The value of the case-sensitive matters only if neither #!fold-case nor #!no-fol
 #+begin_src scheme
 (case-sensitive) \Rightarrow #t
 (eq? 'abc 'ABC) \Rightarrow #f
-#+end_src
 'ABC \Rightarrow ABC
-#+begin_src scheme
 (case-sensitive #f)
 'ABC \Rightarrow abc
-#+end_src
-#+begin_src scheme
 (eq? 'abc 'ABC) \Rightarrow #t
 #+end_src
 
@@ -1698,16 +1691,14 @@ Since objects printed through the ~s option in the format control strings of for
 #+begin_src scheme
 (parameterize ([print-graph #t])
   (let ([x (list 'a 'b)])
-#+end_src
     (format "~s" (list x x)))) \Rightarrow "(#0=(a b) #0#)"
 
-#+begin_src scheme
 (parameterize ([print-graph #t])
   (let ([x (list 'a 'b)])
-#+end_src
     (set-car! x x)
     (set-cdr! x x)
     (format "~s" x))) \Rightarrow "#0=(#0# . #0#)"
+#+end_src
 
 The graph syntax is understood by the procedure read, allowing graph structures to be printed and read consistently.
 
