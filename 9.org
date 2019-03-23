@@ -1614,8 +1614,10 @@ char-name is used to associate names (symbols) with characters or to retrieve th
 char-name 用于将名称（符号）与字符关联，或者获取给定字符或名称的最近关联的名称或字符。名称只能映射到一个字符，但多个名称可以映射到同一个字符。最近与字符关联的名称决定了字符如何打印，并且每个与字符关联的名称，可以用在#\字符前缀之后，以在输入中命名该字符。
 
 Character associations created by char-name are ignored by the printer unless the parameter print-char-name is set to a true value. The reader recognizes character names established by char-name except after #!r6rs, which is implied within a library or R6RS top-level program.
+除非参数对象 print-char-name 设置为真值，否则打印器将忽略 char-name 创建的字符关联。读取器识别由 char-name 创建的字符名称，除了跟在#!r6rs 之后的名称，其隐藏在库或 R^{6}RS 顶层程序中。
 
 In the one-argument form, obj must be a symbol or character. If it is a symbol and a character is associated with the symbol, char-name returns that character. If it is a symbol and no character is associated with the symbol, char-name returns #f. Similarly, if obj is a character, char-name returns the most recently associated symbol for the character or #f if no name is associated with the character. For example, with the default set of character names:
+在单参数形式中，obj 必须是符号或字符。如果它是符号并且有字符与此符号相关联，则 char-name 返回该字符。如果它是符号并且没有字符与此符号相关联，则 char-name 返回#f. 类似地，如果 obj 是一个字符，则 char-name 返回该字符最近关联的符号，或者，如果没有与该字符关联的名称，则返回#f. 例如，使用默认的字符名称集：
 
 #+begin_src scheme
 (char-name #\space) \Rightarrow space
@@ -1625,8 +1627,10 @@ In the one-argument form, obj must be a symbol or character. If it is a symbol a
 #+end_src
 
 When passed two arguments, name is added to the set of names associated with char, and any other association for name is dropped. char may be #f, in which case any other association for name is dropped and no new association is formed. In either case, any other names associated with char remain associated with char.
+传入两个参数时，name 将被添加到与 char 关联的名称集中，并删除 name 的任何其他关联。char 可以是#f, 在这种情况下，名称的任何其他关联都将被删除，并且不会形成新的关联。在任何一种情况下，与 char 相关联的任何其他名称仍与 char 相关联。
 
 The following interactive session demonstrates the use of char-name to establish and remove associations between characters and names, including the association of more than one name with a character.
+以下的交互式会话演示了如何使用 char-name 来建立和删除字符和名称之间的关联，包括多个名称与字符的关联。
 
 #+begin_src scheme
 (print-char-name #t)
@@ -1648,13 +1652,16 @@ The following interactive session demonstrates the use of char-name to establish
 #+end_src
 
 (When using the expression editor, it is necessary to type Control-J to force the editor to read the erroneous #\etx input on the two inputs above that result in read errors, since typing Enter causes the expression editor to read the input only if the input is well-formed.)
+（当使用表达式编辑器时，必须键入 Control-J 以强制编辑器读取上面两个输入上的错误#\etx 输入，其会导致读取错误，因为键入 Enter 会导致表达式编辑器仅在输入形式合法时读取输入。）
 
 The reader does not recognize hex scalar value escapes in character names, as it does in symbols, so #\new\x6c;ine is not equivalent to #\newline. In general, programmers should avoid the use of character name symbols that cannot be entered without the use of hex scalar value escapes or other symbol-name escape mechanisms, since such character names will not be readable.
+读取器不会像对符号一样识别字符名称中转义的十六进制标量值，因此#\new\x6c;ine 不等同于#\newline. 通常，程序员应避免使用那些不使用十六进制标量值转义或其他符号名转义机制则无法输入的字符名称符号，因为这类字符名称将无法读取。
 
 thread parameter: ~print-char-name~
 libraries: (chezscheme)
 
 When print-char-name is set to #f (the default), associations created by char-name are ignored by write, put-datum, pretty-print, and the format "~s" directive. Otherwise, these procedures use the names established by char-name when printing character objects.
+当 print-char-name 设置为#f（默认值）时，char-name 创建的关联将被 write，put-datum，pretty-print 和 ~format "~s"~ 指令忽略。否则，这些过程在打印字符对象时使用 char-name 建立的名称。
 
 #+begin_src scheme
 (char-name 'etx #\x3)
@@ -1667,8 +1674,10 @@ thread parameter: ~case-sensitive~
 libraries: (chezscheme)
 
 The case-sensitive parameter determines whether the reader is case-sensitive with respect to symbol and character names. When set to true (the default, as required by the Revised6 Report) the case of alphabetic characters within symbol names is significant. When set to #f, case is insignificant. More precisely, when set to #f, symbol and character names are folded (as if by string-foldcase); otherwise, they are left as they appear in the input.
+参数对象 case-sensitive 决定读取器是否对符号和字符名称区分大小写。当设置为真（默认值，根据 R^{6}RS 的要求）时，符号名称中字母字符的大小写是有意义的。当设置为#f 时，则大小写无关紧要。更准确地说，当设置为#f 时，符号和字符名称被折叠（就像使用 string-foldcase 一样）; 否则，它们会以它们出现的形式保留在输入中。
 
 The value of the case-sensitive matters only if neither #!fold-case nor #!no-fold-case has appeared previously in the same input stream. That is, symbol and character name are folded if #!fold-case has been seen. They are not folded if #!no-fold-case has been seen. If neither has been seen, they are folded if and only if (case-sensitive) is #f.
+只有当#!fold-case 和#!no-fold-case 都没有先出现在同一输入流中时，case-sensitive 的值才有作用。也就是说，如果遇到#!fold-case，则折叠符号和字符名。如果遇到#!no-fold-case，则它们不会被折叠。如果两者都没有遇到，那么当且仅当 (case-sensitive) 为 #f 时它们被折叠。
 
 #+begin_src scheme
 (case-sensitive) \Rightarrow #t
@@ -1683,10 +1692,13 @@ thread parameter: ~print-graph~
 libraries: (chezscheme)
 
 When print-graph is set to a true value, write and pretty-print locate and print objects with shared structure, including cycles, in a notation that may be read subsequently with read. This notation employs the syntax "#n=obj," where n is a nonnegative integer and obj is the printed representation of an object, to label the first occurrence of obj in the output. The syntax "#n#" is used to refer to the object labeled by n thereafter in the output. print-graph is set to #f by default.
+当 print-graph 设置为真值时，write 和 pretty-print 定位并打印具有共享结构的对象，包括环，以一种可以随后用 read 读取的表示法。这种表示法使用语法 "#n=obj", 其中 n 是非负整数，obj 是对象的打印表示形式，用于标记输出中第一次出现的 obj. 语法"#n#"用于引用后面输出中以 n 标记的对象。print-graph 默认设置为#f。
 
 If graph printing is not enabled, the settings of print-length and print-level are insufficient to force finite output, and write or pretty-print detects a cycle in an object it is given to print, a warning is issued (an exception with condition type &warning is raised) and the object is printed as if print-graph were enabled.
+如果没有启用图打印，则 print-length 和 print-level 的设置不足以强制有限输出，而当 write 或 pretty-print 检测到要打印的对象中有环时，则会发出警告（抛出条件类型的 &warning 异常）并打印对象，如同 print-graph 启用时一样。
 
 Since objects printed through the ~s option in the format control strings of format, printf, and fprintf are printed as with write, the printing of such objects is also affected by print-graph.
+由于通过 format，printf 和 fprintf 的格式控制字符串中的~s 选项打印的对象和使用 write 打印的一样，因此 print-graph 也会影响此类对象的打印。
 
 #+begin_src scheme
 (parameterize ([print-graph #t])
@@ -1701,60 +1713,59 @@ Since objects printed through the ~s option in the format control strings of for
 #+end_src
 
 The graph syntax is understood by the procedure read, allowing graph structures to be printed and read consistently.
+过程 read 可以理解图语法，从而可以一致地打印和读取图结构。
 
 thread parameter: ~print-level~
 thread parameter: ~print-length~
 libraries: (chezscheme)
 
 These parameters can be used to limit the extent to which nested or multiple-element structures are printed. When called without arguments, print-level returns the current print level and print-length returns the current print length. When called with one argument, which must be a nonnegative fixnum or #f, print-level sets the current print level and print-length sets the current print length to the argument.
+这些参数对象可用于限制嵌套或多元素结构的打印范围。当不带参数调用时，print-level 返回当前打印级别，print-length 返回当前打印长度。当使用一个参数（必须是非负的 fixnum 或#f）调用时，print-level 把当前的打印级别设置为实参，print-length 将把当前的打印长度设置为实参。
 
 When print-level is set to a nonnegative integer n, write and pretty-print traverse only n levels deep into nested structures. If a structure being printed exceeds n levels of nesting, the substructure beyond that point is replaced in the output by an ellipsis ( ... ). print-level is set to #f by default, which places no limit on the number of levels printed.
+当 print-level 被设置为非负整数 n 时，write 和 pretty-print 仅在嵌套结构中遍历到第 n 层。如果当前打印的结构超过 n 层嵌套，则超出该层的子结构将在输出中被省略号（...）替换。print-level 默认设置为#f，即对打印的层数没有限制。
 
 When print-length is set to a nonnegative integer n, the procedures write and pretty-print print only n elements of a list or vector, replacing the remainder of the list or vector with an ellipsis ( ... ). print-length is set to #f by default, which places no limit on the number of elements printed.
+当 print-length 被设置为非负整数 n 时，过程 write 和 pretty-print 仅打印列表或向量中的 n 个元素，用省略号（...）替换列表或向量的其余部分。print-length 默认设置为#f，即对打印的元素数量没有限制。
 
 Since objects printed through the ~s option in the format control strings of format, printf, and fprintf are printed as with write, the printing of such objects is also affected by print-level and print-length.
+由于通过 format，printf 和 fprintf 的格式控制字符串中的~s 选项打印的对象和使用 write 打印的一样，因此打印此类对象也会受到 print-level 和 print-length 的影响。
 
 The parameters print-level and print-length are useful for controlling the volume of output in contexts where only a small portion of the output is needed to identify the object being printed. They are also useful in situations where circular structures may be printed (see also print-graph).
+在只需要输出的一小部分来识别打印对象的环境中，参数对象 print-level 和 print-length 对于控制输出量是很有用的。它们在可能打印环结构的情况下也很有用（另请参见 print-graph）。
 
 #+begin_src scheme
 (format "~s" '((((a) b) c) d e f g)) \Rightarrow "((((a) b) c) d e f g)"
-#+end_src
 
-#+begin_src scheme
 (parameterize ([print-level 2])
   (format "~s" '((((a) b) c) d e f g))) \Rightarrow "(((...) c) d e f g)"
-#+end_src
 
-#+begin_src scheme
 (parameterize ([print-length 3])
   (format "~s" '((((a) b) c) d e f g))) \Rightarrow "((((a) b) c) d e ...)"
-#+end_src
 
-#+begin_src scheme
 (parameterize ([print-level 2]
                [print-length 3])
-#+end_src
   (format "~s" '((((a) b) c) d e f g))) \Rightarrow "(((...) c) d e ...)"
+#+end_src
 
 thread parameter: ~print-radix~
 libraries: (chezscheme)
 
 The print-radix parameter determines the radix in which numbers are printed by write, pretty-print, and display. Its value should be an integer between 2 and 36, inclusive. Its default value is 10.
+print-radix 参数对象决定通过 write, pretty-print, 和 display 打印数字时的基数。它的值应该是 2 到 36 之间的整数，包括 2 和 36。其默认值为 10。
 
 When the value of print-radix is not 10, write and pretty-print print a radix prefix before the number (#b for radix 2, #o for radix 8, #x for radix 16, and #nr for any other radix n).
+当 print-radix 的值不是 10 时，write 和 pretty-print 会在数字前打印一个基数前缀（基数 2 为#b，基数 8 为#o，基数 16 为 #x，任何其他基数 n 为#nr）。
 
 Since objects printed through the ~s and ~a options in the format control strings of format, printf, and fprintf are printed as with write and display, the printing of such objects is also affected by print-radix.
+由于通过 format，printf 和 fprintf 的格式控制字符串中的~s 和~a 选项打印的对象与使用 write 和 display 打印的一样，因此这类对象的打印也会受到 print-radix 影响。
 
 #+begin_src scheme
 (format "~s" 11242957) \Rightarrow "11242957"
-#+end_src
 
-#+begin_src scheme
 (parameterize ([print-radix 16])
   (format "~s" 11242957)) \Rightarrow "#xAB8DCD"
-#+end_src
 
-#+begin_src scheme
 (parameterize ([print-radix 16])
   (format "~a" 11242957)) \Rightarrow "AB8DCD"
 #+end_src
@@ -1763,93 +1774,89 @@ thread parameter: ~print-gensym~
 libraries: (chezscheme)
 
 When print-gensym is set to #t (the default) gensyms are printed with an extended symbol syntax that includes both the pretty name and the unique name of the gensym: #{pretty-name unique-name}. When set to pretty, the pretty name only is shown, with the prefix #:. When set to pretty/suffix, the printer prints the gensym's "pretty" name along with a suffix based on the gensym's "unique" name, separated by a dot ( "." ). If the gensym's unique name is generated automatically during the current session, the suffix is that portion of the unique name that is not common to all gensyms created during the current session. Otherwise, the suffix is the entire unique name. When set to #f, the pretty name only is shown, with no prefix.
+当 print-gensym 设置为#t（默认值）时，gensyms 将使用扩展符号语法打印，该语法包括美观名称和 gensym 的唯一名称：#{pretty-name unique-name}. 当设置为 pretty 时，仅显示美观名称，带有前缀#:. 当设置为 pretty/suffix 时，打印器打印 gensym 的“美观”名称以及基于 gensym 的“唯一”名称生成的后缀，以点（"."）分隔。如果 gensym 的唯一名称是在当前会话期间自动生成的，则后缀是唯一名称中与当前会话期间创建的所有 gensyms 不同的部分。否则，后缀为完整的唯一名称。设置为#f 时，仅显示不带前缀的美观名称。
 
 Since objects printed through the ~s option in the format control strings of format, printf, errorf, etc., are printed as with write, the printing of such objects is also affected by print-gensym.
+由于通过 format，printf 和 errorf 等格式控制字符串中的~s 选项打印的对象与使用 write 打印的一样，因此这类对象的打印也会受到 print-gensym 影响。
 
 When printing an object that may contain more than one occurrence of a gensym and print-graph is set to pretty or #f, it is useful to set print-graph to #t so that multiple occurrences of the same gensym are marked as identical in the output.
+当打印一个可能包含同一 gensym 的多次出现的对象，而 print-graph 被设置为 pretty 或#f 时，将 print-graph 设置为#t 非常有用，这样多次出现的同一 gensym 会在输出中被标记为相同的。
 
 #+begin_src scheme
 (let ([g (gensym)])
   (format "~s" g)) \Rightarrow "#{g0 bdids2xl6v49vgwe-a}"
-#+end_src
 
-#+begin_src scheme
 (let ([g (gensym)])
   (parameterize ([print-gensym 'pretty])
-#+end_src
     (format "~s" g))) \Rightarrow "#:g1
 
-#+begin_src scheme
 (let ([g (gensym)])
   (parameterize ([print-gensym #f])
-#+end_src
     (format "~s" g))) \Rightarrow "g2"
 
-#+begin_src scheme
 (let ([g (gensym)])
   (parameterize ([print-graph #t] [print-gensym 'pretty])
-#+end_src
     (format "~s" (list g g)))) \Rightarrow "(#0=#:g3 #0#)"
 
-#+begin_src scheme
 (let ([g1 (gensym "x")]
       [g2 (gensym "x")]
-#+end_src
       [g3 (gensym "y")])
   (parameterize ([print-gensym 'pretty/suffix])
     (format "~s ~s ~s" g1 g2 g3))) \Rightarrow "x.1 x.2 y.3"
+#+end_src
 
 thread parameter: ~print-brackets~
 libraries: (chezscheme)
 
 When print-brackets is set to a true value, the pretty printer (see pretty-print) uses square brackets rather than parentheses around certain subexpressions of common control structures, e.g., around let bindings and cond clauses. print-brackets is set to #t by default.
+当 print-bracket 设置为真值时，美观打印器（参见 pretty-print）使用方括号而不是圆括号来括起共有控制结构的特定子表达式，例如，let 绑定和 cond 子句。print-bracket 默认设置为#t。
 
 #+begin_src scheme
 (let ([p (open-output-string)])
   (pretty-print '(let ([x 3]) x) p) \Rightarrow "(let ([x 3]) x)
-#+end_src
   (get-output-string p))             "
 
-#+begin_src scheme
 (parameterize ([print-brackets #f])
   (let ([p (open-output-string)])
-#+end_src
     (pretty-print '(let ([x 3]) x) p) \Rightarrow "(let ((x 3)) x)
     (get-output-string p)))            "
+#+end_src
 
 thread parameter: ~print-extended-identifiers~
 libraries: (chezscheme)
 
 Chez Scheme extends the syntax of identifiers as described in Section 1.1, except within a set of forms prefixed by #!r6rs (which is implied by in a library or top-level program).
+Chez Scheme 扩展了 1.1 节中描述的标识符的语法，除了在一组以#!r6rs 为前缀的形式中（暗含在库或顶层程序中）。
 
 When this parameter is set to false (the default), identifiers in the extended set are printed with hex scalar value escapes as necessary to conform to the R6RS syntax for identifiers. When this parameter is set to a true value, identifiers in the extended set are printed without the escapes. Identifiers whose names fall outside of both syntaxes are printed with the escapes regardless of the setting of this parameter.
+当此参数对象设置为假（默认值）时，打印扩展集中的标识符将根据需要使用十六进制标量值转义，以符合标识符的 R6RS 语法。当此参数对象设置为真值时，打印扩展集中的标识符将不进行转义。无论此参数对象设置为何值，名称超出两种语法范围的标识符打印时都将使用转义。
 
-For example:
+例如：
 
 #+begin_src scheme
 (parameterize ([print-extended-identifiers #f])
   (printf "~s\n~s\n"
-#+end_src
     '(1+ --- { } .xyz)
     (string->symbol "123")))
+#+end_src
 
-prints
+打印
 
 #+begin_src scheme
 (\x31;+ \x2D;-- \x7B; \x7D; \x2E;xyz)
 \x31;23
 #+end_src
 
-while
+而
 
 #+begin_src scheme
 (parameterize ([print-extended-identifiers #t])
   (printf "~s\n~s\n"
-#+end_src
     '(1+ --- { } .xyz)
     (string->symbol "123")))
+#+end_src
 
-prints
+打印
 
 #+begin_src scheme
 (1+ --- { } .xyz)
@@ -1860,10 +1867,13 @@ thread parameter: ~print-vector-length~
 libraries: (chezscheme)
 
 When print-vector-length is set to a true value, write, put-datum, and pretty-print includes the length for all vectors between the "#" and open parenthesis, all bytevectors between the "#vu8" and open parenthesis, and all fxvectors between the "#vfx" and open parenthesis. This parameter is set to #f by default.
+当 print-vector-length 设置为真值时，write，put-datum 和 pretty-print 包含所有向量在"#"和左括号之间的长度，所有字节向量在"#vu8"和左括号之间的长度， 以及所有 fxvector（定长数向量）在"#vfx"和左括号之间的长度。默认情况下，此参数设置为#f.
 
 When print-vector-length is set to a true value, write, put-datum, and pretty-print also suppress duplicated trailing elements in the vector to reduce the amount of output. This form is also recognized by the reader.
+当 print-vector-length 设置为真值时，write，put-datum 和 pretty-print 同时会省略向量尾部的重复元素，以减少输出量。这种形式也可以被读取器识别。
 
 Since objects printed through the ~s option in the format control strings of format, printf, and fprintf are printed as with write, the printing of such objects is also affected by the setting of print-vector-length.
+由于通过 format，printf 和 fprintf 的格式控制字符串中的~s 选项打印的对象与使用 write 打印时一样，因此这类对象的打印也会受到 print-vector-length 的设置影响。
 
 #+begin_src scheme
 (format "~s" (vector 'a 'b 'c 'c 'c)) \Rightarrow "#(a b c c c)"
@@ -1888,17 +1898,19 @@ thread parameter: ~print-precision~
 libraries: (chezscheme)
 
 When print-precision is set to #f (the default), write, put-datum, pretty-print, and the format "~s" directive do not include the vertical-bar "mantissa-width" syntax after each floating-point number. When set to a nonnegative exact integer, the mantissa width is included, as per the precision argument to number->string.
+当 print-precision 设置为#f（默认值）时，write，put-datum，pretty-print 和 format 的 “~s”指令在每个浮点数后不包括竖杠“小数宽度”语法。当设置为非负精确整数时，将包括小数宽度，根据 number->string 的 precision 参数。
 
 thread parameter: ~print-unicode~
 libraries: (chezscheme)
 
 When print-unicode is set to #f, write, put-datum, pretty-print, and the format "~s" directive display Unicode characters with encodings 8016 (128) and above that appear within character objects, symbols, and strings using hexadecimal character escapes. When set to a true value (the default), they are displayed like other printing characters, as if by put-char.
+当 print-unicode 设置为#f 时，write，put-datum，pretty-print 和 format 的 "~s"指令显示编码 8016（128）及以上的 Unicode 字符，这些字符使用十六进制字符转义出现在字符对象，符号和字符串中。设置为真值（默认值）时，它们会像其他打印字符一样显示，就像使用 put-char 一样。
 
 #+begin_src scheme
-(format "~s" #\x3bb) \Rightarrow "#\\<graphic>"
+(format "~s" #\x3bb) \Rightarrow "#\\\lambda"
 (parameterize ([print-unicode #f])
-#+end_src
   (format "~s" #\x3bb)) \Rightarrow "#\\x3BB"
+#+end_src
 
 ** Section 9.15. Fasl Output
 
