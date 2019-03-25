@@ -1958,64 +1958,75 @@ ifn 和 ofn 必须是字符串。fasl-file 可用于将人类可读格式的文�
 ** Section 9.16. File System Interface
 
 This section describes operations on files, directories, and pathnames.
+本节介绍有关文件，目录和路径名的操作。
 
 global parameter: ~current-directory~
 global parameter: ~cd~
 libraries: (chezscheme)
 
 When invoked without arguments, current-directory returns a string representing the current working directory. Otherwise, the current working directory is changed to the directory specified by the argument, which must be a string representing a valid directory pathname.
+当不带参数调用时，current-directory 返回表示当前工作目录的字符串。否则，当前工作目录将更改为参数指定的目录，该参数必须是表示有效目录路径名的字符串。
 
 cd is bound to the same parameter.
+cd 被绑定为同一个参数对象。
 
 procedure: ~(directory-list path)~
-returns: a list of file names
+返回：文件名列表
 libraries: (chezscheme)
 
 path must be a string. The return value is a list of strings representing the names of files found in the directory named by path. directory-list raises an exception with condition type &i/o-filename if path does not name a directory or if the process cannot list the directory.
+path 必须是一个字符串。返回值是一个字符串列表，表示在 path 指定的目录中找到的文件的名称。如果 path 没有指向一个目录或进程无法列出目录，则 directory-list 会抛出条件类型的&i/o-filename 异常。
 
 procedure: ~(file-exists? path)~
 procedure: ~(file-exists? path follow?)~
-returns: #t if the file named by path exists, #f otherwise
+返回: 如果 ~path~ 指定的文件存在，则为 ~#t~, 否则为 ~#f~.
 libraries: (chezscheme)
 
 path must be a string. If the optional follow? argument is true (the default), file-exists? follows symbolic links; otherwise it does not. Thus, file-exists? will return #f when handed the pathname of a broken symbolic link unless follow? is provided and is #f.
+path 必须是一个字符串。如果可选的 follow? 参数为真（默认值），则 file-exists? 会跟随符号链接；否则它不会。因此，当传入的路径名为损坏的符号链接时，file-exists? 会返回 #f, 除非提供参数 follow?, 且其值为 #f.
 
 The Revised6 Report file-exists? does not accept the optional follow? argument. Whether it follows symbolic links is unspecified.
+R^{6}RS 中的 file-exists? 不接受可选的 follow? 参数。它是否跟随符号链接是未指定的。
 
 procedure: ~(file-regular? path)~
 procedure: ~(file-regular? path follow?)~
-returns: #t if the file named by path is a regular file, #f otherwise
+返回: 如果 ~path~ 指定的文件是一个常规文件，则为 ~#t~, 否则为 ~#f~.
 libraries: (chezscheme)
 
 path must be a string. If the optional follow? argument is true (the default), file-regular? follows symbolic links; otherwise it does not.
+path 必须是一个字符串。如果可选的 follow? 参数为真（默认值），则 file-regular? 会跟随符号链接；否则它不会。
 
 procedure: ~(file-directory? path)~
 procedure: ~(file-directory? path follow?)~
-returns: #t if the file named by path is a directory, #f otherwise
+返回: 如果 ~path~ 指定的文件是一个目录，则为 ~#t~, 否则为 ~#f~.
 libraries: (chezscheme)
 
 path must be a string. If the optional follow? argument is true (the default), this procedure follows symbolic links; otherwise it does not.
+path 必须是一个字符串。如果可选的 follow? 参数为真（默认值），则此过程会跟随符号链接；否则它不会。
 
 procedure: ~(file-symbolic-link? path)~
-returns: #t if the file named by path is a symbolic link, #f otherwise
+返回: 如果 ~path~ 指定的文件是一个符号链接，则为 ~#t~, 否则为 ~#f~.
 libraries: (chezscheme)
 
 path must be a string. file-symbolic-link? never follows symbolic links in making its determination.
+path 必须是一个字符串。file-symbolic-link? 在做出判定时永远不会跟随符号链接。
 
 procedure: ~(file-access-time path/port)~
 procedure: ~(file-access-time path/port follow?)~
-returns: the access time of the specified file
+返回：指定文件的访问时间
 procedure: ~(file-change-time path/port)~
 procedure: ~(file-change-time path/port follow?)~
-returns: the change time of the specified file
+返回：指定文件的更改时间
 procedure: ~(file-modification-time path/port)~
 procedure: ~(file-modification-time path/port follow?)~
-returns: the modification time of the specified file
+返回：指定文件的修改时间
 libraries: (chezscheme)
 
 path/port must be a string or port. If path/port is a string, the time returned is for the file named by the string, and the optional follow? argument determines whether symbolic links are followed. If follow? is true (the default), this procedure follows symbolic links; otherwise it does not. If path/port is a port, it must be a file port, and the time returned is for the associated file. In this case, follow? is ignored.
+path/port 必须是字符串或端口。如果 path/port 是一个字符串，则返回的时间是关于由字符串命名的文件，可选的 follow? 参数决定是否跟随符号链接。如果 follow? 为真（默认值），则此过程会跟随符号链接；否则它不会。如果 path/port 是端口，则它必须是文件端口，并且返回的时间是关于关联的文件。在这种情况下，会忽略参数 follow?.
 
 The returned times are represented as time objects (Section 12.10).
+返回的时间表示为时间对象（第 12.10 节）。
 
 procedure: ~(mkdir path)~
 procedure: ~(mkdir path mode)~
@@ -2023,10 +2034,13 @@ returns: unspecified
 libraries: (chezscheme)
 
 path must be a string. mode must be a fixnum.
+path 必须是一个字符串。mode 必须是 fixnum.
 
 mkdir creates a directory with the name given by path. All path path components leading up to the last must already exist. If the optional mode argument is present, it overrides the default permissions for the new directory. Under Windows, the mode argument is ignored.
+mkdir 创建一个名称由 path 给出的目录。path 的所有路径组件从头到尾都必须已存在。如果提供了可选的 mode 参数，则它将覆盖新目录的默认权限。在 Windows 下，mode 参数将被忽略。
 
 mkdir raises an exception with condition type &i/o-filename if the directory cannot be created.
+如果目录无法创建，则 mkdir 会抛出条件类型的&i/o-filename 异常。
 
 procedure: ~(delete-file path)~
 procedure: ~(delete-file path error?)~
@@ -2034,8 +2048,10 @@ returns: 参见下文
 libraries: (chezscheme)
 
 path must be a string. delete-file removes the file named by path. If the optional error? argument is #f (the default), delete-file returns a boolean value: #t if the operation is successful and #f if it is not. Otherwise, delete-file returns an unspecified value if the operation is successful and raises an exception with condition type &i/o-filename if it is not.
+path 必须是一个字符串。delete-file 删除 path 命名的文件。如果可选的 error? 参数为 #f（默认值），则 delete-file 返回一个布尔值：如果操作成功则返回#t，如果不成功则返回#f. 否则，如果操作成功，则 delete-file 返回一个未定义的值，如果不成功，则抛出条件类型的&i/o-filename 异常。
 
 The Revised6 Report delete-file does not accept the optional error? argument but behaves as if error? is true.
+R^{6}RS 中的 delete-file 不接受可选的 error? 参数，但其行为如同 error? 为真。
 
 procedure: ~(delete-directory path)~
 procedure: ~(delete-directory path error?)~
@@ -2043,39 +2059,46 @@ returns: 参见下文
 libraries: (chezscheme)
 
 path must be a string. delete-directory removes the directory named by path. If the optional error? argument is #f (the default), delete-directory returns a boolean value: #t if the operation is successful and #f if it is not. Otherwise, delete-directory returns an unspecified value if the operation is successful and raises an exception with condition type &i/o-filename if it is not. The behavior is unspecified if the directory is not empty, but on most systems the operations will not succeed.
+path 必须是一个字符串。delete-directory 删除 path 命名的目录。如果可选的 error? 参数为 #f（默认值），delete-directory 返回一个布尔值：如果操作成功则返回#t, 如果不成功则返回#f. 否则，如果操作成功，则 delete-directory 返回一个未定义的值，如果不成功，则抛出条件类型的&i/o-filename 异常。如果目录不为空，则行为是未定义的，但在大多数系统上，操作将不会成功。
 
 procedure: ~(rename-file old-pathname new-pathname)~
 returns: unspecified
 libraries: (chezscheme)
 
 old-pathname and new-pathname must be strings. rename-file changes the name of the file named by old-pathname to new-pathname. If the file does not exist or cannot be renamed, an exception is raised with condition type &i/o-filename.
+old-pathname 和 new-pathname 必须是字符串。rename-file 将 old-pathname 命名的文件名更改为 new-pathname. 如果文件不存在或无法重命名，则会抛出条件类型的&i/o-filename 异常。
 
 procedure: ~(chmod path mode)~
 returns: unspecified
 libraries: (chezscheme)
 
 path must be a string. mode must be a fixnum.
+path 必须是一个字符串。mode 必须是 fixnum.
 
 chmod sets the permissions on the file named by path to mode. Bits 0, 1, and 2 of mode are the execute, write, and read permission bits for users other than the file's owner who are not in the file's group. Bits 3-5 are the execute, write, and read permission bits for users other than the file's owner but in the file's group. Bits 6-8 are the execute, write, and read permission bits for the file's owner. Bits 7-9 are the Unix sticky, set-group-id, and set-user-id bits. Under Windows, all but the user "write" bit are ignored. If the file does not exist or the permissions cannot be changed, an exception is raised with condition type &i/o-filename.
+chmod 将 path 命名的文件权限设置为 mode. mode 的第 0,1 和 2 位是执行，写入和读取权限位，针对文件所有者以外，不在文件组中的用户。第 3-5 位是除文件所有者之外但在文件组中的用户的执行，写入和读取权限位。第 6-8 位是文件所有者的执行，写入和读取权限位。第 7-9 位是 Unix sticky，set-group-id 和 set-user-id 位。在 Windows 下，除了用户“写入”位之外的所有位都被忽略。如果文件不存在或无法更改权限，则会抛出条件类型的&i/o-filename 异常。
 
 procedure: ~(get-mode path)~
 procedure: ~(get-mode path follow?)~
-returns: the current permissions mode for path
+返回：path 的当前权限模式
 libraries: (chezscheme)
 
 path must be a string. get-mode retrieves the permissions on the file named by path and returns them as a fixnum in the same form as the mode argument to chmod. If the optional follow? argument is true (the default), this procedure follows symbolic links; otherwise it does not.
+path 必须是一个字符串。get-mode 获取由 path 命名的文件的权限，并以与 chmod 的 mode 参数相同的形式将它们作为 fixnum 返回。如果可选的 follow? 参数为真（默认值），则此过程会跟随符号链接；否则它不会。
 
 procedure: ~(directory-separator? char)~
-returns: #t if char is a directory separator, #f otherwise
+返回: 如果 ~char~ 是文件分隔符，则为 ~#t~, 否则为 ~#f~.
 libraries: (chezscheme)
 
 The character #\/ is a directory separator on all current machine types, and #\\ is a directory separator under Windows.
+字符#\/是所有当前计算机类型上的目录分隔符，#\\是 Windows 下的目录分隔符。
 
 procedure: ~(directory-separator)~
-returns: the preferred directory separator
+返回：首选目录分隔符
 libraries: (chezscheme)
 
 The preferred directory separator is #\\ for Windows and #\/ for other systems.
+Windows 上的首选目录分隔符是#\\, 其它系统上是 #\/.
 
 procedure: ~(path-first path)~
 procedure: ~(path-rest path)~
@@ -2083,49 +2106,57 @@ procedure: ~(path-last path)~
 procedure: ~(path-parent path)~
 procedure: ~(path-extension path)~
 procedure: ~(path-root path)~
-returns: the specified component of path
+returns: path 的指定组件
 procedure: ~(path-absolute? path)~
-returns: #t if path is absolute, otherwise #f
+返回: 如果 ~path~ 是绝对路径，则为 ~#t~, 否则为 ~#f~.
 libraries: (chezscheme)
 
 path must be a string. The return value is also a (possibly empty) string.
+path 必须是一个字符串。返回值也是（可能为空）字符串。
 
 The path first component is the first directory in the path, or the empty string if the path consists only of a single filename. The path rest component is the portion of the path that does not include the path first component or the directory separator (if any) that separates it from the rest of the path. The path last component is the last (filename) portion of path. The path parent component is the portion of path that does not include the path last component, if any, or the directory separator that separates it from the rest of the path.
+路径的第一个组件是路径中的第一个目录，如果路径仅包含单个文件名，则为空字符串。路径的剩余组件是路径中不包含路径第一个组件或将它与路径其余部分分隔开的目录分隔符（如果有）的部分。路径最后一个组件是路径的最后一个部分（文件名）。路径父组件是路径中不包含路径最后一个组件的部分（如果有），或者是将其与路径的其余部分分隔开的目录分隔符。
 
 If the first component of the path names a root directory (including drives and shares under Windows), home directory (e.g., ~/abc or ~user/abc), the current directory (.), or the parent directory (..), path-first returns that component. For paths that consist only of such a directory, both path-first and path-parent act as identity procedures, while path-rest and path-last return the empty string.
+如果路径的第一个组件指向一个根目录（包括 Windows 下的驱动器和共享文件夹），主目录（例如，~/abc 或~user/abc），当前目录（.）或父目录（..） ，path-first 返回该组件。对于仅包含这样一个目录的路径，path-first 和 path-parent 表现为同样的过程，而 path-rest 和 path-last 返回空字符串。
 
 The path extension component is the portion of path that follows the last dot (period) in the last component of a path name. The path root component is the portion of path that does not include the extension, if any, or the dot that precedes it.
+路径扩展组件是路径名称的最后一个组件中最后一个点号（句点）之后的路径部分。路径根组件是路径中不包含扩展名的部分（如果有）或其前面的点。
 
 If the first component names a root directory (including drives and shares under Windows) or home directory, path-absolute? returns #t. Otherwise, path-absolute? returns #f.
+如果第一个组件指向一个根目录（包括 Windows 下的驱动器和共享文件夹）或主目录，path-absolute? 返回#t. 否则，path-absolute? 返回#f.
 
-The tables below identify the components for several example paths, with underscores representing empty strings.
+下表标识了几个示例路径的组件，下划线表示空字符串。
 
-path 	abs 	first 	rest 	parent 	last 	root 	ext
-a 	#f 	_ 	a 	_ 	a 	a 	_
-a/ 	#f 	a 	_ 	a 	_ 	a/ 	_
-a/b 	#f 	a 	b 	a 	b 	a/b 	_
-a/b.c 	#f 	a 	b.c 	a 	b.c 	a/b 	c
-/ 	#t 	/ 	_ 	/ 	_ 	/ 	_
-/a/b.c 	#t 	/ 	a/b.c 	/a 	b.c 	/a/b 	c
-~/a/b.c 	#t 	~ 	a/b.c 	~/a 	b.c 	~/a/b 	c
-~u/a/b.c 	#t 	~u 	a/b.c 	~u/a 	b.c 	~u/a/b 	c
-../.. 	#f 	.. 	.. 	.. 	.. 	../.. 	_
+| path     | abs | first | rest  | parent | last | root   | ext |
+|----------+-----+-------+-------+--------+------+--------+-----|
+| a        | #f  | _     | a     | _      | a    | a      | _   |
+| a/       | #f  | a     | _     | a      | _    | a/     | _   |
+| a/b      | #f  | a     | b     | a      | b    | a/b    | _   |
+| a/b.c    | #f  | a     | b.c   | a      | b.c  | a/b    | c   |
+| /        | #t  | /     | _     | /      | _    | /      | _   |
+| /a/b.c   | #t  | /     | a/b.c | /a     | b.c  | /a/b   | c   |
+| ~/a/b.c  | #t  | ~     | a/b.c | ~/a    | b.c  | ~/a/b  | c   |
+| ~u/a/b.c | #t  | ~u    | a/b.c | ~u/a   | b.c  | ~u/a/b | c   |
+| ../..    | #f  | ..    | ..    | ..     | ..   | ../..  | _   |
 
 The second table shows the components when Windows drives and shares are involved.
+第二个表显示涉及 Windows 驱动器和共享文件夹时的组件。
 
-path 	abs 	first 	rest 	parent 	last 	root 	ext
-c: 	#f 	c: 	_ 	c: 	_ 	c: 	_
-c:/ 	#t 	c:/ 	_ 	c:/ 	_ 	c:/ 	_
-c:a/b 	#f 	c: 	a/b 	c:a 	b 	c:a/b 	_
-//s/a/b.c 	#t 	//s 	a/b.c 	//s/a 	b.c 	//s/a/b 	c
-//s.com 	#t 	//s.com 	_ 	//s.com 	_ 	//s.com 	_
+| path      | abs | first   | rest  | parent  | last | root    | ext |
+|-----------+-----+---------+-------+---------+------+---------+-----|
+| c:        | #f  | c:      | _     | c:      | _    | c:      | _   |
+| c:/       | #t  | c:/     | _     | c:/     | _    | c:/     | _   |
+| c:a/b     | #f  | c:      | a/b   | c:a     | b    | c:a/b   | _   |
+| //s/a/b.c | #t  | //s     | a/b.c | //s/a   | b.c  | //s/a/b | c   |
+| //s.com   | #t  | //s.com | _     | //s.com | _    | //s.com | _   |
 
 The following procedure can be used to reproduce the tables above.
+以下过程可用于重新生成上表。
 
 #+begin_src scheme
 (define print-table
   (lambda path*
-#+end_src
     (define print-row
       (lambda (abs? path first rest parent last root extension)
         (printf "~a~11t~a~17t~a~28t~a~39t~a~50t~a~61t~a~73t~a\n"
@@ -2140,8 +2171,10 @@ The following procedure can be used to reproduce the tables above.
                  (path-rest path) (path-parent path) (path-last path)
                  (path-root path) (path-extension path)))))
       path*)))
+#+end_src
 
 For example, the first table can be produced with:
+例如，可以使用以下代码生成第一个表格：
 
 #+begin_src scheme
 (print-table "a" "a/" "a/b" "a/b.c" "/" "/a/b.c" "~/a/b.c"
@@ -2149,6 +2182,7 @@ For example, the first table can be produced with:
 #+end_src
 
 while the second can be produced (under Windows) with:
+而第二个表格可以使用以下代码生成（在 Windows 下）：
 
 #+begin_src scheme
 (print-table "c:" "c:/" "c:a/b" "//s/a/b.c" "//s.com")
