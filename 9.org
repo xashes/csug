@@ -1,13 +1,11 @@
 #+OPTIONS: toc:nil
-* Chapter 9. Input/Output Operations
+* 9. 输入/输出操作
 
-This chapter describes Chez Scheme's generic port facility, operations on ports, and various Chez Scheme extensions to the standard set of input/output operations. See Chapter 7 of The Scheme Programming Language, 4th Edition or the Revised6 Report on Scheme for a description of standard input/output operations. Definitions of a few sample generic ports are given in Section 9.17.
 本章介绍了 Chez Scheme 的通用端口工具，端口操作，以及 Chez Scheme 对标准输入/输出操作集的多种扩展。有关标准输入/输出操作的说明，可参见《Scheme 编程语言》第 4 版的第 7 章，或《Scheme 语言修订^{6}报告》。9.17 节给出了一些通用端口样例的定义。
 
-Chez Scheme closes file ports automatically after they become inaccessible to the program or when the Scheme program exits, but it is best to close ports explicitly whenever possible.
-在程序不再可以访问文件端口后，或在 Scheme 程序退出时，Chez Scheme 会自动关闭文件端口，但只要可能的话，最好显式关闭端口。
+在程序不再可以访问文件端口后，或在 Scheme 程序退出时，Chez Scheme 会自动关闭文件端口，但最好尽可能显式地关闭端口。
 
-** Section 9.1. Generic Ports
+** 9.1. 通用端口
 
 Chez Scheme's "generic port" facility allows the programmer to add new types of textual ports with arbitrary input/output semantics. It may be used, for example, to define any of the built-in Common Lisp [30] stream types, i.e., synonym streams, broadcast streams, concatenated streams, two-way streams, echo streams, and string streams. It may also be used to define more exotic ports, such as ports that represent windows on a bit-mapped display or ports that represent processes connected to the current process via pipes or sockets.
 Chez Scheme 的“通用端口”工具支持程序员添加具有任意输入/输出语义的新文本端口类型。例如，它可以用于定义任何内置的 Common Lisp [30]流类型，即，异名流，广播流，级联流，双向流，回显流和字符串流。它还可用于定义更多独特的端口，例如表示位映射显示器上的窗口的端口，或表示通过管道或套接字连接到当前进程的进程的端口。
@@ -81,7 +79,7 @@ Port handlers receiving a message must return a value appropriate for the corres
 接收消息的端口处理程序必须返回适用于相应操作的值。例如，接收 read-char 消息的处理程序必须返回一个字符或 eof 对象（如果它返回）。对于返回未指定值的操作（例如 close-port），处理程序不需要返回任何特定值。
 
 
-** Section 9.2. File Options
+** 9.2. 文件选项
 
 The Revised6 Report requires that the universe of a file-options enumeration set must include no-create, no-fail, and no-truncate, whose meanings are described within the description of the file-options syntax in Section 7.2 of The Scheme Programming Language, 4th Edition. Chez Scheme defines a number of additional file options:
 《Scheme 语言修订^{6}报告》要求文件选项枚举集合的全集必须包含 no-create，no-fail 和 no-truncate，其含义在《Scheme 编程语言》第 4 版 7.2 节中关于文件选项语法的介绍中有所描述。Chez Scheme 定义了许多其他文件选项：
@@ -150,7 +148,7 @@ perm-other-execute:
     For newly created output files under Unix-based systems only, set other execute bit unless masked by process umask. (Other execute bit is not set by default.) 
     仅用于基于 Unix 的系统下新创建的输出文件，除非被进程 umask 屏蔽，否则设置其他用户执行位。（其他用户执行位默认是不设置的。）
 
-** Section 9.3. Transcoders
+** 9.3. 编码转换器
 
 The language of the Revised6 Report provides three built-in codecs: a latin-1 codec, a utf-8 codec, and a utf-16 codec. Chez Scheme provides three additional codecs: a utf-16le codec, utf-16be codec, and an "iconv" codec for non-Unicode character sets. It also provides an alternative to the standard utf-16 codec that defaults to little-endian format rather than the default big-endian format. This section describes these codecs, plus a current-transcoder parameter that allows the programmer to determine the transcoder used for a textual port whenever the transcoder is implicit, as for open-input-file or load, along with the predicate transcoder?, which should be standard but is not.
 《Scheme 语言修订^{6}报告》提供了三种内置编解码器：latin-1 编解码器，utf-8 编解码器和 utf-16 编解码器。Chez Scheme 提供了三个额外的编解码器：utf-16le 编解码器，utf-16be 编解码器和用于非 Unicode 字符集的“iconv”编解码器。它还提供了标准 utf-16 编解码器的替代方案，默认为小端序格式而不是默认的大端序格式。本节描述了这些编解码器，以及一个 current-transcoder 参数，它允许程序员在编码转换器为隐式时决定用于文本端口的编码转换器，如 open-input-file 或 load，以及谓词 transcoder?, 标准中应该包含，但却没有。
@@ -205,7 +203,7 @@ procedure: ~(transcoder? obj)~
 返回: 如果 ~obj~ 是编码转换器，则为 ~#t~, 否则为 ~#f~.
 libraries: (chezscheme)
 
-** Section 9.4. Port Operations
+** 9.4. 端口操作
 
 The procedures used to create, access, and alter ports directly are described in this section. Also described are several nonstandard operations on ports.
 本节描述了用于直接创建，访问和更改端口的过程。还描述了端口上的一些非标准操作。
@@ -531,7 +529,7 @@ port must be an input or an output port, but not an input/output port. It must b
 port 必须是输入或输出端口，但不是输入/输出端口。它必须是指向常规文件的文件端口，即，磁盘上的文件而不是例如套接字等。端口可以是二进制或文本端口。如果端口是输出端口，则发送到端口的后续输出会被压缩。如果端口是输入端口，当且仅当端口当前指向压缩数据时，后续输入才会被解压缩。如果端口已设置为压缩，则此过程无效。
 
 
-** Section 9.5. String Ports
+** 9.5. 字符串端口
 
 String ports allow the creation and manipulation of strings via port operations. The procedure open-input-string converts a string into a textual input port, allowing the characters in the string to be read in sequence via input operations such as read-char or read. The procedure open-output-string allows new strings to be built up with output operations such as write-char and write.
 字符串端口允许通过端口操作创建和操作字符串。过程 open-input-string 将字符串转换为文本输入端口，允许通过 read-char 或 read 等输入操作按顺序读取字符串中的字符。过程 open-output-string 允许使用 write-char 和 write 等输出操作构建新的字符串。
@@ -611,7 +609,7 @@ thunk 必须是一个过程，并且应该接受零个参数。with-output-to-st
 #+end_src
 
 
-** Section 9.6. File Ports
+** 9.6. 文件端口
 
 thread parameter: ~file-buffer-size~
 libraries: (chezscheme)
@@ -635,7 +633,7 @@ port must be a file port, i.e., a port for which file-port? returns #t.
 port 必须是文件端口，即，file-port? 返回 #t 的端口。
 
 
-** Section 9.7. Custom Ports
+** 9.7. 自定义端口
 
 thread parameter: ~custom-port-buffer-size~
 libraries: (chezscheme)
@@ -644,7 +642,7 @@ custom-port-buffer-size is a parameter that determines the sizes of the buffers 
 custom-port-buffer-size 是一个参数对象，用于确定与新创建的自定义端口关联的缓冲区的大小。不带参数调用时，该参数对象返回当前缓冲区大小。 当使用正的 fixnum k 调用时，它将当前缓冲区的大小设置为 k。
 
 
-** Section 9.8. Input Operations
+** 9.8. 输入操作
 
 global parameter: ~console-input-port~
 libraries: (chezscheme)
@@ -990,7 +988,7 @@ The information read-token returns is not always sufficient for reconstituting t
 read-token 返回的信息并不总是足以重构构成 token 的精确字符序列。例如，1.0 和 1e0 都返回类型为 atomic 的值 1.0. 只有通过重新定位端口并使用通过 start 和 end 给出的相对位置读取适当长度的字符块，才能获得精确的字符序列。
 
 
-** Section 9.9. Output Operations
+** 9.9. 输出操作
 
 global parameter: ~console-output-port~
 libraries: (chezscheme)
@@ -1220,7 +1218,7 @@ This procedure behaves like newline, i.e., sends a newline character to textual-
 此过程的行为类似于 newline, 即，发送一个换行符到 textual-output-port，除非它可以确定该端口已经位于一行的开头。它通过刷新端口并查询与端口关联的“行首”（BOL）标志来实现此目的。（参见第 220 页）
 
 
-** Section 9.10. Input/Output Operations
+** 9.10. 输入/输出操作
 
 procedure: ~(open-input-output-file path)~
 procedure: ~(open-input-output-file path options)~
@@ -1251,7 +1249,7 @@ fd 必须是非负的精确整数，并且应该是有效的打开文件描述�
 The file descriptor is closed when the port is closed.
 关闭端口时会关闭文件描述符。
 
-** Section 9.11. Non-Unicode Bytevector/String Conversions
+** 9.11. 非 Unicode 字节向量/字符串转换
 
 The procedures described in this section convert bytevectors containing single- and multiple-byte sequences in non-Unicode character sets to and from Scheme strings. They are available only under Windows. Under other operating systems, and when an iconv DLL is available under Windows, bytevector->string and string->bytevector can be used with a transcoder based on a codec constructed via iconv-codec to achieve the same results, with more control over the handling of invalid characters and line endings.
 本节中描述的过程将包含非 Unicode 字符集中的单字节和多字节序列的字节向量与 Scheme 字符串进行转换。它们仅在 Windows 下可用。在其他操作系统下，以及当 Windows 下有可用的 iconv DLL 时，bytevector->string 和 string->bytevector 可以与基于通过 iconv-codec 构造的编解码器的编码转换器一起使用，以实现相同的结果，并且可以更好地控制对无效字符和行尾的处理。
@@ -1269,7 +1267,7 @@ code-page declares the encoding of the byte sequences in the input or output byt
 code-page 声明了输入或输出字节向量中字节序列的编码。它必须是一个精确的非负整数，用于标识代码页或符号 cp-acp，cp-maccp，cp-oemcp，cp-symbol，cp-thread-acp，cp-utf7 或 cp-utf8 之一，它们与类似名称常量的 API 函数含义相同。
 
 
-** Section 9.12. Pretty Printing
+** 9.12. 美观打印
 
 The pretty printer is a version of the write procedure that produces more human-readable output via introduced whitespace, i.e., line breaks and indentation. The pretty printer is the default printer used by the read-eval-print loop (waiter) to print the output(s) of each evaluated form. The pretty printer may also be invoked explicitly by calling the procedure pretty-print.
 美观打印器是 write 过程的一个版本，它通过引入空白字符，即换行和缩进，生成可读性更好的输出。美观打印器是读-写-打印循环（服务员）使用的默认打印器，用于打印每个求值形式的输出。也可以通过调用过程 pretty-print 显式调用美观打印器。
@@ -1462,7 +1460,7 @@ The parameter pretty-maximum-lines controls how many lines pretty-print prints w
 参数对象 pretty-maximum-lines 控制 pretty-print 被调用时其打印的行数。如果设置为#f（默认值），则不施加限制; 如果设置为非负的 fixnum n, 则最多打印 n 行。
 
 
-** Section 9.13. Formatted Output
+** 9.13. 格式化输出
 
 procedure: ~(format format-string obj ...)~
 procedure: ~(format #f format-string obj ...)~
@@ -1599,7 +1597,7 @@ These procedures are simple wrappers for format. printf prints the formatted out
 这些过程是 format 的简单封装器。printf 将格式化的输出打印到当前输出，就像 format 的第一个参数为 #t 时一样，而 fprintf 将格式化的输出打印到 textual-output-port，就像 format 的第一个参数为端口时一样。
 
 
-** Section 9.14. Input/Output Control Operations
+** 9.14. 输入/输出控制操作
 
 The I/O control operations described in this section are used to control how the reader reads and printer writes, displays, or pretty-prints characters, symbols, gensyms, numbers, vectors, long or deeply nested lists or vectors, and graph-structured objects.
 本节中描述的 I/O 控制操作用于控制读取器如何读取，以及打印器如何 write, display, 或 pretty-print 字符，符号，gensyms，数字，向量，长或深度嵌套的列表或向量，和图结构对象。
@@ -1912,7 +1910,7 @@ When print-unicode is set to #f, write, put-datum, pretty-print, and the format 
   (format "~s" #\x3bb)) \Rightarrow "#\\x3BB"
 #+end_src
 
-** Section 9.15. Fasl Output
+** 9.15. 快速加载（Fasl）输出
 
 The procedures write and pretty-print print objects in a human readable format. For objects with external datum representations, the output produced by write and pretty-print is also machine-readable with read. Objects with external datum representations include pairs, symbols, vectors, strings, numbers, characters, booleans, and records but not procedures and ports.
 过程 write 和 pretty-print 以人类可读的格式打印对象。对于具有外部数据表示形式的对象，write 和 pretty-print 产生的输出同样也可以通过 read 被机器读取。具有外部数据表示形式的对象包括点对，符号，向量，字符串，数字，字符，布尔值和记录，但不包括过程和端口。
@@ -1955,7 +1953,7 @@ ifn and ofn must be strings. fasl-file may be used to convert a file in human-re
 ifn 和 ofn 必须是字符串。fasl-file 可用于将人类可读格式的文件转换为以 fasl 格式写入的等价文件。fasl-file 从 ifn 命名的文件中依次读取每个对象，并将该对象的 fasl 格式写入到由 ofn 命名的文件中。如果 ofn 命名的文件已存在，则替换它。
 
 
-** Section 9.16. File System Interface
+** 9.16. 文件系统接口
 
 This section describes operations on files, directories, and pathnames.
 本节介绍有关文件，目录和路径名的操作。
@@ -2188,7 +2186,7 @@ while the second can be produced (under Windows) with:
 (print-table "c:" "c:/" "c:a/b" "//s/a/b.c" "//s.com")
 #+end_src
 
-** Section 9.17. Generic Port Examples
+** 9.17. 通用端口示例
 
 This section presents the definitions for three types of generic ports: two-way ports, transcript ports, and process ports.
 本节介绍三种通用端口的定义：双向端口，转录端口和进程端口。
