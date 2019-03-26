@@ -378,7 +378,7 @@ When obj is #f, the port's beginning-of-line (BOL) flag is cleared; otherwise, t
 当 obj 为#f 时，端口的行首（BOL）标志被清除; 否则，设置端口的 BOL 标志。
 
 The BOL flag is consulted by fresh-line (page 240) to determine if it needs to emit a newline. This flag is maintained automatically for file output ports, string output ports, and transcript ports. The flag is set for newly created file and string output ports, except for file output ports created with the append option, for which the flag is reset. The BOL flag is clear for newly created generic ports and never set automatically, but may be set explicitly using set-port-bol!. The port is always flushed immediately before the flag is consulted, so it need not be maintained on a per-character basis for buffered ports.
-BOL 标志由 fresh-line（第 240 页）查询，以确定是否需要开启一个新行。对于文件输出端口，字符串输出端口和副本端口，此标志是自动维护的。新创建的文件和字符串输出端口会设置此标志，但使用 append 选项创建的文件输出端口除外，这种情况下，该标志会被重置。对于新创建的通用端口，会清除 BOL 标志，并且从不自动设置，但可以使用 set-port-bol!显式设置。在查询标志之前，总是立即刷新端口，因此不需要逐字符地维护缓冲端口。
+BOL 标志由 fresh-line（第 240 页）查询，以确定是否需要开启一个新行。对于文件输出端口，字符串输出端口和转录端口，此标志是自动维护的。新创建的文件和字符串输出端口会设置此标志，但使用 append 选项创建的文件输出端口除外，这种情况下，该标志会被重置。对于新创建的通用端口，会清除 BOL 标志，并且从不自动设置，但可以使用 set-port-bol!显式设置。在查询标志之前，总是立即刷新端口，因此不需要逐字符地维护缓冲端口。
 
 procedure: ~(port-bol? port)~
 返回: 如果 ~port~ 的 BOL 标志已设置，则为 ~#t~, 否则为 ~#f~.
@@ -2191,44 +2191,42 @@ while the second can be produced (under Windows) with:
 ** Section 9.17. Generic Port Examples
 
 This section presents the definitions for three types of generic ports: two-way ports, transcript ports, and process ports.
+本节介绍三种通用端口的定义：双向端口，转录端口和进程端口。
 
 Two-way ports.  The first example defines make-two-way-port, which constructs a textual input/output port from a given pair of textual input and output ports. For example:
+双向端口。第一个示例定义了 make-two-way-port, 它从给定的一对文本输入和文本输出端口构造文本输入/输出端口。例如：
 
 #+begin_src scheme
 (define ip (open-input-string "this is the input"))
 (define op (open-output-string))
-#+end_src
-#+begin_src scheme
 (define p (make-two-way-port ip op))
 #+end_src
 
 The port returned by make-two-way-port is both an input and an output port, and it is also a textual port:
+make-two-way-port 返回的端口既是输入端口又是输出端口，它同时也是一个文本端口：
 
 #+begin_src scheme
 (port? p) \Rightarrow #t
 (input-port? p) \Rightarrow #t
-#+end_src
-#+begin_src scheme
 (output-port? p) \Rightarrow #t
 (textual-port? p) \Rightarrow #t
 #+end_src
 
 Items read from a two-way port come from the constituent input port, and items written to a two-way port go to the constituent output port:
+从双向端口读取的项目来自输入端口部分，写入双向端口的项目发送到输出端口部分：
 
 #+begin_src scheme
 (read p) \Rightarrow this
 (write 'hello p)
-#+end_src
-#+begin_src scheme
 (get-output-string op) \Rightarrow hello
 #+end_src
 
 The definition of make-two-way-port is straightforward. To keep the example simple, no local buffering is performed, although it would be more efficient to do so.
+make-two-way-port 的定义很直白。为了使示例保持简单，不执行本地缓冲，尽管这样做会更有效。
 
 #+begin_src scheme
 (define make-two-way-port
   (lambda (ip op)
-#+end_src
     (define handler
       (lambda (msg . args)
         (record-case (cons msg args)
@@ -2250,17 +2248,20 @@ The definition of make-two-way-port is straightforward. To keep the example simp
                   "operation ~s not handled"
                   msg)])))
     (make-input/output-port handler "" "")))
+#+end_src
 
 Most of the messages are passed directly to one of the constituent ports. Exceptions are close-port, which is handled directly by marking the port closed, port-name, which is also handled directly. file-position and file-length are rather arbitrarily passed off to the input port.
+大多数消息都直接传递给其中一个组成端口。close-port 是个例外，它通过把端口标记为关闭来直接处理，port-name, 也是直接处理。file-position 和 file-length 则直接传递给输入端口。
 
 Transcript ports.  The next example defines make-transcript-port, which constructs a textual input/output port from three ports: a textual input port ip and two textual output ports, op and tp. Input read from a transcript port comes from ip, and output written to a transcript port goes to op. In this manner, transcript ports are similar to two-way ports. Unlike two-way ports, input from ip and output to op is also written to tp, so that tp reflects both input from ip and output to op.
+转录端口。下一个示例定义了 make-transcript-port，它从三个端口构建文本输入/输出端口：文本输入端口 ip 和两个文本输出端口 op 和 tp. 从转录端口读取的输入来自 ip，写入转录端口的输出发送到 op. 这种方式下，转录端口类似于双向端口。与双向端口不同的是，来自 ip 的输入和发送到 op 的输出也写入到 tp, 因此 tp 反映了来自 ip 的输入和发送到 op 的输出。
 
 Transcript ports may be used to define the Scheme procedures transcript-on and transcript-off, or the Chez Scheme procedure transcript-cafe. For example, here is a definition of transcript-cafe:
+转录端口可用于定义 Scheme 过程 transcript-on 和 transcript-off，或 Chez Scheme 过程 transcript-cafe. 例如，以下是 transcript-cafe 的一个定义：
 
 #+begin_src scheme
 (define transcript-cafe
   (lambda (pathname)
-#+end_src
     (let ([tp (open-output-file pathname 'replace)])
       (let ([p (make-transcript-port
                  (console-input-port)
@@ -2276,13 +2277,14 @@ Transcript ports may be used to define the Scheme procedures transcript-on and t
             (close-port p)
             (close-port tp)
             (apply values vals)))))))
+#+end_src
 
 The implementation of transcript ports is significantly more complex than the implementation of two-way ports defined above, primarily because it buffers input and output locally. Local buffering is needed to allow the transcript file to reflect accurately the actual input and output performed in the presence of unread-char, clear-output-port, and clear-input-port. Here is the code:
+转录端口的实现比上面定义的双向端口的实现复杂得多，主要是因为它在本地缓冲输入和输出。需要本地缓冲以允许转录文件准确反映在存在 unread-char，clear-output-port 和 clear-input-port 时执行的实际输入和输出。代码如下：
 
 #+begin_src scheme
 (define make-transcript-port
   (lambda (ip op tp)
-#+end_src
     (define (handler msg . args)
       (record-case (cons msg args)
         [block-read (p str cnt)
@@ -2408,38 +2410,50 @@ The implementation of transcript ports is significantly more complex than the im
         (set-port-input-size! p 0)
         (set-port-output-size! p (fx- (string-length ob) 1))
         p))))
+#+end_src
 
 The chosen length of both the input and output ports is the same; this is not necessary. They could have different lengths, or one could be buffered locally and the other not buffered locally. Local buffering could be disabled effectively by providing zero-length buffers.
+输入和输出端口选择的长度是相同的; 这不是必须的。它们可以具有不同的长度，或者可以一个在本地缓冲而另一个不在本地缓冲。通过提供零长度缓冲区可以有效地禁用本地缓冲。
 
 After we create the port, the input size is set to zero since there is not yet any data to be read. The port output size is set to one less than the length of the buffer. This is done so that write-char always has one character position left over into which to write its character argument. Although this is not necessary, it does simplify the code somewhat while allowing the buffer to be flushed as soon as the last character is available.
+创建端口后，输入大小设置为零，因为此时还没有要读取的数据。端口输出大小设置为缓冲区长度减一。这样做是为了使 write-char 总有一个剩余的字符位置来写入其字符参数。虽然这不是必须的，但它确实在一定程度上简化了代码，同时允许缓冲区在最后一个字符可用时可以立即刷新。
 
 Block reads and writes are performed on the constituent ports for efficiency and (in the case of writes) to ensure that the operations are performed immediately.
+为了提高效率，以及（在写入的情况下）确保操作立即执行，块读取和写入是在组成端口上执行。
 
 The call to flush-output-port in the handling of read-char insures that all output written to op appears before input is read from ip. Since block-read is typically used to support higher-level operations that are performing their own buffering, or for direct input and output in support of I/O-intensive applications, the flush call has been omitted from that part of the handler.
+在处理 read-char 时调用 flush-output-port 确保在从 ip 读取输入之前把所有输出写入到 op. 由于 block-read 通常用于支持执行其自身缓冲的更高级别操作，或者用于支持 I/O 密集型应用的直接输入和输出，因此从处理程序的该部分省略了刷新调用。
 
 Critical sections are used whenever the handler manipulates one of the buffers, to protect against untimely interrupts that could lead to reentry into the handler. The critical sections are unnecessary if no such reentry is possible, i.e., if only one "thread" of the computation can have access to the port.
+只要处理程序操作其中一个缓冲区，就会使用临界区块，以防止可能导致重新进入处理程序的过早中断。如果不可能有这样的重新进入，即，如果计算中只有一个“线程”可以访问该端口，则不需要临界区块。
 
 Process ports.  The final example demonstrates how to incorporate the socket interface defined in Section 4.9 into a generic port that allows transparent communication with subprocesses via normal Scheme input/output operations.
+*进程端口* 。最后一个示例演示了如何将第 4.9 节中定义的套接字接口合并到一个通用端口中，该端口允许通过标准的 Scheme 输入/输出操作与子进程进行透明通信。
 
 A process port is created with open-process, which accepts a shell command as a string. open-process sets up a socket, forks a child process, sets up two-way communication via the socket, and invokes the command in a subprocess.
+进程端口由 open-process 创建，该过程的参数是一个字符串形式的 shell 命令。open-process 设置一个套接字，fork 一个子进程，通过套接字建立双向通信，并在子进程中调用该命令。
 
 The sample session below demonstrates the use of open-process, running and communicating with another Scheme process started with the "-q" switch to suppress the greeting and prompts.
+下面的示例会话演示了 open-process 的用法，运行并与另一个使用“-q”开关启动的 Scheme 进程进行通信，以废止问候语和提示符。
 
-> (define p (open-process "exec scheme -q"))
-> (define s (make-string 1000 #\nul))
-> (pretty-print '(+ 3 4) p)
-> (read p)
-7
-> (pretty-print '(define (f x) (if (= x 0) 1 (* x (f (- x 1))))) p)
-> (pretty-print '(f 10) p)
-> (read p)
-3628800
-> (pretty-print '(exit) p)
-> (read p)
-#!eof
-> (close-port p)
+#+BEGIN_SRC scheme
+  > (define p (open-process "exec scheme -q"))
+  > (define s (make-string 1000 #\nul))
+  > (pretty-print '(+ 3 4) p)
+  > (read p)
+  7
+  > (pretty-print '(define (f x) (if (= x 0) 1 (* x (f (- x 1))))) p)
+  > (pretty-print '(f 10) p)
+  > (read p)
+  3628800
+  > (pretty-print '(exit) p)
+  > (read p)
+  #!eof
+  > (close-port p)
+#+END_SRC
 
 Since process ports, like transcript ports, are two-way, the implementation is somewhat similar. The main difference is that a transcript port reads from and writes to its subordinate ports, whereas a process port reads from and writes to a socket. When a process port is opened, the socket is created and subprocess invoked, and when the port is closed, the socket is closed and the subprocess is terminated.
+由于进程端口和转录端口一样是双向的，因此实现方式有些类似。主要区别在于，转录端口读取和写入其下级端口，而进程端口读取和写入套接字。打开进程端口时，将创建套接字并调用子进程，当端口关闭时，将关闭套接字并终止子进程。
 
 #+begin_src scheme
 (define open-process
